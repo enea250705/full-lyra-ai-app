@@ -84,19 +84,15 @@ const SubscriptionUpgradeModal: React.FC<SubscriptionUpgradeModalProps> = ({
       interval: 'month',
       popular: false,
       features: [
-        // All Pro features are inherited, plus Premium-only features:
+        // Premium-only features (Free and Pro features are inherited):
         { id: 'crisis_support', name: '24/7 Crisis Support', description: 'Immediate AI crisis intervention' },
         { id: 'location_alerts', name: 'Location-based Alerts', description: 'Smart spending alerts based on your location' },
         { id: 'sleep_analysis', name: 'Advanced Sleep Analysis', description: 'Deep sleep pattern insights with correlations' },
         { id: 'weather_mood', name: 'Weather-Mood Correlation', description: 'Advanced weather impact analysis' },
         { id: 'sms_alerts', name: 'SMS Emergency Alerts', description: 'Urgent spending warnings via SMS' },
         { id: 'unlimited_history', name: 'Unlimited Data History', description: 'Never lose your data - unlimited retention' },
-        { id: 'custom_rules', name: 'Custom Intervention Rules', description: 'Personalized spending protection settings' },
         { id: 'priority_support', name: 'Priority Support', description: 'VIP customer support with faster response' },
-        { id: 'advanced_ai', name: 'Advanced AI Personality', description: 'Most sophisticated AI responses and insights' },
-        { id: 'export_data', name: 'Data Export', description: 'Export all your data in multiple formats' },
-        { id: 'api_access', name: 'API Access', description: 'Connect Lyra to your own apps and services' },
-        { id: 'white_label', name: 'White Label Options', description: 'Customize Lyra with your own branding' }
+        { id: 'financial_alerts', name: 'Financial Alerts on Overspending', description: 'Advanced overspending protection and alerts' }
       ]
     }
   ];
@@ -334,12 +330,22 @@ const SubscriptionUpgradeModal: React.FC<SubscriptionUpgradeModalProps> = ({
             </View>
 
             <View style={styles.featuresContainer}>
-              {/* Show "All Pro features +" for Premium plans */}
+              {/* Show "Everything in Free and Pro, plus:" for Premium plans */}
               {selectedPlanData?.id === 'premium' && (
                 <View style={styles.inheritedFeaturesSection}>
                   <View style={styles.inheritedHeader}>
                     <Crown size={18} color="#8B5CF6" />
-                    <Text style={styles.inheritedTitle}>All Pro features, plus:</Text>
+                    <Text style={styles.inheritedTitle}>Everything in Free and Pro, plus:</Text>
+                  </View>
+                </View>
+              )}
+              
+              {/* Show "Everything in Free, plus:" for Pro plans */}
+              {selectedPlanData?.id === 'pro' && (
+                <View style={styles.inheritedFeaturesSection}>
+                  <View style={styles.inheritedHeader}>
+                    <Star size={18} color="#3B82F6" />
+                    <Text style={styles.inheritedTitle}>Everything in Free, plus:</Text>
                   </View>
                 </View>
               )}
