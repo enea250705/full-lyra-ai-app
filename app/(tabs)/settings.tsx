@@ -270,10 +270,10 @@ export default function SettingsScreen() {
             <Text style={styles.settingLabel}>Google Calendar</Text>
           </View>
           <Switch
-            value={currentSettings.connectedApis.googleCalendar}
+            value={safeSettings.connectedApis.googleCalendar}
             onValueChange={() => handleToggleApi('googleCalendar')}
             trackColor={{ false: colors.gray[300], true: colors.lightPurple }}
-            thumbColor={currentSettings.connectedApis.googleCalendar ? colors.midnightBlue : colors.gray[100]}
+            thumbColor={safeSettings.connectedApis.googleCalendar ? colors.midnightBlue : colors.gray[100]}
           />
         </View>
         
@@ -283,10 +283,10 @@ export default function SettingsScreen() {
             <Text style={styles.settingLabel}>Apple Health</Text>
           </View>
           <Switch
-            value={currentSettings.connectedApis.appleHealth}
+            value={safeSettings.connectedApis.appleHealth}
             onValueChange={() => handleToggleApi('appleHealth')}
             trackColor={{ false: colors.gray[300], true: colors.lightPurple }}
-            thumbColor={currentSettings.connectedApis.appleHealth ? colors.midnightBlue : colors.gray[100]}
+            thumbColor={safeSettings.connectedApis.appleHealth ? colors.midnightBlue : colors.gray[100]}
           />
         </View>
         
@@ -296,10 +296,10 @@ export default function SettingsScreen() {
             <Text style={styles.settingLabel}>Plaid (Finance)</Text>
           </View>
           <Switch
-            value={currentSettings.connectedApis.plaid}
+            value={safeSettings.connectedApis.plaid}
             onValueChange={() => handleToggleApi('plaid')}
             trackColor={{ false: colors.gray[300], true: colors.lightPurple }}
-            thumbColor={currentSettings.connectedApis.plaid ? colors.midnightBlue : colors.gray[100]}
+            thumbColor={safeSettings.connectedApis.plaid ? colors.midnightBlue : colors.gray[100]}
           />
         </View>
       </View>
@@ -307,14 +307,14 @@ export default function SettingsScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Enabled Modules</Text>
         
-        {Object.entries(currentSettings.enabledModules).map(([key, value]) => (
+        {Object.entries(safeSettings.enabledModules).map(([key, value]) => (
           <View key={key} style={styles.settingItem}>
             <Text style={styles.settingLabel}>
               {key.charAt(0).toUpperCase() + key.slice(1)}
             </Text>
             <Switch
               value={value}
-              onValueChange={() => handleToggleModule(key as keyof typeof currentSettings.enabledModules)}
+              onValueChange={() => handleToggleModule(key as keyof typeof safeSettings.enabledModules)}
               trackColor={{ false: colors.gray[300], true: colors.lightPurple }}
               thumbColor={value ? colors.midnightBlue : colors.gray[100]}
             />
@@ -329,14 +329,14 @@ export default function SettingsScreen() {
           <Pressable
             style={[
               styles.voiceStyleOption,
-              currentSettings.voiceStyle === 'calm' && styles.voiceStyleSelected,
+              safeSettings.voiceStyle === 'calm' && styles.voiceStyleSelected,
             ]}
             onPress={() => handleSetVoiceStyle('calm')}
           >
-            <VolumeX size={24} color={currentSettings.voiceStyle === 'calm' ? colors.white : colors.midnightBlue} />
+            <VolumeX size={24} color={safeSettings.voiceStyle === 'calm' ? colors.white : colors.midnightBlue} />
             <Text style={[
               styles.voiceStyleText,
-              currentSettings.voiceStyle === 'calm' && styles.voiceStyleTextSelected,
+              safeSettings.voiceStyle === 'calm' && styles.voiceStyleTextSelected,
             ]}>
               Calm
             </Text>
@@ -345,14 +345,14 @@ export default function SettingsScreen() {
           <Pressable
             style={[
               styles.voiceStyleOption,
-              currentSettings.voiceStyle === 'energetic' && styles.voiceStyleSelected,
+              safeSettings.voiceStyle === 'energetic' && styles.voiceStyleSelected,
             ]}
             onPress={() => handleSetVoiceStyle('energetic')}
           >
-            <Volume2 size={24} color={currentSettings.voiceStyle === 'energetic' ? colors.white : colors.midnightBlue} />
+            <Volume2 size={24} color={safeSettings.voiceStyle === 'energetic' ? colors.white : colors.midnightBlue} />
             <Text style={[
               styles.voiceStyleText,
-              currentSettings.voiceStyle === 'energetic' && styles.voiceStyleTextSelected,
+              safeSettings.voiceStyle === 'energetic' && styles.voiceStyleTextSelected,
             ]}>
               Energetic
             </Text>
@@ -361,14 +361,14 @@ export default function SettingsScreen() {
           <Pressable
             style={[
               styles.voiceStyleOption,
-              currentSettings.voiceStyle === 'minimal' && styles.voiceStyleSelected,
+              safeSettings.voiceStyle === 'minimal' && styles.voiceStyleSelected,
             ]}
             onPress={() => handleSetVoiceStyle('minimal')}
           >
-            <Volume1 size={24} color={currentSettings.voiceStyle === 'minimal' ? colors.white : colors.midnightBlue} />
+            <Volume1 size={24} color={safeSettings.voiceStyle === 'minimal' ? colors.white : colors.midnightBlue} />
             <Text style={[
               styles.voiceStyleText,
-              currentSettings.voiceStyle === 'minimal' && styles.voiceStyleTextSelected,
+              safeSettings.voiceStyle === 'minimal' && styles.voiceStyleTextSelected,
             ]}>
               Minimal
             </Text>
