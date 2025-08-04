@@ -47,9 +47,14 @@ const SubscriptionUpgradeModal: React.FC<SubscriptionUpgradeModalProps> = ({
       interval: 'month',
       popular: false,
       features: [
-        { id: 'basic_chat', name: 'Basic AI Chat', description: 'Limited daily conversations' },
-        { id: 'mood_tracking', name: 'Basic Mood Tracking', description: 'Track your daily mood' },
-        { id: 'basic_goals', name: 'Basic Goal Setting', description: 'Set and track simple goals' },
+        { id: 'basic_chat', name: 'Basic AI Chat', description: '10 conversations per day' },
+        { id: 'mood_tracking', name: 'Basic Mood Tracking', description: 'Track your daily mood and energy' },
+        { id: 'basic_goals', name: 'Basic Goal Setting', description: 'Set and track up to 3 goals' },
+        { id: 'spending_tracking', name: 'Basic Spending Tracking', description: 'See your transactions and categories' },
+        { id: 'weekly_reports', name: 'Weekly Email Reports', description: 'Automated weekly summaries' },
+        { id: 'basic_calendar', name: 'Calendar Read-Only', description: 'View your appointments' },
+        { id: 'basic_alerts', name: 'Basic Spending Alerts', description: 'Simple daily spending notifications' },
+        { id: '30_day_history', name: '30 Days History', description: 'Last 30 days of data retention' }
       ]
     },
     {
@@ -59,10 +64,17 @@ const SubscriptionUpgradeModal: React.FC<SubscriptionUpgradeModalProps> = ({
       interval: 'month',
       popular: true,
       features: [
-        { id: 'unlimited_chat', name: 'Unlimited AI Chat', description: 'No daily limits' },
-        { id: 'advanced_tracking', name: 'Advanced Tracking', description: 'Detailed mood and health metrics' },
-        { id: 'goal_coaching', name: 'AI Goal Coaching', description: 'Personalized coaching for your goals' },
-        { id: 'calendar_sync', name: 'Calendar Integration', description: 'Sync with your calendar' },
+        // All Free features, plus Pro features:
+        { id: 'unlimited_chat', name: 'Unlimited AI Chat', description: 'No daily conversation limits' },
+        { id: 'advanced_tracking', name: 'Advanced Tracking', description: 'Detailed mood, sleep, and energy analytics' },
+        { id: 'goal_coaching', name: 'AI Goal Coaching', description: 'Personalized coaching and accountability' },
+        { id: 'calendar_sync', name: 'Calendar Integration', description: 'Smart scheduling and rescheduling' },
+        { id: 'mood_intervention', name: 'AI Spending Intervention', description: 'Prevent overspending when emotional' },
+        { id: 'savings_counter', name: 'Savings Tracking', description: 'Track exactly how much Lyra saved you' },
+        { id: 'push_notifications', name: 'Smart Notifications', description: 'Real-time intervention alerts' },
+        { id: 'extended_history', name: '6 Months History', description: 'Extended data retention' },
+        { id: 'pattern_recognition', name: 'Pattern Recognition', description: 'AI identifies your behavioral patterns' },
+        { id: 'journal_insights', name: 'Journal AI Insights', description: 'AI analysis of your journal entries' }
       ]
     },
     {
@@ -72,10 +84,19 @@ const SubscriptionUpgradeModal: React.FC<SubscriptionUpgradeModalProps> = ({
       interval: 'month',
       popular: false,
       features: [
-        { id: 'crisis_support', name: 'Crisis Support', description: '24/7 AI crisis intervention' },
-        { id: 'location_alerts', name: 'Location-based Alerts', description: 'Smart alerts based on your location' },
-        { id: 'sleep_analysis', name: 'Advanced Sleep Analysis', description: 'Deep sleep pattern insights' },
-        { id: 'weather_mood', name: 'Weather-Mood Correlation', description: 'Track how weather affects your mood' },
+        // All Pro features are inherited, plus Premium-only features:
+        { id: 'crisis_support', name: '24/7 Crisis Support', description: 'Immediate AI crisis intervention' },
+        { id: 'location_alerts', name: 'Location-based Alerts', description: 'Smart spending alerts based on your location' },
+        { id: 'sleep_analysis', name: 'Advanced Sleep Analysis', description: 'Deep sleep pattern insights with correlations' },
+        { id: 'weather_mood', name: 'Weather-Mood Correlation', description: 'Advanced weather impact analysis' },
+        { id: 'sms_alerts', name: 'SMS Emergency Alerts', description: 'Urgent spending warnings via SMS' },
+        { id: 'unlimited_history', name: 'Unlimited Data History', description: 'Never lose your data - unlimited retention' },
+        { id: 'custom_rules', name: 'Custom Intervention Rules', description: 'Personalized spending protection settings' },
+        { id: 'priority_support', name: 'Priority Support', description: 'VIP customer support with faster response' },
+        { id: 'advanced_ai', name: 'Advanced AI Personality', description: 'Most sophisticated AI responses and insights' },
+        { id: 'export_data', name: 'Data Export', description: 'Export all your data in multiple formats' },
+        { id: 'api_access', name: 'API Access', description: 'Connect Lyra to your own apps and services' },
+        { id: 'white_label', name: 'White Label Options', description: 'Customize Lyra with your own branding' }
       ]
     }
   ];

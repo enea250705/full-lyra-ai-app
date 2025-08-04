@@ -269,10 +269,8 @@ export const useUserData = () => {
       
       setMessages(prev => [...prev, newMessage]);
       
-      // If it's a user message, create a check-in
-      if (sender === 'user') {
-        await apiService.createCheckin(text, undefined, isVoice ? 'voice_url' : undefined);
-      }
+      // Note: Check-ins are handled separately, not for every chat message
+      // to avoid daily limit conflicts
     } catch (error) {
       console.error('Error adding message:', error);
       setError('Failed to add message');

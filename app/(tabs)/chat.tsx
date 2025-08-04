@@ -45,7 +45,7 @@ export default function ChatScreen() {
     
     try {
       // Use real AI chat endpoint
-      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.24:3000/api/v1'}/ai/chat`, {
+      const response = await fetch(`https://lyra-backend-xn4o.onrender.com/api/v1/ai/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -57,6 +57,8 @@ export default function ChatScreen() {
             mood: userData?.mood || 'neutral',
             sleepHours: userData?.sleepHours || 0,
             energyLevel: userData?.energyLevel || 0,
+            isFirstInteraction: messages.length === 0,
+            messageHistory: messages.slice(-3), // Send last 3 messages for context
           },
         }),
       });
@@ -101,7 +103,7 @@ export default function ChatScreen() {
                   onPress: async () => {
                     try {
                       // Execute the confirmed action
-                      const confirmResponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.24:3000/api/v1'}/ai/execute-action`, {
+                      const confirmResponse = await fetch(`https://lyra-backend-xn4o.onrender.com/api/v1/ai/execute-action`, {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',
@@ -184,7 +186,7 @@ export default function ChatScreen() {
       let apiResponse;
       switch (action.type) {
         case 'subscription_cancelled':
-          apiResponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.24:3000/api/v1'}/ai/execute-action`, {
+          apiResponse = await fetch(`https://lyra-backend-xn4o.onrender.com/api/v1/ai/execute-action`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -198,7 +200,7 @@ export default function ChatScreen() {
           break;
           
         case 'avoided_purchase':
-          apiResponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.24:3000/api/v1'}/ai/execute-action`, {
+          apiResponse = await fetch(`https://lyra-backend-xn4o.onrender.com/api/v1/ai/execute-action`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -212,7 +214,7 @@ export default function ChatScreen() {
           break;
           
         case 'cheaper_alternative':
-          apiResponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL || 'http://192.168.1.24:3000/api/v1'}/ai/execute-action`, {
+          apiResponse = await fetch(`https://lyra-backend-xn4o.onrender.com/api/v1/ai/execute-action`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
