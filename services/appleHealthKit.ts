@@ -99,15 +99,21 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
             console.log('[HealthKit] Cannot grant permissions:', error);
             this.isInitialized = false;
             this.hasPermissions = false;
-          resolve(false);
-        } else {
-          console.log('[HealthKit] Permissions granted successfully');
-          this.isInitialized = true;
-          this.hasPermissions = true;
-          resolve(true);
-        }
+            resolve(false);
+          } else {
+            console.log('[HealthKit] Permissions granted successfully');
+            this.isInitialized = true;
+            this.hasPermissions = true;
+            resolve(true);
+          }
+        });
       });
-    });
+    } catch (error) {
+      console.error('[HealthKit] Exception in initHealthKit:', error);
+      this.isInitialized = false;
+      this.hasPermissions = false;
+      return false;
+    }
   }
 
   async getSleepData(startDate: Date, endDate: Date): Promise<ProcessedSleepData[]> {
