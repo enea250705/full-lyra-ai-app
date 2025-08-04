@@ -66,14 +66,13 @@ const SubscriptionUpgradeModal: React.FC<SubscriptionUpgradeModalProps> = ({
       features: [
         // All Free features, plus Pro features:
         { id: 'unlimited_chat', name: 'Unlimited AI Chat', description: 'No daily conversation limits' },
-        { id: 'advanced_tracking', name: 'Advanced Tracking', description: 'Detailed mood, sleep, and energy analytics' },
+        { id: 'basic_analytics', name: 'Basic Analytics', description: 'Simple mood and energy tracking analytics' },
         { id: 'goal_coaching', name: 'AI Goal Coaching', description: 'Personalized coaching and accountability' },
         { id: 'calendar_sync', name: 'Calendar Integration', description: 'Smart scheduling and rescheduling' },
-        { id: 'mood_intervention', name: 'AI Spending Intervention', description: 'Prevent overspending when emotional' },
-        { id: 'savings_counter', name: 'Savings Tracking', description: 'Track exactly how much Lyra saved you' },
-        { id: 'push_notifications', name: 'Smart Notifications', description: 'Real-time intervention alerts' },
+        { id: 'basic_interventions', name: 'Basic Spending Alerts', description: 'Simple spending notifications' },
+        { id: 'savings_counter', name: 'Savings Tracking', description: 'Track how much you saved' },
+        { id: 'push_notifications', name: 'Smart Notifications', description: 'Real-time basic alerts' },
         { id: 'extended_history', name: '6 Months History', description: 'Extended data retention' },
-        { id: 'pattern_recognition', name: 'Pattern Recognition', description: 'AI identifies your behavioral patterns' },
         { id: 'journal_insights', name: 'Journal AI Insights', description: 'AI analysis of your journal entries' }
       ]
     },
