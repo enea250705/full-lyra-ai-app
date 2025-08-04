@@ -12,7 +12,7 @@ import { User, Calendar, Activity, DollarSign, Trash2, Download, VolumeX, Volume
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { settings, updateSettings } = useUserData();
+  const { settings, updateSettings, loading: userDataLoading } = useUserData();
   const { 
     healthKitAvailable, 
     healthKitEnabled, 
@@ -20,7 +20,7 @@ export default function SettingsScreen() {
     isLoading 
   } = useSleep();
   
-  // Provide default settings if null
+  // Provide default settings if null or undefined
   const defaultSettings = {
     name: 'User',
     goals: [],
@@ -38,27 +38,61 @@ export default function SettingsScreen() {
     voiceStyle: 'calm' as const,
   };
   
+  // Debug logging
+  console.log('Settings from useUserData:', settings);
+  console.log('Settings type:', typeof settings);
+  
   const currentSettings = settings || defaultSettings;
-  const [name, setName] = useState(currentSettings.name);
+  
+  // Ensure currentSettings has the expected structure
+  const safeSettings = {
+    name: currentSettings?.name || 'User',
+    goals: currentSettings?.goals || [],
+    connectedApis: {
+      googleCalendar: currentSettings?.connectedApis?.googleCalendar || false,
+      appleHealth: currentSettings?.connectedApis?.appleHealth || false,
+      plaid: currentSettings?.connectedApis?.plaid || false,
+    },
+    enabledModules: {
+      finances: currentSettings?.enabledModules?.finances || false,
+      sleep: currentSettings?.enabledModules?.sleep || false,
+      mood: currentSettings?.enabledModules?.mood || false,
+      decisions: currentSettings?.enabledModules?.decisions || false,
+    },
+    voiceStyle: currentSettings?.voiceStyle || 'calm',
+  };
+  
+  const [name, setName] = useState(safeSettings.name);
+  
+  // Show loading state if user data is still loading
+  if (userDataLoading) {
+    return (
+      <ScreenContainer>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text>Loading settings...</Text>
+        </View>
+      </ScreenContainer>
+    );
+  }
 
   const handleManageSubscription = () => {
     router.push('/subscription');
   };
 
-  const handleToggleModule = (module: keyof typeof currentSettings.enabledModules) => {
+  const handleToggleModule = (module: keyof typeof safeSettings.enabledModules) => {
     updateSettings({
       enabledModules: {
-        ...currentSettings.enabledModules,
-        [module]: !currentSettings.enabledModules[module],
+        ...safeSettings.enabledModules,
+        [module]: !safeSettings.enabledModules[module],
       },
     });
   };
 
-  const handleToggleApi = (api: keyof typeof currentSettings.connectedApis) => {
+  const handleToggleApi = (api: keyof typeof safeSettings.connectedApis) => {
     updateSettings({
       connectedApis: {
-        ...currentSettings.connectedApis,
-        [api]: !currentSettings.connectedApis[api],
+        ...safeSettings.connectedApis,
+        [api]: !safeSettings.connectedApis[api],
       },
     });
   };
