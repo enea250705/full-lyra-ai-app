@@ -309,7 +309,17 @@ export const useUserData = () => {
         const updatedSettings = { ...prev, ...newSettings };
         
         // Update settings on server (only send allowed fields per API schema)
-        const allowedFields = ['theme', 'aiTone', 'timezone', 'language', 'featuresEnabled'];
+        const allowedFields = [
+          'theme', 
+          'aiTone', 
+          'timezone', 
+          'language', 
+          'featuresEnabled',
+          'enabledModules',
+          'connectedApis',
+          'voiceStyle',
+          'name'
+        ];
         const settingsToUpdate: any = {};
         allowedFields.forEach(field => {
           if (updatedSettings[field] !== undefined) {
