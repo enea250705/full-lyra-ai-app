@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "Lyra - AI Life Companion",
+    "slug": "lyra-personal-life-operating-system",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.getlyra.app",
+      "infoPlist": {
+        "NSHealthShareUsageDescription": "Lyra needs access to your sleep data to provide personalized insights and track your sleep patterns automatically.",
+        "NSHealthUpdateUsageDescription": "Lyra wants to save sleep data to your Health app to keep your health information synchronized.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.getlyra.app"
+    },
+    "web": {},
+    "plugins": [
+      "expo-router",
+      "expo-web-browser"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "0e478310-4447-4dfa-8de0-5b8df766e190"
+      }
+    }
+  }
+}

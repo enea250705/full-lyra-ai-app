@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm start)",
+      "Bash(npm run dev:*)",
+      "Bash(node:*)",
+      "Bash(curl:*)",
+      "Bash(find:*)",
+      "Bash(sed:*)",
+      "Bash(grep:*)",
+      "WebFetch(domain:adapty.io)",
+      "Bash(rm:*)",
+      "Bash(npm run:*)",
+      "Bash(tail:*)",
+      "Bash(ls:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npm ls:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(eas:*)",
+      "Bash(npx expo install:*)",
+      "Bash(npx expo:*)",
+      "WebFetch(domain:expo.dev)",
+      "Bash(bun install:*)"
+    ],
+    "deny": []
+  }
+}

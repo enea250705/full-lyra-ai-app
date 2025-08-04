@@ -310,8 +310,14 @@ export const useUserData = () => {
         if (!prev) return null;
         const updatedSettings = { ...prev, ...newSettings };
         
-        // Update settings on server (exclude system fields)
-        const { id, createdAt, updatedAt, ...settingsToUpdate } = updatedSettings;
+        // Update settings on server (only send allowed fields per API schema)
+        const allowedFields = ['theme', 'aiTone', 'timezone', 'language', 'featuresEnabled'];
+        const settingsToUpdate: any = {};
+        allowedFields.forEach(field => {
+          if (updatedSettings[field] !== undefined) {
+            settingsToUpdate[field] = updatedSettings[field];
+          }
+        });
         apiService.updateUserSettings(settingsToUpdate).catch(error => {
           console.error('Error updating settings on server:', error);
         });

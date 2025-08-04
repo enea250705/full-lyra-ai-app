@@ -1,0 +1,155 @@
+{
+  "paywall_id": "default",
+  "placement_id": "default", 
+  "revision": 1,
+  "developer_id": "lyra_ai",
+  
+  "paywall": {
+    "locale": "en",
+    "is_promo": false,
+    
+    "remote_config": {
+      "title": "Unlock Your Life Operating System",
+      "subtitle": "AI-powered insights to optimize your daily decisions and protect your spending",
+      "header_image_url": "",
+      "background_color": "#667eea",
+      "text_color": "#FFFFFF",
+      "button_color": "#3B82F6",
+      "accent_color": "#8B5CF6",
+      "call_to_action": "Start 7-Day Free Trial",
+      "secondary_action": "Restore Purchases",
+      "footer_text": "🔒 Secure payments • ⭐ Premium quality • 💰 7-day free trial • 📱 Cancel anytime",
+      "terms_url": "https://your-app.com/terms",
+      "privacy_url": "https://your-app.com/privacy"
+    },
+
+    "products": [
+      {
+        "vendor_product_id": "lyra_pro_monthly",
+        "adapty_product_id": "lyra_pro_monthly", 
+        "title": "Pro",
+        "subtitle": "Core AI-powered spending protection",
+        "price": "€9.99",
+        "period": "month",
+        "is_popular": true,
+        "badge_text": "Most Popular",
+        "badge_color": "#FF6B35",
+        "features": [
+          "🤖 AI Spending Intervention",
+          "🎯 Advanced Goal Tracking",
+          "📊 Mood-Spending Correlation", 
+          "📅 Calendar Management",
+          "🔔 Push Notifications",
+          "💰 Savings Counter",
+          "📈 6-Month Data History",
+          "⚡ Real-time Alerts"
+        ],
+        "feature_comparison": {
+          "free": [
+            "✅ Basic mood tracking",
+            "✅ Simple goals (3 max)",
+            "✅ 30-day data",
+            "✅ Weekly reports"
+          ],
+          "included": [
+            "🤖 AI intervention when mood + location = overspending risk",
+            "🎯 Complex goals like 'No shopping for 3 days'", 
+            "📊 Understand when emotions trigger spending",
+            "📅 Reschedule when tired/overwhelmed",
+            "🔔 Real-time intervention alerts",
+            "💰 Track exactly how much Lyra saved you",
+            "📈 Extended 6-month data retention"
+          ]
+        }
+      },
+      {
+        "vendor_product_id": "lyra_premium_monthly",
+        "adapty_product_id": "lyra_premium_monthly",
+        "title": "Premium", 
+        "subtitle": "Complete life optimization & unlimited protection",
+        "price": "€19.99",
+        "period": "month",
+        "is_popular": false,
+        "badge_text": "Complete Package",
+        "badge_color": "#8B5CF6",
+        "features": [
+          "💎 Everything in Pro",
+          "📍 Location-Based Alerts",
+          "😴 Sleep Correlation Analysis", 
+          "🌤️ Weather-Mood Insights",
+          "🧠 Advanced AI Pattern Recognition",
+          "📱 SMS Alerts",
+          "⚙️ Custom Intervention Rules",
+          "♾️ Unlimited Data History",
+          "🏆 Priority Support"
+        ],
+        "feature_comparison": {
+          "pro_included": [
+            "✅ All Pro features included"
+          ],
+          "additional": [
+            "📍 Intervention alerts when near expensive stores",
+            "😴 Reschedule expensive meetings when tired",
+            "🌤️ Understand how weather affects your spending patterns",
+            "🧠 Deep behavioral insights and spending predictions",
+            "📱 Urgent spending warnings via text message",
+            "⚙️ Create your own personalized protection settings",
+            "♾️ Access to all your historical data forever",
+            "🏆 Get help faster with priority support queue"
+          ]
+        }
+      }
+    ],
+
+    "free_plan": {
+      "title": "Free",
+      "subtitle": "Perfect for getting started",
+      "price": "€0",
+      "features": [
+        "📱 Basic spending tracking",
+        "😊 Daily mood check-ins",
+        "🚨 Basic spending alerts", 
+        "🎯 Simple goal setting (3 max)",
+        "📧 Weekly email reports",
+        "📅 Calendar read-only",
+        "📊 30-day data retention"
+      ],
+      "limitations": [
+        "❌ No AI intervention",
+        "❌ No advanced analytics",
+        "❌ Limited data history",
+        "❌ No real-time alerts"
+      ]
+    },
+
+    "comparison_table": {
+      "show": true,
+      "features": [
+        {"name": "Basic mood tracking", "free": true, "pro": true, "premium": true},
+        {"name": "AI spending intervention", "free": false, "pro": true, "premium": true},
+        {"name": "Location-based alerts", "free": false, "pro": false, "premium": true},
+        {"name": "Sleep correlation", "free": false, "pro": false, "premium": true},
+        {"name": "SMS alerts", "free": false, "pro": false, "premium": true},
+        {"name": "Data retention", "free": "30 days", "pro": "6 months", "premium": "Unlimited"},
+        {"name": "Support", "free": "Community", "pro": "Email", "premium": "Priority"}
+      ]
+    },
+
+    "free_trial": {
+      "enabled": true,
+      "duration": 7,
+      "duration_unit": "day",
+      "description": "Start your 7-day free trial. Cancel anytime before it ends and you won't be charged."
+    },
+
+    "presentation": {
+      "style": "cards",
+      "show_close_button": true,
+      "show_restore_button": true,
+      "show_terms_and_privacy": true,
+      "show_free_plan": true,
+      "show_comparison_table": false,
+      "animation": "slide_up"
+    }
+  }
+}

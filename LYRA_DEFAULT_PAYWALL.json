@@ -1,0 +1,88 @@
+{
+  "paywall_id": "default",
+  "placement_id": "default", 
+  "revision": 1,
+  "developer_id": "lyra_ai",
+  
+  "paywall": {
+    "locale": "en",
+    "is_promo": false,
+    
+    "remote_config": {
+      "title": "Unlock Your Life Operating System",
+      "subtitle": "AI-powered insights to optimize your daily decisions",
+      "features": [
+        "AI spending intervention",
+        "Advanced goal tracking", 
+        "Mood-spending correlation",
+        "Calendar management",
+        "Real-time notifications",
+        "Savings counter",
+        "Extended data history"
+      ],
+      "call_to_action": "Start Free Trial",
+      "secondary_action": "Restore Purchases",
+      "footer_text": "7-day free trial • Cancel anytime",
+      "background_color": "#667eea",
+      "text_color": "#FFFFFF",
+      "button_color": "#3B82F6",
+      "accent_color": "#8B5CF6"
+    },
+
+    "products": [
+      {
+        "vendor_product_id": "lyra_pro_monthly",
+        "adapty_product_id": "lyra_pro_monthly", 
+        "title": "Pro",
+        "subtitle": "Core AI-powered protection",
+        "price": "€9.99",
+        "period": "month",
+        "is_popular": true,
+        "badge_text": "Most Popular",
+        "features": [
+          "AI Spending Intervention",
+          "Advanced Goal Tracking",
+          "Mood-Spending Analysis", 
+          "Calendar Management",
+          "Push Notifications",
+          "Savings Counter",
+          "6-Month Data History"
+        ]
+      },
+      {
+        "vendor_product_id": "lyra_premium_monthly",
+        "adapty_product_id": "lyra_premium_monthly",
+        "title": "Premium", 
+        "subtitle": "Complete life optimization",
+        "price": "€19.99",
+        "period": "month",
+        "is_popular": false,
+        "badge_text": "Complete Package",
+        "features": [
+          "Everything in Pro",
+          "Location-Based Alerts",
+          "Sleep Correlation Analysis", 
+          "Weather-Mood Insights",
+          "Advanced AI Patterns",
+          "SMS Alerts",
+          "Custom Rules",
+          "Unlimited Data",
+          "Priority Support"
+        ]
+      }
+    ],
+
+    "free_trial": {
+      "enabled": true,
+      "duration": 7,
+      "duration_unit": "day"
+    },
+
+    "presentation": {
+      "style": "cards",
+      "show_close_button": true,
+      "show_restore_button": true,
+      "show_terms_and_privacy": true
+    }
+  }
+}
