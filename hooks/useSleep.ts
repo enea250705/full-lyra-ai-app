@@ -151,7 +151,7 @@ export const useSleep = (userId?: string) => {
       if (response.success && response.data && response.data.data) {
         setState(prev => ({
           ...prev,
-          sleepLogs: page === 1 ? response.data.data : [...prev.sleepLogs, ...response.data.data],
+          sleepLogs: page === 1 ? response.data!.data : [...prev.sleepLogs, ...response.data!.data],
           isLoading: false,
         }));
         return response.data;
