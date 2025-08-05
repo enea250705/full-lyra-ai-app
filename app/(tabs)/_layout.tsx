@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Home, MessageSquare, BookOpen, BarChart2, Settings } from 'lucide-react-native';
 import { colors } from '@/constants/colors';
 import { useAuth } from '../../contexts/AuthContext';
+import ErrorBoundary from '../../components/ErrorBoundary';
 
 export default function TabLayout() {
   const { isAuthenticated, isLoading } = useAuth();

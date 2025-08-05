@@ -2,6 +2,7 @@ import React from 'react';
 import { Pressable, Text, StyleSheet, View, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../../contexts/AuthContext';
+import LoadingSpinner from './LoadingSpinner';
 
 interface GoogleSignInButtonProps {
   onSuccess?: () => void;
@@ -42,7 +43,11 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
       >
         <View style={styles.content}>
           <View style={styles.iconContainer}>
-            <Text style={styles.googleIcon}>G</Text>
+            {isLoading ? (
+              <LoadingSpinner size="small" color="white" />
+            ) : (
+              <Text style={styles.googleIcon}>G</Text>
+            )}
           </View>
           <Text style={styles.buttonText}>
             {isLoading ? 'Signing in...' : buttonText}

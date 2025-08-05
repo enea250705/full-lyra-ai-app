@@ -3,6 +3,8 @@ export const colors = {
     midnightBlue: '#1A1B41',
     softLavender: '#E6E6FA',
     lightPurple: '#B8B5FF',
+    deepPurple: '#6B46C1',
+    background: '#FFFFFF',
     gray: {
       100: '#F7F7F7',
       200: '#E6E6E6',

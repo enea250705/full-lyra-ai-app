@@ -6,6 +6,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from '../contexts/AuthContext';
+import ErrorBoundary from '../components/ErrorBoundary';
 
 export const unstable_settings = {
   initialRouteName: "(tabs)",
@@ -42,37 +43,39 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <SafeAreaProvider>
-      <AuthProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <Stack
-            screenOptions={{
-              headerBackTitle: "Back",
-              headerStyle: {
-                backgroundColor: '#FFFFFF',
-              },
-              headerShadowVisible: false,
-              headerTitleStyle: {
-                fontWeight: '600',
-                color: '#1A1B41',
-              },
-              contentStyle: {
-                backgroundColor: '#FFFFFF',
-              },
-            }}
-          >
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="auth" options={{ headerShown: false }} />
-            <Stack.Screen 
-              name="modal" 
-              options={{ 
-                presentation: "modal",
-                title: "About Lyra"
-              }} 
-            />
-          </Stack>
-        </GestureHandlerRootView>
-      </AuthProvider>
-    </SafeAreaProvider>
+    <ErrorBoundary>
+      <SafeAreaProvider>
+        <AuthProvider>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <Stack
+              screenOptions={{
+                headerBackTitle: "Back",
+                headerStyle: {
+                  backgroundColor: '#FFFFFF',
+                },
+                headerShadowVisible: false,
+                headerTitleStyle: {
+                  fontWeight: '600',
+                  color: '#1A1B41',
+                },
+                contentStyle: {
+                  backgroundColor: '#FFFFFF',
+                },
+              }}
+            >
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="auth" options={{ headerShown: false }} />
+              <Stack.Screen 
+                name="modal" 
+                options={{ 
+                  presentation: "modal",
+                  title: "About Lyra"
+                }} 
+              />
+            </Stack>
+          </GestureHandlerRootView>
+        </AuthProvider>
+      </SafeAreaProvider>
+    </ErrorBoundary>
   );
 }

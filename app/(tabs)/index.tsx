@@ -19,6 +19,7 @@ import { colors } from '@/constants/colors';
 import { getGreeting } from '@/utils/dateUtils';
 import { Mood } from '@/types';
 import { Moon, Battery, MessageCircle, MapPin, CloudSun } from 'lucide-react-native';
+import SafeLoadingScreen from '@/components/ui/SafeLoadingScreen';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -137,9 +138,11 @@ export default function HomeScreen() {
   if (loading || !userData) {
     return (
       <ScreenContainer>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading your dashboard...</Text>
-        </View>
+        <SafeLoadingScreen 
+          type="dashboard"
+          message="Loading your dashboard..."
+          subMessage="Gathering your latest insights and data"
+        />
       </ScreenContainer>
     );
   }

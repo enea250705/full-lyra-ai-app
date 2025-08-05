@@ -7,6 +7,7 @@ import WeatherCard from './WeatherCard';
 import MoodWeatherCorrelation from './MoodWeatherCorrelation';
 import ExpensiveStoreAlert from './ExpensiveStoreAlert';
 import { Loader2, MapPin, AlertCircle } from 'lucide-react-native';
+import LoadingScreen from './LoadingScreen';
 
 interface ComprehensiveInsightsProps {
   userId: string;
@@ -70,10 +71,12 @@ const ComprehensiveInsights: React.FC<ComprehensiveInsightsProps> = ({
 
   if (isLoading && !comprehensiveData) {
     return (
-      <View style={[styles.container, styles.loadingContainer, style]}>
-        <Loader2 size={32} color="#007AFF" />
-        <Text style={styles.loadingText}>Loading insights...</Text>
-      </View>
+      <LoadingScreen 
+        type="insights"
+        size="medium"
+        message="Loading comprehensive insights..."
+        subMessage="Analyzing your data patterns"
+      />
     );
   }
 

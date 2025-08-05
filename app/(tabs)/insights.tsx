@@ -7,6 +7,7 @@ import ComprehensiveInsights from '@/components/ui/ComprehensiveInsights';
 import { useUserData } from '@/hooks/useUserData';
 import { colors } from '@/constants/colors';
 import { Mood } from '@/types';
+import SafeLoadingScreen from '@/components/ui/SafeLoadingScreen';
 
 export default function InsightsScreen() {
   const { insightData, userData, loading } = useUserData();
@@ -62,9 +63,11 @@ export default function InsightsScreen() {
   if (loading || !insightData) {
     return (
       <ScreenContainer>
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading your insights...</Text>
-        </View>
+        <SafeLoadingScreen 
+          type="insights"
+          message="Analyzing your insights..."
+          subMessage="Processing your patterns and generating personalized recommendations"
+        />
       </ScreenContainer>
     );
   }

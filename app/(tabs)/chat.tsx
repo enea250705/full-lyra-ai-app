@@ -12,6 +12,7 @@ import SubscriptionUpgradeModal from '@/components/ui/SubscriptionUpgradeModal';
 import { colors } from '@/constants/colors';
 import { Send, Plus } from 'lucide-react-native';
 import { StatusBar } from 'expo-status-bar';
+import SafeLoadingScreen from '@/components/ui/SafeLoadingScreen';
 
 export default function ChatScreen() {
   const { messages, addMessage, userData, loading } = useUserData();
@@ -354,9 +355,12 @@ export default function ChatScreen() {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
       >
         <StatusBar style="dark" />
-        <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading your chat...</Text>
-        </View>
+        <SafeLoadingScreen 
+          type="chat"
+          size="medium"
+          message="Connecting to Lyra..."
+          subMessage="Your AI companion is getting ready to chat"
+        />
       </KeyboardAvoidingView>
     );
   }

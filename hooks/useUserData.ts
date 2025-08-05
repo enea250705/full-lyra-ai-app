@@ -16,11 +16,13 @@ export const useUserData = () => {
 
   const loadUserData = useCallback(async () => {
     if (!isAuthenticated || !user) {
+      console.log('[useUserData] Not authenticated or no user, skipping load');
       setLoading(false);
       return;
     }
 
     try {
+      console.log('[useUserData] Starting to load user data...');
       setLoading(true);
       setError(null);
 
@@ -33,12 +35,17 @@ export const useUserData = () => {
         suggestedAction: 'Take a moment to check in with yourself and set your intentions for the day.',
       };
       setUserData(fallbackUserData);
+      console.log('[useUserData] Set fallback user data');
 
       // Load user profile and settings
+      console.log('[useUserData] Loading profile and settings...');
       const [profileResponse, settingsResponse] = await Promise.all([
         apiService.getProfile(),
         apiService.getUserSettings(),
       ]);
+
+      console.log('[useUserData] Profile response:', profileResponse);
+      console.log('[useUserData] Settings response:', settingsResponse);
 
       if (profileResponse.success && profileResponse.data) {
         // Transform profile data to UserData format
@@ -51,10 +58,16 @@ export const useUserData = () => {
           suggestedAction: 'Loading your personalized insights...',
         };
         setUserData(transformedUserData);
+        console.log('[useUserData] Set transformed user data');
+      } else {
+        console.log('[useUserData] Profile response failed:', profileResponse.error);
       }
 
       if (settingsResponse.success && settingsResponse.data) {
         setSettings(settingsResponse.data);
+        console.log('[useUserData] Set settings data');
+      } else {
+        console.log('[useUserData] Settings response failed:', settingsResponse.error);
       }
 
       // Load recent data to populate dashboard
@@ -78,9 +91,13 @@ export const useUserData = () => {
   }, [isAuthenticated, user]);
 
   const loadRecentData = useCallback(async () => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      console.log('[useUserData] Not authenticated, skipping recent data load');
+      return;
+    }
 
     try {
+      console.log('[useUserData] Loading recent data...');
       // Load recent mood, sleep, and energy data
       const [moodResponse, sleepResponse, energyResponse] = await Promise.all([
         apiService.getMoodEntries(1, 1),

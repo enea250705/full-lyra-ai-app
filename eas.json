@@ -18,10 +18,23 @@
       "ios": {
         "autoIncrement": "buildNumber"
       }
+    },
+    "testflight": {
+      "ios": {
+        "autoIncrement": "buildNumber",
+        "distribution": "store"
+      }
     }
   },
   "submit": {
     "production": {
+      "ios": {
+        "appleId": "enea.scalper@gmail.com",
+        "ascAppId": "6739059976",
+        "appleTeamId": "KKQYC3MR43"
+      }
+    },
+    "testflight": {
       "ios": {
         "appleId": "enea.scalper@gmail.com",
         "ascAppId": "6739059976",

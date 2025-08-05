@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/Button';
 import { colors } from '../../constants/colors';
+import SafeLoadingScreen from '../../components/ui/SafeLoadingScreen';
 
 export default function AuthIndex() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -22,10 +23,14 @@ export default function AuthIndex() {
         colors={['#0c0c1e', '#1a1a3a', '#2a1d5f', '#0c0c1e']}
         style={styles.container}
       >
-        <View style={styles.loadingContainer}>
+        <View style={styles.lyraContainer}>
           <Text style={styles.lyraText}>LYRA</Text>
-          <Text style={styles.loadingText}>Loading...</Text>
         </View>
+        <SafeLoadingScreen 
+          type="auth"
+          message="Welcome back..."
+          subMessage="Preparing your personalized wellness experience"
+        />
       </LinearGradient>
     );
   }
@@ -191,6 +196,12 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.9)',
     fontSize: 16,
     fontWeight: '600',
+  },
+  lyraContainer: {
+    position: 'absolute',
+    top: 120,
+    alignSelf: 'center',
+    zIndex: 10,
   },
   loadingContainer: {
     alignItems: 'center',

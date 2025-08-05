@@ -5,10 +5,13 @@ import { ScreenContainer } from '../../components/layout/ScreenContainer';
 import { Button } from '../../components/ui/Button';
 import { HealthKitPermissionCard } from '../../components/ui/HealthKitPermissionCard';
 import { SleepTrackingModeCard } from '../../components/ui/SleepTrackingModeCard';
+import SubscriptionUpgradeModal from '../../components/ui/SubscriptionUpgradeModal';
+import SafeLoadingScreen from '../../components/ui/SafeLoadingScreen';
 import { useUserData } from '../../hooks/useUserData';
 import { useSleep } from '../../hooks/useSleep';
+import { useNativeSubscription } from '../../hooks/useNativeSubscription';
 import { colors } from '../../constants/colors';
-import { User, Calendar, Activity, DollarSign, Trash2, Download, VolumeX, Volume1, Volume2, Crown, Moon } from 'lucide-react-native';
+import { User, Calendar, Activity, DollarSign, Trash2, Download, VolumeX, Volume1, Volume2, Crown, Moon, Lock } from 'lucide-react-native';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -19,6 +22,12 @@ export default function SettingsScreen() {
     enableHealthKitTracking, 
     isLoading 
   } = useSleep();
+  const {
+    isProActive,
+    isPremiumActive,
+    isFree,
+    currentPlan
+  } = useNativeSubscription();
   
   // Provide default settings if null or undefined
   const defaultSettings = {
@@ -63,14 +72,50 @@ export default function SettingsScreen() {
   };
   
   const [name, setName] = useState(safeSettings.name);
+  const [upgradeModalVisible, setUpgradeModalVisible] = useState(false);
+  const [upgradeContext, setUpgradeContext] = useState({ featureId: '', featureName: '' });
+
+  // Define which features require which subscription tiers
+  const featureRequirements = {
+    // Free features (no restriction)
+    mood: 'free',
+    
+    // Pro features  
+    finances: 'pro',
+    calendar_sync: 'pro',
+    savings_tracking: 'pro',
+    basic_ai_coaching: 'pro',
+    
+    // Premium features
+    advanced_sleep_analysis: 'premium',
+    location_alerts: 'premium',
+    sms_alerts: 'premium',
+    crisis_support: 'premium',
+  };
+
+  // Check if user can access a feature
+  const canAccessFeature = (requiredTier: string) => {
+    if (requiredTier === 'free') return true;
+    if (requiredTier === 'pro') return isProActive || isPremiumActive;
+    if (requiredTier === 'premium') return isPremiumActive;
+    return true;
+  };
+
+  // Show upgrade modal for restricted features
+  const showUpgradeModal = (featureId: string, featureName: string) => {
+    setUpgradeContext({ featureId, featureName });
+    setUpgradeModalVisible(true);
+  };
   
   // Show loading state if user data is still loading
   if (userDataLoading) {
     return (
       <ScreenContainer>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text>Loading settings...</Text>
-        </View>
+        <SafeLoadingScreen 
+          type="settings"
+          message="Loading your settings..."
+          subMessage="Configuring your personalized experience"
+        />
       </ScreenContainer>
     );
   }
@@ -80,6 +125,23 @@ export default function SettingsScreen() {
   };
 
   const handleToggleModule = (module: keyof typeof safeSettings.enabledModules) => {
+    // Check if trying to enable a restricted feature
+    if (!safeSettings.enabledModules[module]) {
+      // User is trying to enable the feature - check if they have access
+      let requiredTier = 'free';
+      let featureName = module;
+      
+      if (module === 'finances') {
+        requiredTier = 'pro';
+        featureName = 'Financial Tracking & AI Spending Interventions';
+      }
+      
+      if (!canAccessFeature(requiredTier)) {
+        showUpgradeModal(`module_${module}`, featureName);
+        return;
+      }
+    }
+    
     updateSettings({
       enabledModules: {
         ...safeSettings.enabledModules,
@@ -89,6 +151,28 @@ export default function SettingsScreen() {
   };
 
   const handleToggleApi = (api: keyof typeof safeSettings.connectedApis) => {
+    // Check if trying to enable a restricted API
+    if (!safeSettings.connectedApis[api]) {
+      let requiredTier = 'free';
+      let featureName = api;
+      
+      if (api === 'googleCalendar') {
+        requiredTier = 'pro';
+        featureName = 'Google Calendar Integration & AI Scheduling';
+      } else if (api === 'plaid') {
+        requiredTier = 'pro';
+        featureName = 'Banking Integration & Real-time Spending Alerts';
+      } else if (api === 'appleHealth') {
+        requiredTier = 'premium';
+        featureName = 'Advanced Health Data Integration';
+      }
+      
+      if (!canAccessFeature(requiredTier)) {
+        showUpgradeModal(`api_${api}`, featureName);
+        return;
+      }
+    }
+    
     updateSettings({
       connectedApis: {
         ...safeSettings.connectedApis,
@@ -268,6 +352,11 @@ export default function SettingsScreen() {
           <View style={styles.settingLabelContainer}>
             <Calendar size={20} color={colors.midnightBlue} />
             <Text style={styles.settingLabel}>Google Calendar</Text>
+            {!canAccessFeature('pro') && (
+              <View style={styles.lockIconContainer}>
+                <Lock size={14} color={colors.gray[400]} />
+              </View>
+            )}
           </View>
           <Switch
             value={safeSettings.connectedApis.googleCalendar}
@@ -281,6 +370,11 @@ export default function SettingsScreen() {
           <View style={styles.settingLabelContainer}>
             <Activity size={20} color={colors.midnightBlue} />
             <Text style={styles.settingLabel}>Apple Health</Text>
+            {!canAccessFeature('premium') && (
+              <View style={styles.lockIconContainer}>
+                <Lock size={14} color={colors.gray[400]} />
+              </View>
+            )}
           </View>
           <Switch
             value={safeSettings.connectedApis.appleHealth}
@@ -294,6 +388,11 @@ export default function SettingsScreen() {
           <View style={styles.settingLabelContainer}>
             <DollarSign size={20} color={colors.midnightBlue} />
             <Text style={styles.settingLabel}>Plaid (Finance)</Text>
+            {!canAccessFeature('pro') && (
+              <View style={styles.lockIconContainer}>
+                <Lock size={14} color={colors.gray[400]} />
+              </View>
+            )}
           </View>
           <Switch
             value={safeSettings.connectedApis.plaid}
@@ -307,19 +406,31 @@ export default function SettingsScreen() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Enabled Modules</Text>
         
-        {Object.entries(safeSettings.enabledModules).map(([key, value]) => (
-          <View key={key} style={styles.settingItem}>
-            <Text style={styles.settingLabel}>
-              {key.charAt(0).toUpperCase() + key.slice(1)}
-            </Text>
-            <Switch
-              value={value}
-              onValueChange={() => handleToggleModule(key as keyof typeof safeSettings.enabledModules)}
-              trackColor={{ false: colors.gray[300], true: colors.lightPurple }}
-              thumbColor={value ? colors.midnightBlue : colors.gray[100]}
-            />
-          </View>
-        ))}
+        {Object.entries(safeSettings.enabledModules).map(([key, value]) => {
+          const isFinances = key === 'finances';
+          const requiresUpgrade = isFinances && !canAccessFeature('pro');
+          
+          return (
+            <View key={key} style={styles.settingItem}>
+              <View style={styles.settingLabelContainer}>
+                <Text style={styles.settingLabel}>
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
+                </Text>
+                {requiresUpgrade && (
+                  <View style={styles.lockIconContainer}>
+                    <Lock size={14} color={colors.gray[400]} />
+                  </View>
+                )}
+              </View>
+              <Switch
+                value={value}
+                onValueChange={() => handleToggleModule(key as keyof typeof safeSettings.enabledModules)}
+                trackColor={{ false: colors.gray[300], true: colors.lightPurple }}
+                thumbColor={value ? colors.midnightBlue : colors.gray[100]}
+              />
+            </View>
+          );
+        })}
       </View>
 
       <View style={styles.section}>
@@ -401,6 +512,13 @@ export default function SettingsScreen() {
         <Text style={styles.copyrightText}>© 2025 Lyra AI</Text>
       </View>
       </ScrollView>
+      
+      <SubscriptionUpgradeModal
+        visible={upgradeModalVisible}
+        onClose={() => setUpgradeModalVisible(false)}
+        featureName={upgradeContext.featureName}
+        context={`Enable ${upgradeContext.featureName} to enhance your Lyra experience with advanced features.`}
+      />
     </ScreenContainer>
   );
 }
@@ -527,6 +645,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.gray[400],
     marginTop: 4,
+  },
+  lockIconContainer: {
+    marginLeft: 8,
+    opacity: 0.6,
   },
   manualOnlyContainer: {
     backgroundColor: colors.gray[50],

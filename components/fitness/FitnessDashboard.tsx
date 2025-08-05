@@ -6,6 +6,7 @@ import { useGoogleFit, useGoogleFitDashboard } from '../../hooks/useGoogleFit';
 import { ProgressBar } from '../ui/ProgressBar';
 import { InsightCard } from '../ui/InsightCard';
 import { colors } from '../../constants/colors';
+import LoadingScreen from '../ui/LoadingScreen';
 
 interface MetricCardProps {
   title: string;
@@ -130,9 +131,12 @@ export const FitnessDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.loadingText}>Loading your fitness data...</Text>
-      </View>
+      <LoadingScreen 
+        type="dashboard"
+        size="medium"
+        message="Loading your fitness data..."
+        subMessage="Syncing with Google Fit and Apple Health"
+      />
     );
   }
 
