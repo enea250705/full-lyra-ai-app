@@ -40,6 +40,7 @@ export default function HomeScreen() {
   const [currentMood, setCurrentMood] = useState<Mood>(userData?.mood || 'neutral');
   const [showStoreAlert, setShowStoreAlert] = useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   // Update mood when userData changes
   useEffect(() => {
@@ -76,16 +77,18 @@ export default function HomeScreen() {
   };
 
   const handleLocationPermission = async () => {
-    const currentLocation = await getCurrentLocation();
-    if (currentLocation) {
-      await fetchWeatherData(currentLocation.latitude, currentLocation.longitude);
-      await fetchNearbyExpensiveStores(currentLocation.latitude, currentLocation.longitude);
-    } else {
-      Alert.alert(
-        'Location Permission Required',
-        'Please enable location services to get weather updates and location-based insights.',
-        [{ text: 'OK' }]
-      );
+    try {
+      const currentLocation = await getCurrentLocation();
+      if (currentLocation) {
+        await fetchWeatherData(currentLocation.latitude, currentLocation.longitude);
+        await fetchNearbyExpensiveStores(currentLocation.latitude, currentLocation.longitude);
+      } else {
+        // Don't show alert immediately - let user continue without location
+        console.log('Location permission not granted, continuing without location features');
+      }
+    } catch (error) {
+      console.error('Error getting location:', error);
+      // Don't crash the app if location fails
     }
   };
 
@@ -96,17 +99,37 @@ export default function HomeScreen() {
     }
   }, [location]);
 
+  // Initialize app safely
   useEffect(() => {
-    handleLocationPermission();
+    const initializeApp = async () => {
+      try {
+        setIsInitializing(true);
+        // Wait a bit for authentication to settle
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Try to get location but don't fail if it doesn't work
+        handleLocationPermission().catch(error => {
+          console.error('Location initialization failed:', error);
+        });
+      } catch (error) {
+        console.error('App initialization error:', error);
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+
+    initializeApp();
   }, []);
 
   // Show loading screen while data is loading or if no real data
-  if (loading || !userData) {
+  if (loading || isInitializing || !userData) {
     return (
       <ScreenContainer>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text style={{ fontSize: 18, color: colors.midnightBlue }}>Loading your dashboard...</Text>
-        </View>
+        <SafeLoadingScreen 
+          type="dashboard"
+          message="Loading your dashboard..."
+          subMessage="Gathering your latest insights and data"
+        />
       </ScreenContainer>
     );
   }

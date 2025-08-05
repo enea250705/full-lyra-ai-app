@@ -29,19 +29,23 @@ export const useUserData = () => {
       // Don't set fallback data - wait for real data
       console.log('[useUserData] Waiting for real user data...');
 
-      // Load user profile and settings
+      // Load user profile and settings with better error handling
       console.log('[useUserData] Loading profile and settings...');
-      const [profileResponse, settingsResponse] = await Promise.all([
+      
+      const results = await Promise.allSettled([
         apiService.getProfile(),
         apiService.getUserSettings(),
       ]);
 
+      const profileResponse = results[0];
+      const settingsResponse = results[1];
+
       console.log('[useUserData] Profile response:', profileResponse);
       console.log('[useUserData] Settings response:', settingsResponse);
 
-      if (profileResponse.success && profileResponse.data) {
+      if (profileResponse.status === 'fulfilled' && profileResponse.value.success && profileResponse.value.data) {
         // Transform profile data to UserData format
-        const profile = profileResponse.data;
+        const profile = profileResponse.value.data;
         const transformedUserData: UserData = {
           name: profile.firstName || profile.email.split('@')[0],
           mood: 'neutral' as Mood, // Will be updated from latest mood entry
@@ -52,22 +56,58 @@ export const useUserData = () => {
         setUserData(transformedUserData);
         console.log('[useUserData] Set transformed user data');
       } else {
-        console.log('[useUserData] Profile response failed:', profileResponse.error);
+        console.log('[useUserData] Profile response failed:', profileResponse.status === 'rejected' ? profileResponse.reason : profileResponse.value?.error);
+        // Set fallback user data if profile fails
+        const fallbackUserData: UserData = {
+          name: user.email?.split('@')[0] || 'User',
+          mood: 'neutral' as Mood,
+          sleepHours: 0,
+          energyLevel: 0,
+          suggestedAction: 'Welcome to Lyra! Start by checking in with your mood.',
+        };
+        setUserData(fallbackUserData);
       }
 
-      if (settingsResponse.success && settingsResponse.data) {
-        setSettings(settingsResponse.data);
+      if (settingsResponse.status === 'fulfilled' && settingsResponse.value.success && settingsResponse.value.data) {
+        setSettings(settingsResponse.value.data);
         console.log('[useUserData] Set settings data');
       } else {
-        console.log('[useUserData] Settings response failed:', settingsResponse.error);
+        console.log('[useUserData] Settings response failed:', settingsResponse.status === 'rejected' ? settingsResponse.reason : settingsResponse.value?.error);
+        // Set default settings if settings fail
+        setSettings({
+          name: user.email?.split('@')[0] || 'User',
+          goals: [],
+          connectedApis: {
+            googleCalendar: false,
+            appleHealth: false,
+            plaid: false,
+          },
+          enabledModules: {
+            finances: false,
+            sleep: false,
+            mood: false,
+            decisions: false,
+          },
+          voiceStyle: 'calm' as const,
+        });
       }
 
-      // Load recent data to populate dashboard
-      await loadRecentData();
+      // Load recent data to populate dashboard (don't block on this)
+      loadRecentData().catch(error => {
+        console.error('[useUserData] Error loading recent data:', error);
+      });
     } catch (error) {
       console.error('Error loading user data:', error);
       setError('Failed to load user data');
-      // Don't set fallback data - let the error propagate
+      // Set fallback data to prevent crashes
+      const fallbackUserData: UserData = {
+        name: user.email?.split('@')[0] || 'User',
+        mood: 'neutral' as Mood,
+        sleepHours: 0,
+        energyLevel: 0,
+        suggestedAction: 'Welcome to Lyra! Start by checking in with your mood.',
+      };
+      setUserData(fallbackUserData);
     } finally {
       setLoading(false);
     }

@@ -6,6 +6,7 @@ import { Home, MessageSquare, BookOpen, BarChart2, Settings } from 'lucide-react
 import { colors } from '@/constants/colors';
 import { useAuth } from '../../contexts/AuthContext';
 import ErrorBoundary from '../../components/ErrorBoundary';
+import SafeLoadingScreen from '../../components/ui/SafeLoadingScreen';
 
 export default function TabLayout() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -19,7 +20,13 @@ export default function TabLayout() {
   }, [isAuthenticated, isLoading, router]);
 
   if (isLoading) {
-    return null;
+    return (
+      <SafeLoadingScreen 
+        type="auth"
+        message="Loading your account..."
+        subMessage="Please wait while we set up your experience"
+      />
+    );
   }
 
   if (!isAuthenticated) {

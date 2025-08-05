@@ -106,13 +106,20 @@ class ApiService {
       console.log('Response status:', response.status);
       console.log('Response headers:', response.headers);
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error('Failed to parse JSON response:', jsonError);
+        throw new Error('Invalid response format from server');
+      }
+      
       console.log('Response data:', data);
 
       if (!response.ok) {
         console.error('API request failed with status:', response.status);
         console.error('Response data:', data);
-        throw new Error(data.error || 'API request failed');
+        throw new Error(data.error || data.message || 'API request failed');
       }
 
       return data;
@@ -127,6 +134,9 @@ class ApiService {
         }
         if (error.message.includes('Network request failed')) {
           throw new Error('Network error - please check your internet connection');
+        }
+        if (error.message.includes('Invalid response format')) {
+          throw new Error('Server error - please try again later');
         }
       }
       
