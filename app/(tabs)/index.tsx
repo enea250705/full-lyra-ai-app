@@ -37,16 +37,25 @@ export default function HomeScreen() {
   const { savings, loading: savingsLoading, recordSavings, fetchSavingsStats } = useSavings();
   const { subscription } = useSubscription();
   
-  const [currentMood, setCurrentMood] = useState<Mood>(userData?.mood || 'neutral');
+  // Safe fallback for userData
+  const safeUserData = userData || {
+    name: 'User',
+    mood: 'neutral' as Mood,
+    sleepHours: 0,
+    energyLevel: 0,
+    suggestedAction: 'Welcome to Lyra!'
+  };
+  
+  const [currentMood, setCurrentMood] = useState<Mood>(safeUserData.mood);
   const [showStoreAlert, setShowStoreAlert] = useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
   // Update mood when userData changes
   useEffect(() => {
-    if (userData?.mood) {
-      setCurrentMood(userData.mood);
+    if (safeUserData?.mood) {
+      setCurrentMood(safeUserData.mood);
     }
-  }, [userData?.mood]);
+  }, [safeUserData?.mood]);
   
   // Convert mood string to number for API
   const moodToNumber = (mood: Mood): number => {
@@ -100,6 +109,17 @@ export default function HomeScreen() {
     handleLocationPermission();
   }, []);
 
+  // Show loading screen while data is loading
+  if (loading) {
+    return (
+      <ScreenContainer>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ fontSize: 18, color: colors.midnightBlue }}>Loading your dashboard...</Text>
+        </View>
+      </ScreenContainer>
+    );
+  }
+
   const handleConfirmSavings = async (actualAmount: number, originalAmount: number, reason: string) => {
     try {
       const response = await recordSavings({
@@ -135,7 +155,7 @@ export default function HomeScreen() {
   };
 
   // Show loading state if userData is not available
-  if (loading || !userData) {
+  if (loading) {
     return (
       <ScreenContainer>
         <SafeLoadingScreen 
@@ -150,7 +170,7 @@ export default function HomeScreen() {
   return (
     <ScreenContainer>
       <View style={styles.header}>
-        <Text style={styles.greeting}>{getGreeting()}, {userData?.name || 'User'}</Text>
+        <Text style={styles.greeting}>{getGreeting()}, {safeUserData.name}</Text>
         <Text style={styles.date}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</Text>
       </View>
 
@@ -192,7 +212,7 @@ export default function HomeScreen() {
               <Moon size={18} color={colors.midnightBlue} />
               <Text style={styles.metricLabel}>Sleep</Text>
             </View>
-            <Text style={styles.metricValue}>{userData?.sleepHours || 0} hours</Text>
+            <Text style={styles.metricValue}>{safeUserData.sleepHours} hours</Text>
           </View>
           
           <View style={styles.metricItem}>
@@ -201,7 +221,7 @@ export default function HomeScreen() {
               <Text style={styles.metricLabel}>Energy</Text>
             </View>
             <ProgressBar 
-              value={userData?.energyLevel || 0} 
+              value={safeUserData.energyLevel} 
               height={6}
               color={colors.lightPurple}
             />
@@ -226,7 +246,7 @@ export default function HomeScreen() {
       <View style={styles.actionContainer}>
         <InsightCard
           title="Today's Focus"
-          description={userData?.suggestedAction || "Take a moment to check in with yourself and set your intentions for the day."}
+          description={safeUserData.suggestedAction}
           variant="info"
         />
         
