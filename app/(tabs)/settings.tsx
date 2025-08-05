@@ -133,7 +133,7 @@ export default function SettingsScreen() {
       
       if (module === 'finances') {
         requiredTier = 'pro';
-        featureName = 'Financial Tracking & AI Spending Interventions';
+        featureName = 'Financial Tracking & AI Spending Interventions' as any;
       }
       
       if (!canAccessFeature(requiredTier)) {
@@ -158,13 +158,13 @@ export default function SettingsScreen() {
       
       if (api === 'googleCalendar') {
         requiredTier = 'pro';
-        featureName = 'Google Calendar Integration & AI Scheduling';
+        featureName = 'Google Calendar Integration & AI Scheduling' as any;
       } else if (api === 'plaid') {
         requiredTier = 'pro';
-        featureName = 'Banking Integration & Real-time Spending Alerts';
+        featureName = 'Banking Integration & Real-time Spending Alerts' as any;
       } else if (api === 'appleHealth') {
         requiredTier = 'premium';
-        featureName = 'Advanced Health Data Integration';
+        featureName = 'Advanced Health Data Integration' as any;
       }
       
       if (!canAccessFeature(requiredTier)) {
@@ -517,7 +517,6 @@ export default function SettingsScreen() {
         visible={upgradeModalVisible}
         onClose={() => setUpgradeModalVisible(false)}
         featureName={upgradeContext.featureName}
-        context={`Enable ${upgradeContext.featureName} to enhance your Lyra experience with advanced features.`}
       />
     </ScreenContainer>
   );
@@ -651,7 +650,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   manualOnlyContainer: {
-    backgroundColor: colors.gray[50],
+    backgroundColor: colors.gray[100],
     borderRadius: 12,
     padding: 16,
     marginVertical: 8,
