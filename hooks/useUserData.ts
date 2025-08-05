@@ -309,23 +309,21 @@ export const useUserData = () => {
         const updatedSettings = { ...prev, ...newSettings };
         
         // Update settings on server (only send allowed fields per API schema)
-        const allowedFields = [
-          'theme', 
-          'aiTone', 
-          'timezone', 
-          'language', 
-          'featuresEnabled',
-          'enabledModules',
-          'connectedApis',
-          'voiceStyle',
-          'name'
-        ];
         const settingsToUpdate: any = {};
-        allowedFields.forEach(field => {
-          if (updatedSettings[field] !== undefined) {
-            settingsToUpdate[field] = updatedSettings[field];
-          }
-        });
+        
+        // Manually check and copy allowed fields
+        if (updatedSettings.name !== undefined) {
+          settingsToUpdate.name = updatedSettings.name;
+        }
+        if (updatedSettings.enabledModules !== undefined) {
+          settingsToUpdate.enabledModules = updatedSettings.enabledModules;
+        }
+        if (updatedSettings.connectedApis !== undefined) {
+          settingsToUpdate.connectedApis = updatedSettings.connectedApis;
+        }
+        if (updatedSettings.voiceStyle !== undefined) {
+          settingsToUpdate.voiceStyle = updatedSettings.voiceStyle;
+        }
         apiService.updateUserSettings(settingsToUpdate).catch(error => {
           console.error('Error updating settings on server:', error);
         });
