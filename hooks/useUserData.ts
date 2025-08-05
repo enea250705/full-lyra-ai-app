@@ -26,16 +26,8 @@ export const useUserData = () => {
       setLoading(true);
       setError(null);
 
-      // Create fallback userData first
-      const fallbackUserData: UserData = {
-        name: user.firstName || user.email.split('@')[0],
-        mood: 'neutral' as Mood,
-        sleepHours: 0,
-        energyLevel: 0,
-        suggestedAction: 'Take a moment to check in with yourself and set your intentions for the day.',
-      };
-      setUserData(fallbackUserData);
-      console.log('[useUserData] Set fallback user data');
+      // Don't set fallback data - wait for real data
+      console.log('[useUserData] Waiting for real user data...');
 
       // Load user profile and settings
       console.log('[useUserData] Loading profile and settings...');
@@ -75,16 +67,7 @@ export const useUserData = () => {
     } catch (error) {
       console.error('Error loading user data:', error);
       setError('Failed to load user data');
-      
-      // Keep fallback userData even if API calls fail
-      const fallbackUserData: UserData = {
-        name: user.firstName || user.email.split('@')[0],
-        mood: 'neutral' as Mood,
-        sleepHours: 0,
-        energyLevel: 0,
-        suggestedAction: 'Take a moment to check in with yourself and set your intentions for the day.',
-      };
-      setUserData(fallbackUserData);
+      // Don't set fallback data - let the error propagate
     } finally {
       setLoading(false);
     }
