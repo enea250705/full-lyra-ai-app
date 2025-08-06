@@ -10,11 +10,13 @@ import WeatherCard from '@/components/ui/WeatherCard';
 import ExpensiveStoreAlert from '@/components/ui/ExpensiveStoreAlert';
 import SavingsCounter from '@/components/ui/SavingsCounter';
 import SubscriptionUpgradeModal from '@/components/ui/SubscriptionUpgradeModal';
+import { PermissionsRequestModal } from '@/components/ui/PermissionsRequestModal';
 import { useUserData } from '@/hooks/useUserData';
 import { useWeatherMood } from '@/hooks/useWeatherMood';
 import { useLocation } from '@/hooks/useLocation';
 import { useSavings } from '@/hooks/useSavings';
 import { useSubscription } from '@/hooks/useSubscription';
+import { usePermissions } from '@/hooks/usePermissions';
 import { colors } from '@/constants/colors';
 import { getGreeting } from '@/utils/dateUtils';
 import { Mood } from '@/types';
@@ -36,11 +38,13 @@ export default function HomeScreen() {
   
   const { savings, loading: savingsLoading, recordSavings, fetchSavingsStats } = useSavings();
   const { subscription } = useSubscription();
+  const { permissions, requestAllPermissions, isLoading: permissionsLoading } = usePermissions();
   
   const [currentMood, setCurrentMood] = useState<Mood>(userData?.mood || 'neutral');
   const [showStoreAlert, setShowStoreAlert] = useState(true);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [showPermissionsModal, setShowPermissionsModal] = useState(false);
 
   // Update mood when userData changes
   useEffect(() => {
@@ -102,10 +106,28 @@ export default function HomeScreen() {
   // Initialize app safely
   useEffect(() => {
     const initializeApp = async () => {
+      if (!userData) return;
+      
       try {
         setIsInitializing(true);
         // Wait a bit for authentication to settle
         await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Check if permissions have been requested
+        const hasRequestedPermissions = permissions.location.requested || permissions.healthKit.requested;
+        
+        if (!hasRequestedPermissions) {
+          // Show permissions modal
+          setShowPermissionsModal(true);
+        } else {
+          // Request permissions in background if not already granted
+          if (!permissions.location.granted || !permissions.healthKit.granted) {
+            console.log('[HomeScreen] Requesting permissions in background...');
+            requestAllPermissions().catch(error => {
+              console.error('Background permission request failed:', error);
+            });
+          }
+        }
         
         // Try to get location but don't fail if it doesn't work
         handleLocationPermission().catch(error => {
@@ -119,16 +141,33 @@ export default function HomeScreen() {
     };
 
     initializeApp();
-  }, []);
+  }, [userData, permissions.location.requested, permissions.healthKit.requested]); // Only run when userData or permissions change
+
+  const handlePermissionsRequest = async () => {
+    try {
+      await requestAllPermissions();
+      setShowPermissionsModal(false);
+    } catch (error) {
+      console.error('Error requesting permissions:', error);
+    }
+  };
+
+  const handleSkipPermissions = () => {
+    setShowPermissionsModal(false);
+  };
+
+  const handleContinueWithoutPermissions = () => {
+    setShowPermissionsModal(false);
+  };
 
   // Show loading screen while data is loading or if no real data
-  if (loading || isInitializing || !userData) {
+  if (loading || isInitializing || permissionsLoading || !userData) {
     return (
       <ScreenContainer>
         <SafeLoadingScreen 
           type="dashboard"
           message="Loading your dashboard..."
-          subMessage="Gathering your latest insights and data"
+          subMessage="Setting up permissions and gathering your latest insights"
         />
       </ScreenContainer>
     );
@@ -313,6 +352,15 @@ export default function HomeScreen() {
         onClose={() => setShowUpgradeModal(false)}
         featureId="savings_tracking"
         featureName="Savings Tracking"
+      />
+
+      {/* Permissions Request Modal */}
+      <PermissionsRequestModal
+        visible={showPermissionsModal}
+        permissions={permissions}
+        onRequestPermissions={handlePermissionsRequest}
+        onSkip={handleSkipPermissions}
+        onContinue={handleContinueWithoutPermissions}
       />
     </ScreenContainer>
   );

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Plan {
   id: string;
@@ -47,8 +48,22 @@ interface SubscriptionState {
 }
 
 export const useSubscription = () => {
+  const { user } = useAuth();
+  
+  // Developer override: Grant full Premium access to eneamuja87@gmail.com
+  const isDeveloperAccount = user?.email === 'eneamuja87@gmail.com';
+  
   const [state, setState] = useState<SubscriptionState>({
-    subscription: null,
+    subscription: isDeveloperAccount ? {
+      id: 'dev-premium',
+      plan: 'premium',
+      status: 'active',
+      isActive: true,
+      isPro: true,
+      isPremium: true,
+      cancelAtPeriodEnd: false,
+      dataRetentionDays: -1,
+    } : null,
     plans: [],
     isLoading: false,
     error: null,
@@ -56,6 +71,27 @@ export const useSubscription = () => {
 
   const fetchSubscription = async () => {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
+    
+    // Developer override: Return premium subscription for eneamuja87@gmail.com
+    if (isDeveloperAccount) {
+      const devSubscription = {
+        id: 'dev-premium',
+        plan: 'premium',
+        status: 'active',
+        isActive: true,
+        isPro: true,
+        isPremium: true,
+        cancelAtPeriodEnd: false,
+        dataRetentionDays: -1,
+      };
+      
+      setState(prev => ({
+        ...prev,
+        subscription: devSubscription,
+        isLoading: false,
+      }));
+      return devSubscription;
+    }
     
     try {
       const response = await apiService.getSubscription();
@@ -251,6 +287,11 @@ export const useSubscription = () => {
   };
 
   const hasFeature = (featureId: string): boolean => {
+    // Developer override: Grant access to all features for eneamuja87@gmail.com
+    if (isDeveloperAccount) {
+      return true;
+    }
+    
     if (!state.subscription) return false;
     
     const currentPlan = state.plans.find(plan => plan.id === state.subscription?.plan);

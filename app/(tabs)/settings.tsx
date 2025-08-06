@@ -10,6 +10,7 @@ import SafeLoadingScreen from '../../components/ui/SafeLoadingScreen';
 import { useUserData } from '../../hooks/useUserData';
 import { useSleep } from '../../hooks/useSleep';
 import { useNativeSubscription } from '../../hooks/useNativeSubscription';
+import { useAuth } from '../../contexts/AuthContext';
 import { colors } from '../../constants/colors';
 import { User, Calendar, Activity, DollarSign, Trash2, Download, VolumeX, Volume1, Volume2, Crown, Moon, Lock } from 'lucide-react-native';
 
@@ -28,6 +29,12 @@ export default function SettingsScreen() {
     isFree,
     currentPlan
   } = useNativeSubscription();
+  const { user } = useAuth();
+  
+  // Debug logging for developer override
+  console.log('[Settings] User email:', user?.email);
+  console.log('[Settings] isDeveloperAccount:', user?.email === 'eneamuja87@gmail.com');
+  console.log('[Settings] Subscription status:', { isProActive, isPremiumActive, isFree, currentPlan });
   
   // Provide default settings if null or undefined
   const defaultSettings = {
