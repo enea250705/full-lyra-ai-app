@@ -285,6 +285,8 @@ export default function ChatScreen() {
   const generateSavingsActions = (message: any) => {
     if (message.sender === 'user') return [];
     
+    if (!message.text) return [];
+    
     const text = message.text.toLowerCase();
     const actions = [];
     
