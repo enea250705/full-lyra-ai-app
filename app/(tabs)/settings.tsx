@@ -329,6 +329,8 @@ export default function SettingsScreen() {
               onChangeText={setName}
               placeholder="Your name"
               onBlur={handleSaveName}
+              onSubmitEditing={handleSaveName}
+              returnKeyType="done"
             />
           </View>
         </View>

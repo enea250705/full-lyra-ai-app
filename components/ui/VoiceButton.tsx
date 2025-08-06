@@ -57,7 +57,7 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
         {
           width: sizeValues.button,
           height: sizeValues.button,
-          backgroundColor: isRecording ? colors.error : colors.midnightBlue,
+          backgroundColor: isRecording ? colors.error : colors.gray[100],
           opacity: pressed ? 0.8 : 1,
         },
       ]}
@@ -65,11 +65,11 @@ export const VoiceButton: React.FC<VoiceButtonProps> = ({
       disabled={isProcessing}
     >
       {isProcessing ? (
-        <ActivityIndicator color={colors.white} size="small" />
+        <ActivityIndicator color={colors.midnightBlue} size="small" />
       ) : isRecording ? (
-        <Square size={sizeValues.icon} color={colors.white} />
+        <Square size={sizeValues.icon} color={colors.error} />
       ) : (
-        <Mic size={sizeValues.icon} color={colors.white} />
+        <Mic size={sizeValues.icon} color={colors.midnightBlue} />
       )}
       {isRecording && <View style={styles.recordingIndicator} />}
     </Pressable>
@@ -86,6 +86,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    borderWidth: 1,
+    borderColor: colors.gray[200],
   },
   recordingIndicator: {
     position: 'absolute',

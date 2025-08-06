@@ -10,7 +10,7 @@ import { useSavings } from '@/hooks/useSavings';
 import { useSubscription } from '@/hooks/useSubscription';
 import SubscriptionUpgradeModal from '@/components/ui/SubscriptionUpgradeModal';
 import { colors } from '@/constants/colors';
-import { Send, Plus } from 'lucide-react-native';
+import { Send } from 'lucide-react-native';
 import { StatusBar } from 'expo-status-bar';
 import SafeLoadingScreen from '@/components/ui/SafeLoadingScreen';
 
@@ -437,7 +437,7 @@ export default function ChatScreen() {
         />
         
         <LinearGradient
-          colors={['rgba(255,255,255,0.95)', 'rgba(255,255,255,1)']}
+          colors={['rgba(255,255,255,0.98)', 'rgba(255,255,255,1)']}
           style={styles.inputContainer}
         >
           <View style={styles.inputWrapper}>
@@ -452,11 +452,7 @@ export default function ChatScreen() {
             />
             
             <View style={styles.inputActions}>
-              <TouchableOpacity style={styles.attachButton}>
-                <Plus size={20} color="#64748B" />
-              </TouchableOpacity>
-              
-              <VoiceButton onRecordingComplete={handleVoiceInput} size="small" />
+              <VoiceButton onRecordingComplete={handleVoiceInput} size="medium" />
               
               <TouchableOpacity
                 onPress={() => handleSendMessage()}
@@ -545,10 +541,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     gap: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 28,
+    padding: 4,
+    shadowColor: '#64748B',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 4,
   },
   input: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'transparent',
     borderRadius: 24,
     paddingHorizontal: 20,
     paddingVertical: 16,
@@ -558,36 +562,19 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     textAlignVertical: 'top',
     minHeight: 52,
-    borderWidth: 2,
-    borderColor: '#E2E8F0',
     fontWeight: '400',
-    shadowColor: '#64748B',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
   },
   inputActions: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: 8,
-  },
-  attachButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F1F5F9',
-    justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    marginBottom: 6,
+    gap: 8,
+    paddingRight: 4,
+    paddingBottom: 4,
   },
   sendButton: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    marginBottom: 2,
     shadowColor: '#8B5CF6',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,

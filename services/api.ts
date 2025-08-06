@@ -656,10 +656,24 @@ class ApiService {
 
   // Health Check
   async healthCheck() {
-    return this.request<any>('/health', {
-      headers: {
-        'Content-Type': 'application/json',
-      },
+    return this.request<{ status: string; timestamp: string; service: string; version: string }>('/health');
+  }
+
+  // Chat Messages
+  async getChatMessages(page = 1, limit = 50) {
+    return this.request<{ data: any[]; pagination: any }>(`/chat/messages?page=${page}&limit=${limit}`);
+  }
+
+  async createChatMessage(text: string, sender: 'user' | 'lyra', isVoice = false) {
+    return this.request('/chat/messages', {
+      method: 'POST',
+      body: JSON.stringify({ text, sender, isVoice }),
+    });
+  }
+
+  async deleteChatMessages() {
+    return this.request('/chat/messages', {
+      method: 'DELETE',
     });
   }
 }

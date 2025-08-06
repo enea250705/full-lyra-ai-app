@@ -69,8 +69,17 @@ export const useUserData = () => {
       }
 
       if (settingsResponse.status === 'fulfilled' && settingsResponse.value.success && settingsResponse.value.data) {
-        setSettings(settingsResponse.value.data);
+        const settingsData = settingsResponse.value.data;
+        setSettings(settingsData);
         console.log('[useUserData] Set settings data');
+        
+        // Update userData with name from settings if it exists
+        if (settingsData.name && settingsData.name !== 'User') {
+          setUserData(prev => {
+            if (!prev) return null;
+            return { ...prev, name: settingsData.name };
+          });
+        }
       } else {
         console.log('[useUserData] Settings response failed:', settingsResponse.status === 'rejected' ? settingsResponse.reason : settingsResponse.value?.error);
         // Set default settings if settings fail
@@ -162,22 +171,27 @@ export const useUserData = () => {
     if (!isAuthenticated) return;
 
     try {
-      // Load recent check-ins as messages
-      const checkinsResponse = await apiService.getCheckins(1, 20);
+      // Load chat messages from the new API endpoint
+      const chatResponse = await apiService.getChatMessages(1, 50);
       
-      if (checkinsResponse.success && checkinsResponse.data) {
-        const transformedMessages: Message[] = checkinsResponse.data.data.map((checkin: any) => ({
-          id: checkin.id,
-          text: checkin.content,
-          sender: 'user' as const,
-          timestamp: new Date(checkin.createdAt),
-          isVoice: false,
+      if (chatResponse.success && chatResponse.data) {
+        const transformedMessages: Message[] = chatResponse.data.data.map((message: any) => ({
+          id: message.id,
+          text: message.text,
+          sender: message.sender as 'user' | 'lyra',
+          timestamp: new Date(message.createdAt),
+          isVoice: message.isVoice || false,
         }));
         
         setMessages(transformedMessages);
+        console.log('[useUserData] Loaded chat messages:', transformedMessages.length);
+      } else {
+        console.log('[useUserData] No chat messages found or API error');
+        setMessages([]);
       }
     } catch (error) {
-      console.error('Error loading messages:', error);
+      console.error('Error loading chat messages:', error);
+      setMessages([]);
     }
   }, [isAuthenticated]);
 
@@ -299,6 +313,7 @@ export const useUserData = () => {
     if (!isAuthenticated) return;
 
     try {
+      // Create message locally first for immediate UI update
       const newMessage: Message = {
         id: Date.now().toString(),
         text,
@@ -309,8 +324,28 @@ export const useUserData = () => {
       
       setMessages(prev => [...prev, newMessage]);
       
-      // Note: Check-ins are handled separately, not for every chat message
-      // to avoid daily limit conflicts
+      // Save message to backend
+      const response = await apiService.createChatMessage(text, sender, isVoice);
+      
+      if (response.success && response.data) {
+        // Update the message with the real ID from the backend
+        const savedMessage: Message = {
+          id: (response.data as any).id,
+          text: (response.data as any).text,
+          sender: (response.data as any).sender as 'user' | 'lyra',
+          timestamp: new Date((response.data as any).createdAt),
+          isVoice: (response.data as any).isVoice || false,
+        };
+        
+        // Replace the temporary message with the saved one
+        setMessages(prev => prev.map(msg => 
+          msg.id === newMessage.id ? savedMessage : msg
+        ));
+        
+        console.log('[useUserData] Message saved to backend:', savedMessage.id);
+      } else {
+        console.error('[useUserData] Failed to save message to backend:', response.error);
+      }
     } catch (error) {
       console.error('Error adding message:', error);
       setError('Failed to add message');
@@ -370,6 +405,14 @@ export const useUserData = () => {
         
         return updatedSettings;
       });
+
+      // Also update userData if name is being changed
+      if (newSettings.name !== undefined) {
+        setUserData(prev => {
+          if (!prev) return null;
+          return { ...prev, name: newSettings.name! };
+        });
+      }
     } catch (error) {
       console.error('Error updating settings:', error);
       setError('Failed to update settings');
