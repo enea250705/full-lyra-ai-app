@@ -79,7 +79,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
                 styles.userMessageText,
               ]}
             >
-              {message.text}
+              {message.text || ''}
             </Text>
           </LinearGradient>
         ) : (
@@ -101,7 +101,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
                 styles.lyraMessageText,
               ]}
             >
-              {message.text}
+              {message.text || ''}
             </Text>
           </View>
         )}
@@ -118,7 +118,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
             <View style={styles.actionButtons}>
               <TouchableOpacity
                 style={styles.actionButton}
-                onPress={() => onCopy?.(message.text)}
+                onPress={() => onCopy?.(message.text || '')}
               >
                 <Copy size={14} color={colors.gray[500]} />
               </TouchableOpacity>

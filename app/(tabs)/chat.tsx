@@ -147,7 +147,7 @@ export default function ChatScreen() {
       
       // Fallback to simple contextual responses if AI fails
       let fallbackResponse = "";
-      const lowerText = messageText.toLowerCase();
+      const lowerText = (messageText || '').toLowerCase();
       
       if (lowerText.includes('mood') || lowerText.includes('feeling')) {
         fallbackResponse = userData?.mood 
@@ -287,7 +287,7 @@ export default function ChatScreen() {
     
     if (!message.text) return [];
     
-    const text = message.text.toLowerCase();
+    const text = (message.text || '').toLowerCase();
     const actions = [];
     
     // Check for subscription suggestions

@@ -84,13 +84,16 @@ export const usePermissions = () => {
         return false;
       }
 
+      console.log('[usePermissions] Requesting HealthKit permissions...');
       setPermissions(prev => ({
         ...prev,
         healthKit: { ...prev.healthKit, requested: true }
       }));
 
+      // Request HealthKit permissions with proper error handling
       const granted = await enableHealthKitTracking();
       
+      console.log('[usePermissions] HealthKit permission result:', granted);
       setPermissions(prev => ({
         ...prev,
         healthKit: { granted, requested: true, available: isAvailable }

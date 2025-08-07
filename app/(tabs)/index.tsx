@@ -117,14 +117,15 @@ export default function HomeScreen() {
         const hasRequestedPermissions = permissions.location.requested || permissions.healthKit.requested;
         
         if (!hasRequestedPermissions) {
-          // Show permissions modal
+          // Show permissions modal - let user explicitly request permissions
           setShowPermissionsModal(true);
         } else {
-          // Request permissions in background if not already granted
-          if (!permissions.location.granted || !permissions.healthKit.granted) {
-            console.log('[HomeScreen] Requesting permissions in background...');
-            requestAllPermissions().catch(error => {
-              console.error('Background permission request failed:', error);
+          // Only request location permission in background if not already granted
+          // Don't request HealthKit permissions in background as iOS requires user interaction
+          if (!permissions.location.granted) {
+            console.log('[HomeScreen] Requesting location permission in background...');
+            requestLocationPermission().catch(error => {
+              console.error('Background location permission request failed:', error);
             });
           }
         }
