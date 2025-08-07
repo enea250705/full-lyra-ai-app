@@ -13,6 +13,12 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.getlyra.app",
+      "entitlements": {
+        "com.apple.developer.healthkit": true,
+        "com.apple.developer.healthkit.access": [
+          "health-records"
+        ]
+      },
       "infoPlist": {
         "NSHealthShareUsageDescription": "Lyra needs access to your sleep data to provide personalized insights and track your sleep patterns automatically.",
         "NSHealthUpdateUsageDescription": "Lyra wants to save sleep data to your Health app to keep your health information synchronized.",
