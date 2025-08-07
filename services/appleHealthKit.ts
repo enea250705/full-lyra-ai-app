@@ -93,6 +93,7 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
         return false;
       }
 
+      console.log('[HealthKit] Requesting permissions...');
       return new Promise((resolve) => {
         initHealthKit(permissions, (error: string) => {
           if (error) {
@@ -343,12 +344,44 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
   }
 
   async requestPermissions(): Promise<boolean> {
-    return this.initHealthKit();
+    try {
+      if (!this.isHealthKitAvailable()) {
+        console.log('[HealthKit] HealthKit not available on this device');
+        return false;
+      }
+
+      console.log('[HealthKit] Starting permission request...');
+      
+      // First check if permissions are already granted
+      const alreadyGranted = await this.isPermissionGranted();
+      if (alreadyGranted) {
+        console.log('[HealthKit] Permissions already granted');
+        this.isInitialized = true;
+        this.hasPermissions = true;
+        return true;
+      }
+
+      // Request permissions through initHealthKit
+      const granted = await this.initHealthKit();
+      
+      if (granted) {
+        console.log('[HealthKit] Permission request successful');
+        return true;
+      } else {
+        console.log('[HealthKit] Permission request failed or denied');
+        return false;
+      }
+    } catch (error) {
+      console.error('[HealthKit] Error in requestPermissions:', error);
+      return false;
+    }
   }
 
   isHealthKitAvailable(): boolean {
     try {
-      return Platform.OS === 'ios' && typeof isAvailable === 'function' && isAvailable();
+      const isAvailable = Platform.OS === 'ios' && typeof isAvailable === 'function' && isAvailable();
+      console.log('[HealthKit] isHealthKitAvailable check:', { platform: Platform.OS, isAvailable });
+      return isAvailable;
     } catch (error) {
       console.warn('[HealthKit] isAvailable check failed:', error);
       return false;
