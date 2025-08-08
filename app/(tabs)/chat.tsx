@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, FlatList, KeyboardAvoidingView, Platform, TouchableOpacity, Clipboard, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, FlatList, KeyboardAvoidingView, Platform, TouchableOpacity, Alert } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ChatBubble } from '@/components/ui/ChatBubble';
@@ -37,16 +38,21 @@ export default function ChatScreen() {
     const messageText = text || inputText.trim();
     if (messageText === '') return;
     
-    // Add user message
-    await addMessage(messageText, 'user');
+    // Clear input immediately
     setInputText('');
+    
+    // Add user message immediately
+    await addMessage(messageText, 'user');
     
     // Simulate Lyra thinking
     setIsLoading(true);
     
     try {
       // Use real AI chat endpoint
-      const response = await fetch(`https://lyra-backend-xn4o.onrender.com/api/v1/ai/chat`, {
+      const base = (process.env.EXPO_PUBLIC_API_URL && process.env.EXPO_PUBLIC_API_URL.trim().length > 0
+        ? process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '')
+        : 'https://lyra-backend-xn4o.onrender.com/api/v1');
+      const response = await fetch(`${base}/ai/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +65,10 @@ export default function ChatScreen() {
             sleepHours: userData?.sleepHours || 0,
             energyLevel: userData?.energyLevel || 0,
             isFirstInteraction: messages.length === 0,
-            messageHistory: messages.slice(-3), // Send last 3 messages for context
+            messageHistory: messages.slice(-3).map(msg => ({
+              role: msg.sender === 'user' ? 'user' : 'assistant',
+              content: msg.text
+            })), // Send last 3 messages for context
           },
         }),
       });
@@ -104,7 +113,10 @@ export default function ChatScreen() {
                   onPress: async () => {
                     try {
                       // Execute the confirmed action
-                      const confirmResponse = await fetch(`https://lyra-backend-xn4o.onrender.com/api/v1/ai/execute-action`, {
+                      const base = (process.env.EXPO_PUBLIC_API_URL && process.env.EXPO_PUBLIC_API_URL.trim().length > 0
+                        ? process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '')
+                        : 'https://lyra-backend-xn4o.onrender.com/api/v1');
+                      const confirmResponse = await fetch(`${base}/ai/execute-action`, {
                         method: 'POST',
                         headers: {
                           'Content-Type': 'application/json',
@@ -168,7 +180,7 @@ export default function ChatScreen() {
   };
 
   const handleCopy = (text: string) => {
-    Clipboard.setString(text);
+    Clipboard.setStringAsync(text);
     Alert.alert('Copied', 'Message copied to clipboard');
   };
 
@@ -187,7 +199,11 @@ export default function ChatScreen() {
       let apiResponse;
       switch (action.type) {
         case 'subscription_cancelled':
-          apiResponse = await fetch(`https://lyra-backend-xn4o.onrender.com/api/v1/ai/execute-action`, {
+          {
+            const base = (process.env.EXPO_PUBLIC_API_URL && process.env.EXPO_PUBLIC_API_URL.trim().length > 0
+              ? process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '')
+              : 'https://lyra-backend-xn4o.onrender.com/api/v1');
+            apiResponse = await fetch(`${base}/ai/execute-action`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -198,10 +214,15 @@ export default function ChatScreen() {
               parameters: action.data,
             }),
           });
+          }
           break;
           
         case 'avoided_purchase':
-          apiResponse = await fetch(`https://lyra-backend-xn4o.onrender.com/api/v1/ai/execute-action`, {
+          {
+            const base = (process.env.EXPO_PUBLIC_API_URL && process.env.EXPO_PUBLIC_API_URL.trim().length > 0
+              ? process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '')
+              : 'https://lyra-backend-xn4o.onrender.com/api/v1');
+            apiResponse = await fetch(`${base}/ai/execute-action`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -212,10 +233,15 @@ export default function ChatScreen() {
               parameters: action.data,
             }),
           });
+          }
           break;
           
         case 'cheaper_alternative':
-          apiResponse = await fetch(`https://lyra-backend-xn4o.onrender.com/api/v1/ai/execute-action`, {
+          {
+            const base = (process.env.EXPO_PUBLIC_API_URL && process.env.EXPO_PUBLIC_API_URL.trim().length > 0
+              ? process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '')
+              : 'https://lyra-backend-xn4o.onrender.com/api/v1');
+            apiResponse = await fetch(`${base}/ai/execute-action`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -226,6 +252,7 @@ export default function ChatScreen() {
               parameters: action.data,
             }),
           });
+          }
           break;
           
         default:

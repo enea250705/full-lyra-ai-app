@@ -1,18 +1,32 @@
 export const formatDate = (date: Date): string => {
+  try {
+    if (!date || isNaN(date.getTime())) {
+      return 'Invalid date';
+    }
     return date.toLocaleDateString('en-US', {
       weekday: 'long',
       month: 'long',
       day: 'numeric',
     });
-  };
-  
-  export const formatTime = (date: Date): string => {
+  } catch (error) {
+    return 'Invalid date';
+  }
+};
+
+export const formatTime = (date: Date): string => {
+  try {
+    if (!date || isNaN(date.getTime())) {
+      return 'Invalid time';
+    }
     return date.toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
     });
-  };
+  } catch (error) {
+    return 'Invalid time';
+  }
+};
   
   export const getGreeting = (): string => {
     const hour = new Date().getHours();

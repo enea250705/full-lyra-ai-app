@@ -316,12 +316,13 @@ export const useUserData = () => {
       // Create message locally first for immediate UI update
       const newMessage: Message = {
         id: Date.now().toString(),
-        text,
+        text: text || '',
         sender,
         timestamp: new Date(),
         isVoice,
       };
       
+      // Add message to local state immediately
       setMessages(prev => [...prev, newMessage]);
       
       // Save message to backend
@@ -330,10 +331,10 @@ export const useUserData = () => {
       if (response.success && response.data) {
         // Update the message with the real ID from the backend
         const savedMessage: Message = {
-          id: (response.data as any).id,
-          text: (response.data as any).text,
-          sender: (response.data as any).sender as 'user' | 'lyra',
-          timestamp: new Date((response.data as any).createdAt),
+          id: (response.data as any).id || newMessage.id,
+          text: (response.data as any).text || text,
+          sender: (response.data as any).sender as 'user' | 'lyra' || sender,
+          timestamp: (response.data as any).createdAt ? new Date((response.data as any).createdAt) : new Date(),
           isVoice: (response.data as any).isVoice || false,
         };
         
@@ -345,9 +346,11 @@ export const useUserData = () => {
         console.log('[useUserData] Message saved to backend:', savedMessage.id);
       } else {
         console.error('[useUserData] Failed to save message to backend:', response.error);
+        // Keep the local message even if backend save fails
       }
     } catch (error) {
       console.error('Error adding message:', error);
+      // Don't remove the message from state if there's an error
       setError('Failed to add message');
     }
   }, [isAuthenticated]);

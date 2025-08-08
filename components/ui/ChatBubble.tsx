@@ -111,7 +111,12 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
           styles.messageFooter,
           isUser ? styles.userMessageFooter : styles.lyraMessageFooter
         ]}>
-          <Text style={styles.timestamp}>{formatTime(message.timestamp)}</Text>
+          <Text style={styles.timestamp}>
+            {message.timestamp && !isNaN(message.timestamp.getTime()) 
+              ? formatTime(message.timestamp) 
+              : 'Just now'
+            }
+          </Text>
           
           {/* Action Buttons for Lyra messages */}
           {!isUser && (

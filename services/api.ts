@@ -1,7 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // API Configuration
-const API_BASE_URL = 'https://lyra-backend-xn4o.onrender.com/api/v1';
+const API_BASE_URL = (process.env.EXPO_PUBLIC_API_URL && process.env.EXPO_PUBLIC_API_URL.trim().length > 0
+  ? process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '')
+  : 'https://lyra-backend-xn4o.onrender.com/api/v1');
 
 // Add timeout and additional options for better error handling
 const API_TIMEOUT = 30000; // 30 seconds
@@ -64,7 +66,7 @@ class ApiService {
       if (refreshToken) {
         try {
           const refreshResponse = await this.refreshToken(refreshToken);
-          if (refreshResponse.success) {
+          if (refreshResponse.success && refreshResponse.data) {
             await AsyncStorage.setItem('authToken', refreshResponse.data.token);
             await AsyncStorage.setItem('refreshToken', refreshResponse.data.refreshToken);
             return true;
@@ -448,6 +450,20 @@ class ApiService {
     });
   }
 
+  // Push Notifications (client helpers)
+  async saveExpoPushToken(token: string, device?: { os?: string; model?: string }) {
+    return this.request<any>('/notifications/tokens', {
+      method: 'POST',
+      body: JSON.stringify({ expoPushToken: token, platform: device?.os || 'unknown', deviceModel: device?.model }),
+    });
+  }
+
+  async unregisterPushToken(deviceId: string) {
+    return this.request<any>(`/notifications/tokens/${deviceId}`, {
+      method: 'DELETE',
+    });
+  }
+
   // Settings API
   async getUserSettings() {
     return this.request<any>('/settings');
@@ -569,6 +585,21 @@ class ApiService {
 
   async checkFeatureAccess(featureId: string) {
     return this.request<any>(`/subscription/feature/${featureId}`);
+  }
+
+  // Validate native IAP receipt
+  async validateReceipt(receiptData: {
+    receipt: string;
+    productId: string;
+    transactionId: string;
+    platform: string;
+    purchaseToken?: string;
+    packageName?: string;
+  }) {
+    return this.request<any>('/subscription/validate-receipt', {
+      method: 'POST',
+      body: JSON.stringify(receiptData),
+    });
   }
 
   // Google Fit API

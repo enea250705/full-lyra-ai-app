@@ -8,6 +8,7 @@ interface SavingsCounterProps {
   totalSaved: number;
   monthlyTarget?: number;
   monthlySaved?: number;
+  todaySaved?: number; // Add today's savings
   onPress?: () => void;
   onUpgradePress?: () => void;
   style?: any;
@@ -19,6 +20,7 @@ const SavingsCounter: React.FC<SavingsCounterProps> = ({
   totalSaved = 0,
   monthlyTarget = 100,
   monthlySaved = 0,
+  todaySaved = 0, // Add today's savings
   onPress,
   onUpgradePress,
   style,
@@ -129,6 +131,17 @@ const SavingsCounter: React.FC<SavingsCounterProps> = ({
             <Text style={styles.badgeText}>Total</Text>
           </View>
         </View>
+
+        {/* Today's Savings */}
+        {todaySaved > 0 && (
+          <View style={styles.todaySection}>
+            <View style={styles.todayHeader}>
+              <Calendar size={16} color="rgba(255, 255, 255, 0.8)" />
+              <Text style={styles.todayLabel}>Today: €{todaySaved.toFixed(2)}</Text>
+              <TrendingUp size={16} color="rgba(255, 255, 255, 0.8)" />
+            </View>
+          </View>
+        )}
 
         {/* Monthly Progress */}
         <View style={styles.monthlySection}>
@@ -368,6 +381,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: 'white',
     textAlign: 'center',
+  },
+  todaySection: {
+    marginBottom: 16,
+  },
+  todayHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+    gap: 8,
+  },
+  todayLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: 'rgba(255, 255, 255, 0.9)',
   },
 });
 

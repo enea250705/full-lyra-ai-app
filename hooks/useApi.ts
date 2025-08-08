@@ -113,3 +113,48 @@ export function useMutation<T, V>(
     reset,
   };
 }
+
+export function useApiRequest() {
+  const request = useCallback(
+    async (path: string, init?: RequestInit) => {
+      // Reuse apiService private request via a small facade
+      // We can't access apiService.request directly since it's private, so we call endpoint through apiService by method
+      // Build a generic passthrough using fetch to the same base as apiService
+      try {
+        const headers = await (async () => {
+          try {
+            const AsyncStorage = (await import('@react-native-async-storage/async-storage')).default;
+            const token = await AsyncStorage.getItem('authToken');
+            const h: Record<string, string> = { 'Content-Type': 'application/json' };
+            if (token) h['Authorization'] = `Bearer ${token}`;
+            return h;
+          } catch {
+            return { 'Content-Type': 'application/json' } as Record<string, string>;
+          }
+        })();
+        const base = (process.env.EXPO_PUBLIC_API_URL && process.env.EXPO_PUBLIC_API_URL.trim().length > 0
+          ? process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '')
+          : 'https://lyra-backend-xn4o.onrender.com/api/v1');
+        const res = await fetch(`${base}${path}`, {
+          ...init,
+          headers: { ...headers, ...(init?.headers as any) },
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          return { success: false, error: data?.error || data?.message || 'Request failed' };
+        }
+        return data;
+      } catch (e: any) {
+        return { success: false, error: e?.message || 'Network error' };
+      }
+    },
+    []
+  );
+
+  const get = useCallback((path: string, init?: RequestInit) => request(path, { method: 'GET', ...(init || {}) }), [request]);
+  const post = useCallback((path: string, body?: any, init?: RequestInit) => request(path, { method: 'POST', body: typeof body === 'string' ? body : JSON.stringify(body || {}), ...(init || {}) }), [request]);
+  const put = useCallback((path: string, body?: any, init?: RequestInit) => request(path, { method: 'PUT', body: typeof body === 'string' ? body : JSON.stringify(body || {}), ...(init || {}) }), [request]);
+  const del = useCallback((path: string, init?: RequestInit) => request(path, { method: 'DELETE', ...(init || {}) }), [request]);
+
+  return { request, get, post, put, del };
+}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, RefreshControl, Alert } from 'react-native';
-import { useApi } from '../../hooks/useApi';
+import { useApiRequest } from '../../hooks/useApi';
 import { PlaidLinkButton } from './PlaidLinkButton';
 import { ComingSoonCard } from './ComingSoonCard';
 import { isFeatureEnabled, getComingSoonFeature } from '../../constants/features';
@@ -40,7 +40,7 @@ export const FinancialDashboard: React.FC = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const { get } = useApi();
+  const { get } = useApiRequest();
 
   // Check if Plaid feature is enabled
   const isPlaidEnabled = isFeatureEnabled('PLAID_FINANCE');

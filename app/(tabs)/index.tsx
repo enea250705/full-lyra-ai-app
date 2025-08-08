@@ -38,7 +38,7 @@ export default function HomeScreen() {
   
   const { savings, loading: savingsLoading, recordSavings, fetchSavingsStats } = useSavings();
   const { subscription } = useSubscription();
-  const { permissions, requestAllPermissions, isLoading: permissionsLoading } = usePermissions();
+  const { permissions, requestAllPermissions, requestLocationPermission, isLoading: permissionsLoading } = usePermissions();
   
   const [currentMood, setCurrentMood] = useState<Mood>(userData?.mood || 'neutral');
   const [showStoreAlert, setShowStoreAlert] = useState(true);
@@ -124,7 +124,7 @@ export default function HomeScreen() {
           // Don't request HealthKit permissions in background as iOS requires user interaction
           if (!permissions.location.granted) {
             console.log('[HomeScreen] Requesting location permission in background...');
-            requestLocationPermission().catch(error => {
+            requestLocationPermission().catch((error: any) => {
               console.error('Background location permission request failed:', error);
             });
           }
@@ -233,6 +233,7 @@ export default function HomeScreen() {
         totalSaved={savings?.total.amount || 0}
         monthlyTarget={savings?.monthly.target || 100}
         monthlySaved={savings?.monthly.amount || 0}
+        todaySaved={savings?.today?.amount || 0}
         onPress={() => {
           // Navigate to subscription screen for now since /savings doesn't exist
           router.push('/subscription');

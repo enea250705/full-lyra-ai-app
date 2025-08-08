@@ -211,7 +211,7 @@ class NativeSubscriptionService {
   async getSubscriptionStatus(): Promise<SubscriptionStatus> {
     try {
       // Get status from backend
-      const response = await apiService.get('/subscription');
+      const response = await apiService.getSubscription();
       
       if (response.success && response.data) {
         const { plan, status, currentPeriodEnd, autoRenewing } = response.data;
@@ -260,7 +260,7 @@ class NativeSubscriptionService {
         }),
       };
 
-      const response = await apiService.post('/subscription/validate-receipt', receiptData);
+      const response = await apiService.validateReceipt(receiptData);
       
       if (response.success) {
         console.log('[IAP] Receipt validation successful');

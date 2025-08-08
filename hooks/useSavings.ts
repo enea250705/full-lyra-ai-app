@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useApi } from './useApi';
+import { useApiRequest } from './useApi';
 
 interface SavingsStats {
   total: {
@@ -10,6 +10,10 @@ interface SavingsStats {
     amount: number;
     count: number;
     target: number;
+  };
+  today: {
+    amount: number;
+    count: number;
   };
   byCategory: Array<{
     category: string;
@@ -50,7 +54,7 @@ interface SavingsRecord {
 }
 
 export const useSavings = () => {
-  const { request } = useApi();
+  const { request } = useApiRequest();
   const [savings, setSavings] = useState<SavingsStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { PlaidLink, LinkSuccess, LinkExit } from 'react-native-plaid-link-sdk';
-import { useApi } from '../../hooks/useApi';
+import { useApiRequest } from '../../hooks/useApi';
 
 interface PlaidLinkButtonProps {
   onSuccess?: (publicToken: string, metadata: any) => void;
@@ -20,12 +19,26 @@ export const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({
 }) => {
   const [linkToken, setLinkToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { post } = useApi();
+  const [PlaidLinkModule, setPlaidLinkModule] = useState<any>(null);
+  const { post } = useApiRequest();
+
+  useEffect(() => {
+    // Only load the Plaid SDK if this component is actually rendered
+    (async () => {
+      try {
+        const mod = await import('react-native-plaid-link-sdk');
+        setPlaidLinkModule(mod);
+      } catch (e) {
+        // SDK not available; show fallback
+        setPlaidLinkModule(null);
+      }
+    })();
+  }, []);
 
   const createLinkToken = async () => {
     try {
       setIsLoading(true);
-      const response = await post('/plaid/link-token', {});
+      const response = await post('/plaid/link-token');
       
       if (response.success && response.data?.linkToken) {
         setLinkToken(response.data.linkToken);
@@ -46,14 +59,12 @@ export const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({
     }
   };
 
-  const handleSuccess = async (success: LinkSuccess) => {
+  const handleSuccess = async (success: any) => {
     try {
       console.log('Plaid Link success:', success);
       
       // Exchange public token for access token
-      const response = await post('/plaid/exchange-token', {
-        publicToken: success.publicToken,
-      });
+      const response = await post('/plaid/exchange-token', { publicToken: success.publicToken });
 
       if (response.success) {
         Alert.alert(
@@ -78,7 +89,7 @@ export const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({
     }
   };
 
-  const handleExit = (exit: LinkExit) => {
+  const handleExit = (exit: any) => {
     console.log('Plaid Link exit:', exit);
     
     if (exit.error) {
@@ -96,6 +107,10 @@ export const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({
   };
 
   const handlePress = async () => {
+    if (!PlaidLinkModule?.PlaidLink) {
+      Alert.alert('Unavailable', 'Plaid integration is not available in this build.');
+      return;
+    }
     if (!linkToken) {
       const token = await createLinkToken();
       if (!token) return;
@@ -104,11 +119,9 @@ export const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({
 
   return (
     <View style={style}>
-      {linkToken ? (
-        <PlaidLink
-          tokenConfig={{
-            token: linkToken,
-          }}
+      {linkToken && PlaidLinkModule?.PlaidLink ? (
+        <PlaidLinkModule.PlaidLink
+          tokenConfig={{ token: linkToken }}
           onSuccess={handleSuccess}
           onExit={handleExit}
         >
@@ -135,7 +148,7 @@ export const PlaidLinkButton: React.FC<PlaidLinkButtonProps> = ({
               </Text>
             )}
           </TouchableOpacity>
-        </PlaidLink>
+        </PlaidLinkModule.PlaidLink>
       ) : (
         <TouchableOpacity
           style={{
