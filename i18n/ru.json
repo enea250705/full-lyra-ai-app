@@ -1,0 +1,50 @@
+{
+  "common": {
+    "ok": "ОК",
+    "cancel": "Отмена"
+  },
+  "settings": {
+    "title": "Настройки",
+    "sleep_tracking": "Отслеживание сна",
+    "manual_sleep_title": "Ручное отслеживание сна",
+    "manual_sleep_desc": "HealthKit недоступен на этом устройстве. Вы можете вести учёт сна вручную.",
+    "log_sleep_manually": "Записать вручную",
+    "profile": "Профиль",
+    "your_name": "Ваше имя",
+    "subscription": "Подписка",
+    "manage_subscription": "Управление подпиской",
+    "plans_billing": "Тарифы и оплата",
+    "api_connections": "Подключения API",
+    "google_calendar": "Google Календарь",
+    "apple_health": "Apple Health",
+    "plaid": "Plaid (финансы)",
+    "enabled_modules": "Включённые модули",
+    "voice_style": "Стиль голоса",
+    "voice_calm": "Спокойный",
+    "voice_energetic": "Энергичный",
+    "voice_minimal": "Минимальный",
+    "data_management": "Управление данными",
+    "export_data": "Экспорт данных",
+    "delete_all_data": "Удалить все данные",
+    "language": "Язык",
+    "change_language": "Изменить язык"
+  },
+  "languages": {
+    "en": "English",
+    "it": "Italiano",
+    "ja": "日本語",
+    "ko": "한국어",
+    "ar": "العربية",
+    "zh": "简体中文",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "tr": "Türkçe",
+    "ru": "Русский",
+    "pt-BR": "Português (Brasil)"
+  }
+}
+
+
+
+

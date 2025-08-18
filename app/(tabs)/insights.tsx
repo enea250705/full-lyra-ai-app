@@ -8,8 +8,10 @@ import { useUserData } from '@/hooks/useUserData';
 import { colors } from '@/constants/colors';
 import { Mood } from '@/types';
 import SafeLoadingScreen from '@/components/ui/SafeLoadingScreen';
+import { useI18n } from '@/i18n';
 
 export default function InsightsScreen() {
+  const { t } = useI18n();
   const { insightData, userData, loading } = useUserData();
   const [refreshing, setRefreshing] = useState(false);
 
@@ -65,8 +67,8 @@ export default function InsightsScreen() {
       <ScreenContainer>
         <SafeLoadingScreen 
           type="insights"
-          message="Analyzing your insights..."
-          subMessage="Processing your patterns and generating personalized recommendations"
+          message={t('insights.screen.loading_title')}
+          subMessage={t('insights.screen.loading_sub')}
         />
       </ScreenContainer>
     );
@@ -74,59 +76,59 @@ export default function InsightsScreen() {
 
   return (
     <ScreenContainer onRefresh={handleRefresh} refreshing={refreshing}>
-      <Text style={styles.title}>Your Insights</Text>
+      <Text style={styles.title}>{t('insights.screen.title')}</Text>
       <Text style={styles.subtitle}>
-        Patterns and trends from your daily activities
+        {t('insights.screen.subtitle')}
       </Text>
 
       {/* Comprehensive Weather & Location Insights */}
-      {userData?.id && (
+      {userData && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Weather & Location Insights</Text>
-          <ComprehensiveInsights userId={userData.id} />
+          <Text style={styles.sectionTitle}>{t('insights.screen.weather_location')}</Text>
+          <ComprehensiveInsights userId={userData.name} />
         </View>
       )}
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Mood Trend (7 Days)</Text>
+        <Text style={styles.sectionTitle}>{t('insights.screen.mood_trend')}</Text>
         {moodData.length > 0 ? (
           <GraphView
             data={moodData}
-            title="Mood"
+            title={t('insights.mood_weather.title')}
             maxValue={5}
             minValue={1}
             barColor={colors.lightPurple}
           />
         ) : (
           <View style={styles.emptyStateContainer}>
-            <Text style={styles.emptyStateText}>No mood data available yet.</Text>
-            <Text style={styles.emptyStateSubtext}>Start tracking your daily mood to see trends!</Text>
+            <Text style={styles.emptyStateText}>{t('insights.screen.no_mood_data')}</Text>
+            <Text style={styles.emptyStateSubtext}>{t('insights.screen.start_tracking_mood')}</Text>
           </View>
         )}
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Sleep Tracker</Text>
+        <Text style={styles.sectionTitle}>{t('insights.screen.sleep_tracker')}</Text>
         {sleepData.length > 0 ? (
           <GraphView
             data={sleepData}
-            title="Hours of Sleep"
-            yAxisLabel="Hours"
+            title={t('insights.screen.hours_of_sleep')}
+            yAxisLabel={t('insights.screen.hours')}
             barColor={colors.midnightBlue}
           />
         ) : (
           <View style={styles.emptyStateContainer}>
-            <Text style={styles.emptyStateText}>No sleep data available yet.</Text>
-            <Text style={styles.emptyStateSubtext}>Start logging your sleep to see patterns!</Text>
+            <Text style={styles.emptyStateText}>{t('insights.screen.no_sleep_data')}</Text>
+            <Text style={styles.emptyStateSubtext}>{t('insights.screen.start_logging_sleep')}</Text>
           </View>
         )}
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Weekly Reflections</Text>
+        <Text style={styles.sectionTitle}>{t('insights.screen.weekly_reflections')}</Text>
         
         <View style={styles.reflectionContainer}>
-          <Text style={styles.reflectionTitle}>3 Wins</Text>
+          <Text style={styles.reflectionTitle}>{t('insights.screen.wins_title')}</Text>
           {insightData?.wins?.length > 0 ? (
             insightData.wins.map((win, index) => (
               <View key={`win-${index}`} style={styles.reflectionItem}>
@@ -135,12 +137,12 @@ export default function InsightsScreen() {
               </View>
             ))
           ) : (
-            <Text style={styles.reflectionText}>No wins recorded yet. Start tracking your daily activities!</Text>
+            <Text style={styles.reflectionText}>{t('insights.screen.no_wins')}</Text>
           )}
         </View>
         
         <View style={styles.reflectionContainer}>
-          <Text style={styles.reflectionTitle}>3 Lessons</Text>
+          <Text style={styles.reflectionTitle}>{t('insights.screen.lessons_title')}</Text>
           {insightData?.lessons?.length > 0 ? (
             insightData.lessons.map((lesson, index) => (
               <View key={`lesson-${index}`} style={styles.reflectionItem}>
@@ -149,26 +151,26 @@ export default function InsightsScreen() {
               </View>
             ))
           ) : (
-            <Text style={styles.reflectionText}>No lessons recorded yet. Continue your journey to unlock insights!</Text>
+            <Text style={styles.reflectionText}>{t('insights.screen.no_lessons')}</Text>
           )}
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Actionable Suggestions</Text>
+        <Text style={styles.sectionTitle}>{t('insights.screen.actionable_suggestions')}</Text>
         {insightData?.suggestions?.length > 0 ? (
           insightData.suggestions.map((suggestion, index) => (
             <InsightCard
               key={`suggestion-${index}`}
-              title={`Suggestion ${index + 1}`}
+              title={t('insights.screen.suggestion_n', { n: String(index + 1) })}
               description={suggestion}
               variant={index % 3 === 0 ? 'warning' : index % 3 === 1 ? 'info' : 'success'}
             />
           ))
         ) : (
           <InsightCard
-            title="Getting Started"
-            description="Start tracking your mood, sleep, and daily activities to receive personalized suggestions!"
+            title={t('insights.screen.getting_started')}
+            description={t('insights.screen.getting_started_desc')}
             variant="info"
           />
         )}

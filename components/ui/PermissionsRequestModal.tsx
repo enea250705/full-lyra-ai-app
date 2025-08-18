@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,7 @@ import {
   XCircle,
   ArrowRight 
 } from 'lucide-react-native';
+import { useI18n } from '@/i18n';
 
 interface PermissionItem {
   id: string;
@@ -49,44 +50,47 @@ export const PermissionsRequestModal: React.FC<PermissionsRequestModalProps> = (
   onContinue,
 }) => {
   const [isRequesting, setIsRequesting] = useState(false);
+  const { t } = useI18n();
 
-  const permissionItems: PermissionItem[] = [
+  const permissionItems: PermissionItem[] = useMemo(() => [
     {
       id: 'location',
-      title: 'Location Access',
-      description: 'Get weather insights and location-based recommendations',
+      title: t('permissions.location_title'),
+      description: t('permissions.location_desc'),
       icon: <MapPin size={24} color={colors.midnightBlue} />,
       required: false,
       granted: permissions.location.granted,
     },
     {
       id: 'healthKit',
-      title: 'Health & Sleep Tracking',
-      description: 'Automatic sleep detection and health insights',
+      title: t('permissions.health_title'),
+      description: t('permissions.health_desc'),
       icon: <Heart size={24} color={colors.midnightBlue} />,
       required: false,
       granted: permissions.healthKit.granted,
     },
     {
       id: 'notifications',
-      title: 'Notifications',
-      description: 'Get reminders and important updates',
+      title: t('permissions.notifications_title'),
+      description: t('permissions.notifications_desc'),
       icon: <Bell size={24} color={colors.midnightBlue} />,
       required: false,
       granted: permissions.notifications.granted,
     },
-  ];
+  ], [permissions.location.granted, permissions.healthKit.granted, permissions.notifications.granted]);
 
   const handleRequestPermissions = async () => {
     setIsRequesting(true);
     try {
+      console.log('[PermissionsRequestModal] Requesting permissions...');
       await onRequestPermissions();
+      console.log('[PermissionsRequestModal] Permissions request completed');
     } catch (error) {
-      console.error('Error requesting permissions:', error);
+      console.error('[PermissionsRequestModal] Error requesting permissions:', error);
       Alert.alert(
-        'Permission Request Failed',
-        'Some permissions could not be requested. You can enable them later in Settings.',
-        [{ text: 'OK' }]
+        t('permissions.request_failed_title'),
+        t('permissions.request_failed_message'),
+        [{ text: t('common.ok') }]
       );
     } finally {
       setIsRequesting(false);
@@ -95,17 +99,25 @@ export const PermissionsRequestModal: React.FC<PermissionsRequestModalProps> = (
 
   const handleSkip = () => {
     Alert.alert(
-      'Skip Permissions?',
-      'You can still use Lyra, but some features will be limited. You can enable permissions later in Settings.',
+      t('common.info'),
+      t('permissions.denied_message', { list: '' }),
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Skip for Now', onPress: onSkip },
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('permissions.skip'), onPress: onSkip },
       ]
     );
   };
 
   const grantedCount = permissionItems.filter(item => item.granted).length;
   const totalCount = permissionItems.length;
+
+  console.log('[PermissionsRequestModal] Render:', { 
+    visible, 
+    permissions, 
+    grantedCount, 
+    totalCount,
+    permissionItems: permissionItems.map(item => ({ id: item.id, granted: item.granted }))
+  });
 
   return (
     <Modal
@@ -122,16 +134,16 @@ export const PermissionsRequestModal: React.FC<PermissionsRequestModalProps> = (
             <View style={styles.iconContainer}>
               <Shield size={32} color={colors.midnightBlue} />
             </View>
-            <Text style={styles.title}>Welcome to Lyra</Text>
+            <Text style={styles.title}>{t('permissions.welcome_title')}</Text>
             <Text style={styles.subtitle}>
-              Let's set up your personalized experience
+              {t('permissions.welcome_subtitle')}
             </Text>
           </View>
 
           <View style={styles.permissionsContainer}>
-            <Text style={styles.sectionTitle}>Permissions</Text>
+            <Text style={styles.sectionTitle}>{t('permissions.section_title')}</Text>
             <Text style={styles.sectionDescription}>
-              These permissions help Lyra provide better insights and recommendations
+              {t('permissions.section_description')}
             </Text>
 
             {permissionItems.map((item) => (
@@ -166,7 +178,7 @@ export const PermissionsRequestModal: React.FC<PermissionsRequestModalProps> = (
               />
             </View>
             <Text style={styles.progressText}>
-              {grantedCount} of {totalCount} permissions granted
+              {t('permissions.progress_text', { granted: String(grantedCount), total: String(totalCount) })}
             </Text>
           </View>
 
@@ -176,7 +188,7 @@ export const PermissionsRequestModal: React.FC<PermissionsRequestModalProps> = (
               onPress={handleSkip}
               disabled={isRequesting}
             >
-              <Text style={styles.skipButtonText}>Skip for Now</Text>
+              <Text style={styles.skipButtonText}>{t('permissions.skip')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -192,7 +204,7 @@ export const PermissionsRequestModal: React.FC<PermissionsRequestModalProps> = (
                 style={styles.continueButtonGradient}
               >
                 <Text style={styles.continueButtonText}>
-                  {isRequesting ? 'Requesting...' : 'Enable Permissions'}
+                  {isRequesting ? t('common.processing') : t('permissions.enable')}
                 </Text>
                 <ArrowRight size={16} color="#FFFFFF" />
               </LinearGradient>
@@ -201,7 +213,7 @@ export const PermissionsRequestModal: React.FC<PermissionsRequestModalProps> = (
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>
-              You can change these settings anytime in the app
+              {t('permissions.footer')}
             </Text>
           </View>
         </LinearGradient>

@@ -1,0 +1,50 @@
+{
+  "common": {
+    "ok": "确定",
+    "cancel": "取消"
+  },
+  "settings": {
+    "title": "设置",
+    "sleep_tracking": "睡眠跟踪",
+    "manual_sleep_title": "手动睡眠跟踪",
+    "manual_sleep_desc": "此设备不支持 HealthKit。您仍可手动记录睡眠。",
+    "log_sleep_manually": "手动记录",
+    "profile": "个人资料",
+    "your_name": "你的名字",
+    "subscription": "订阅",
+    "manage_subscription": "管理订阅",
+    "plans_billing": "套餐与账单",
+    "api_connections": "API 连接",
+    "google_calendar": "Google 日历",
+    "apple_health": "Apple 健康",
+    "plaid": "Plaid（金融）",
+    "enabled_modules": "已启用模块",
+    "voice_style": "语音风格",
+    "voice_calm": "平静",
+    "voice_energetic": "活力",
+    "voice_minimal": "简约",
+    "data_management": "数据管理",
+    "export_data": "导出数据",
+    "delete_all_data": "删除全部数据",
+    "language": "语言",
+    "change_language": "更改语言"
+  },
+  "languages": {
+    "en": "English",
+    "it": "Italiano",
+    "ja": "日本語",
+    "ko": "한국어",
+    "ar": "العربية",
+    "zh": "简体中文",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "tr": "Türkçe",
+    "ru": "Русский",
+    "pt-BR": "Português (Brasil)"
+  }
+}
+
+
+
+

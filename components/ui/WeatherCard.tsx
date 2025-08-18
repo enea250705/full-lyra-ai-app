@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Cloud, Sun, CloudRain, Wind, Eye, Thermometer } from 'lucide-react-native';
+import { useI18n } from '@/i18n';
 
 interface WeatherData {
   temperature: number;
@@ -53,6 +54,7 @@ const getWeatherGradient = (weatherType: string) => {
 };
 
 const WeatherCard: React.FC<WeatherCardProps> = ({ weather, style }) => {
+  const { t } = useI18n();
   const gradient = getWeatherGradient(weather.weatherType);
 
   return (
@@ -74,7 +76,7 @@ const WeatherCard: React.FC<WeatherCardProps> = ({ weather, style }) => {
 
       <View style={styles.temperatureContainer}>
         <Text style={styles.temperature}>{Math.round(weather.temperature)}°C</Text>
-        <Text style={styles.weatherType}>{weather.weatherType}</Text>
+        <Text style={styles.weatherType}>{t(`weather.type_${weather.weatherType.toLowerCase()}`)}</Text>
       </View>
 
       <View style={styles.detailsContainer}>
@@ -82,35 +84,35 @@ const WeatherCard: React.FC<WeatherCardProps> = ({ weather, style }) => {
           <View style={styles.detailIcon}>
             <Thermometer size={16} color="#FFFFFF" />
           </View>
-          <Text style={styles.detailText}>Feels like {Math.round(weather.temperature)}°C</Text>
+          <Text style={styles.detailText}>{t('weather.feels_like', { temp: String(Math.round(weather.temperature)) })}</Text>
         </View>
 
         <View style={styles.detailItem}>
           <View style={styles.detailIcon}>
             <Wind size={16} color="#FFFFFF" />
           </View>
-          <Text style={styles.detailText}>{weather.windSpeed} m/s</Text>
+          <Text style={styles.detailText}>{t('weather.wind_speed', { value: String(weather.windSpeed) })}</Text>
         </View>
 
         <View style={styles.detailItem}>
           <View style={styles.detailIcon}>
             <Eye size={16} color="#FFFFFF" />
           </View>
-          <Text style={styles.detailText}>{weather.visibility} km</Text>
+          <Text style={styles.detailText}>{t('weather.visibility', { value: String(weather.visibility) })}</Text>
         </View>
       </View>
 
       <View style={styles.statsContainer}>
         <View style={styles.statItem}>
-          <Text style={styles.statLabel}>Humidity</Text>
+          <Text style={styles.statLabel}>{t('weather.humidity')}</Text>
           <Text style={styles.statValue}>{weather.humidity}%</Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={styles.statLabel}>UV Index</Text>
+          <Text style={styles.statLabel}>{t('weather.uv_index')}</Text>
           <Text style={styles.statValue}>{weather.uvIndex}</Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={styles.statLabel}>Pressure</Text>
+          <Text style={styles.statLabel}>{t('weather.pressure')}</Text>
           <Text style={styles.statValue}>{weather.pressure} hPa</Text>
         </View>
       </View>

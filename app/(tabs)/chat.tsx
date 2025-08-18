@@ -14,6 +14,7 @@ import { colors } from '@/constants/colors';
 import { Send } from 'lucide-react-native';
 import { StatusBar } from 'expo-status-bar';
 import SafeLoadingScreen from '@/components/ui/SafeLoadingScreen';
+import { useI18n } from '@/i18n';
 
 export default function ChatScreen() {
   const { messages, addMessage, userData, loading } = useUserData();
@@ -24,6 +25,7 @@ export default function ChatScreen() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgradeContext, setUpgradeContext] = useState<{featureId?: string, featureName?: string}>({});
   const flatListRef = useRef<FlatList>(null);
+  const { t } = useI18n();
 
   useEffect(() => {
     // Scroll to bottom when messages change
@@ -100,16 +102,16 @@ export default function ChatScreen() {
           // If action requires confirmation, show confirmation dialog
           if (actionInfo.requiresConfirmation) {
             Alert.alert(
-              'Confirm Action',
+              t('chat.confirm_action_title'),
               aiResponse,
               [
                 {
-                  text: 'Cancel',
+                  text: t('common.cancel'),
                   style: 'cancel',
-                  onPress: () => addMessage('Action cancelled.', 'lyra'),
+                  onPress: () => addMessage(t('chat.action_cancelled'), 'lyra'),
                 },
                 {
-                  text: 'Confirm',
+                  text: t('common.confirm'),
                   onPress: async () => {
                     try {
                       // Execute the confirmed action
@@ -131,13 +133,13 @@ export default function ChatScreen() {
 
                       const confirmData = await confirmResponse.json();
                       if (confirmData.success) {
-                        await addMessage(confirmData.message || 'Action completed successfully!', 'lyra');
+                        await addMessage(confirmData.message || t('chat.action_completed'), 'lyra');
                       } else {
-                        await addMessage('Sorry, I couldn\'t complete that action. Please try again.', 'lyra');
+                        await addMessage(t('chat.action_failed'), 'lyra');
                       }
                     } catch (error) {
                       console.error('Action confirmation error:', error);
-                      await addMessage('Sorry, I couldn\'t complete that action. Please try again.', 'lyra');
+                      await addMessage(t('chat.action_failed'), 'lyra');
                     }
                   },
                 },
@@ -163,14 +165,14 @@ export default function ChatScreen() {
       
       if (lowerText.includes('mood') || lowerText.includes('feeling')) {
         fallbackResponse = userData?.mood 
-          ? `I see you're feeling ${userData.mood} today. I'd love to help, but I'm having trouble connecting to my AI right now. Please try again in a moment.`
-          : "I'd love to help with your mood! For now, try setting your current mood on the home screen. I'll be back to full capacity soon.";
+          ? t('chat.fallback_mood', { mood: userData.mood })
+          : t('chat.fallback_get_started');
       } else if (lowerText.includes('anxious') || lowerText.includes('anxiety')) {
-        fallbackResponse = "I hear that you're feeling anxious. Try some deep breathing exercises - inhale for 4 counts, hold for 4, exhale for 4. I'm having connection issues but will be back to help more soon.";
+        fallbackResponse = t('chat.fallback_anxiety');
       } else if (lowerText.includes('started') || lowerText.includes('get started')) {
-        fallbackResponse = "Welcome to Lyra! 🎉 Start by setting your mood on the home screen. I'm having some technical difficulties but will be back to full capacity soon.";
+        fallbackResponse = t('chat.fallback_get_started');
       } else {
-        fallbackResponse = "I'm experiencing some technical difficulties right now, but I'm still here for you. Please try again in a moment - I'll be back to help you properly soon!";
+        fallbackResponse = t('chat.fallback_generic');
       }
       
       await addMessage(fallbackResponse, 'lyra');
@@ -181,14 +183,14 @@ export default function ChatScreen() {
 
   const handleCopy = (text: string) => {
     Clipboard.setStringAsync(text);
-    Alert.alert('Copied', 'Message copied to clipboard');
+    Alert.alert(t('chat.copied_title'), t('chat.copied_message'));
   };
 
   const handleReaction = (messageId: string, reaction: 'like' | 'dislike') => {
     // Here you would typically send feedback to your AI service
     Alert.alert(
-      'Feedback Recorded', 
-      `Thank you for your ${reaction}! This helps me learn and improve.`
+      t('chat.feedback_title'), 
+      t('chat.feedback_message', { reaction })
     );
   };
 
@@ -387,8 +389,8 @@ export default function ChatScreen() {
         <SafeLoadingScreen 
           type="chat"
           size="medium"
-          message="Connecting to Lyra..."
-          subMessage="Your AI companion is getting ready to chat"
+          message={t('auth.index.welcome_back_loading')}
+          subMessage={t('auth.index.preparing_experience')}
         />
       </KeyboardAvoidingView>
     );
@@ -436,29 +438,28 @@ export default function ChatScreen() {
               >
                 <Text style={styles.welcomeAvatarText}>✨</Text>
               </LinearGradient>
-              <Text style={styles.welcomeTitle}>Hey there! I'm Lyra</Text>
+              <Text style={styles.welcomeTitle}>{t('common.app_name')}</Text>
               <Text style={styles.welcomeSubtitle}>
-                Your personal AI companion for mindful living. I'm here to help you with mood tracking, 
-                insights, savings tips, and thoughtful conversations.
+                {t('home.default_focus')}
               </Text>
               <View style={styles.suggestionChips}>
                 <TouchableOpacity 
                   style={styles.suggestionChip}
-                  onPress={() => handleSendMessage("How are you feeling today?")}
+                  onPress={() => handleSendMessage(t('mood.question'))}
                 >
-                  <Text style={styles.suggestionChipText}>💭 How are you feeling?</Text>
+                  <Text style={styles.suggestionChipText}>💭 {t('mood.question')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.suggestionChip}
-                  onPress={() => handleSendMessage("Help me save money this month")}
+                  onPress={() => handleSendMessage(t('finance.save', { amount: '€50' }))}
                 >
-                  <Text style={styles.suggestionChipText}>💰 Save money tips</Text>
+                  <Text style={styles.suggestionChipText}>💰 {t('savings.locked_title')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.suggestionChip}
-                  onPress={() => handleSendMessage("What should I focus on today?")}
+                  onPress={() => handleSendMessage(t('home.todays_focus'))}
                 >
-                  <Text style={styles.suggestionChipText}>🎯 Daily focus</Text>
+                  <Text style={styles.suggestionChipText}>🎯 {t('home.todays_focus')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -513,11 +514,11 @@ export default function ChatScreen() {
             style={styles.typingBubble}
           >
             <View style={styles.typingAnimation}>
-              <View style={[styles.typingDot, { animationDelay: '0ms' }]} />
-              <View style={[styles.typingDot, { animationDelay: '150ms' }]} />
-              <View style={[styles.typingDot, { animationDelay: '300ms' }]} />
+              <View style={styles.typingDot} />
+              <View style={styles.typingDot} />
+              <View style={styles.typingDot} />
             </View>
-            <Text style={styles.typingText}>Lyra is thinking...</Text>
+            <Text style={styles.typingText}>{t('common.processing')}</Text>
           </LinearGradient>
         </View>
       )}

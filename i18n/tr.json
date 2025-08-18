@@ -1,0 +1,50 @@
+{
+  "common": {
+    "ok": "Tamam",
+    "cancel": "İptal"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "sleep_tracking": "Uyku Takibi",
+    "manual_sleep_title": "Manuel Uyku Takibi",
+    "manual_sleep_desc": "Bu cihazda HealthKit kullanılamıyor. Uykunuzu manuel olarak kaydedebilirsiniz.",
+    "log_sleep_manually": "Manuel Kaydet",
+    "profile": "Profil",
+    "your_name": "Adınız",
+    "subscription": "Abonelik",
+    "manage_subscription": "Aboneliği Yönet",
+    "plans_billing": "Planlar ve Faturalandırma",
+    "api_connections": "API Bağlantıları",
+    "google_calendar": "Google Takvim",
+    "apple_health": "Apple Health",
+    "plaid": "Plaid (Finans)",
+    "enabled_modules": "Etkin Modüller",
+    "voice_style": "Ses Stili",
+    "voice_calm": "Sakin",
+    "voice_energetic": "Enerjik",
+    "voice_minimal": "Minimal",
+    "data_management": "Veri Yönetimi",
+    "export_data": "Verileri Dışa Aktar",
+    "delete_all_data": "Tüm Verileri Sil",
+    "language": "Dil",
+    "change_language": "Dili Değiştir"
+  },
+  "languages": {
+    "en": "English",
+    "it": "Italiano",
+    "ja": "日本語",
+    "ko": "한국어",
+    "ar": "العربية",
+    "zh": "简体中文",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "tr": "Türkçe",
+    "ru": "Русский",
+    "pt-BR": "Português (Brasil)"
+  }
+}
+
+
+
+

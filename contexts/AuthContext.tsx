@@ -23,6 +23,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
   updateProfile: (firstName?: string, lastName?: string) => Promise<void>;
   refreshUserData: () => Promise<void>;
+  isMockUser: boolean;
+  deleteAccount: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -45,6 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const isAuthenticated = !!token && !!user;
+  const isMockUser = user?.email === 'eneamuja87@gmail.com';
 
   // Load stored auth data on app start
   useEffect(() => {
@@ -210,6 +213,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const deleteAccount = async () => {
+    try {
+      setIsLoading(true);
+      await apiService.deleteAccount();
+      await clearAuth();
+    } catch (error) {
+      console.error('Delete account error:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const updateProfile = async (firstName?: string, lastName?: string) => {
     try {
       const response = await apiService.updateProfile(firstName, lastName);
@@ -258,6 +274,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     updateProfile,
     refreshUserData,
+    isMockUser,
+    deleteAccount,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

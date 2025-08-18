@@ -379,9 +379,17 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
 
   isHealthKitAvailable(): boolean {
     try {
-      const isAvailable = Platform.OS === 'ios' && typeof isAvailable === 'function' && isAvailable();
-      console.log('[HealthKit] isHealthKitAvailable check:', { platform: Platform.OS, isAvailable });
-      return isAvailable;
+      if (Platform.OS !== 'ios') {
+        return false;
+      }
+      
+      // Check if react-native-health is available and HealthKit is supported
+      if (typeof isAvailable !== 'function') {
+        return false;
+      }
+      const healthKitAvailable = isAvailable();
+      console.log('[HealthKit] isHealthKitAvailable check:', { platform: Platform.OS, healthKitAvailable });
+      return healthKitAvailable;
     } catch (error) {
       console.warn('[HealthKit] isAvailable check failed:', error);
       return false;
@@ -447,16 +455,21 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
 
   async isPermissionGranted(): Promise<boolean> {
     if (!this.isHealthKitAvailable()) {
+      console.log('[HealthKit] HealthKit not available, permission check skipped');
       return false;
     }
 
     return new Promise((resolve) => {
       getAuthStatus(permissions, (err: Object, result: any) => {
         if (err) {
+          console.log('[HealthKit] Error checking auth status:', err);
           resolve(false);
         } else {
+          console.log('[HealthKit] Auth status result:', result);
           const sleepPermission = result[Constants.Permissions.SleepAnalysis];
-          resolve(sleepPermission === Constants.AuthorizationStatusCodes.Granted);
+          const isGranted = sleepPermission === Constants.AuthorizationStatusCodes.Granted;
+          console.log('[HealthKit] Sleep permission status:', { sleepPermission, isGranted });
+          resolve(isGranted);
         }
       });
     });

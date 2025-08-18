@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/Button';
 import { GoogleSignInButton } from '../../components/ui/GoogleSignInButton';
 import { colors } from '../../constants/colors';
+import { useI18n } from '../../i18n';
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -15,20 +16,21 @@ export default function Register() {
   const [lastName, setLastName] = useState('');
   const { register, isLoading } = useAuth();
   const router = useRouter();
+  const { t } = useI18n();
 
   const handleRegister = async () => {
     if (!email || !password || !confirmPassword) {
-      Alert.alert('Error', 'Please fill in all required fields');
+      Alert.alert(t('common.error'), t('auth.register.error_fill_required'));
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
+      Alert.alert(t('common.error'), t('auth.register.error_password_mismatch'));
       return;
     }
 
     if (password.length < 8) {
-      Alert.alert('Error', 'Password must be at least 8 characters long');
+      Alert.alert(t('common.error'), t('auth.register.error_password_length'));
       return;
     }
 
@@ -36,7 +38,7 @@ export default function Register() {
       await register(email, password, firstName, lastName);
       router.replace('/(tabs)');
     } catch (error) {
-      Alert.alert('Registration Failed', error instanceof Error ? error.message : 'An error occurred');
+      Alert.alert(t('auth.register.registration_failed'), error instanceof Error ? error.message : t('common.something_went_wrong'));
     }
   };
 
@@ -84,8 +86,8 @@ export default function Register() {
           <View style={styles.content}>
             <View style={styles.titleContainer}>
               <Text style={styles.lyraText}>LYRA</Text>
-              <Text style={styles.title}>Create Account</Text>
-              <Text style={styles.subtitle}>Begin your wellness journey with Lyra</Text>
+              <Text style={styles.title}>{t('auth.register.title')}</Text>
+              <Text style={styles.subtitle}>{t('auth.register.subtitle')}</Text>
             </View>
             
             <View style={styles.form}>
@@ -93,7 +95,7 @@ export default function Register() {
                 <View style={[styles.inputContainer, styles.nameInput]}>
                   <TextInput
                     style={styles.input}
-                    placeholder="First Name"
+                    placeholder={t('auth.register.first_name')}
                     placeholderTextColor="rgba(255, 255, 255, 0.6)"
                     value={firstName}
                     onChangeText={setFirstName}
@@ -103,7 +105,7 @@ export default function Register() {
                 <View style={[styles.inputContainer, styles.nameInput]}>
                   <TextInput
                     style={styles.input}
-                    placeholder="Last Name"
+                    placeholder={t('auth.register.last_name')}
                     placeholderTextColor="rgba(255, 255, 255, 0.6)"
                     value={lastName}
                     onChangeText={setLastName}
@@ -115,7 +117,7 @@ export default function Register() {
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
-                  placeholder="Email *"
+                  placeholder={t('auth.register.email_required')}
                   placeholderTextColor="rgba(255, 255, 255, 0.6)"
                   value={email}
                   onChangeText={setEmail}
@@ -128,7 +130,7 @@ export default function Register() {
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
-                  placeholder="Password *"
+                  placeholder={t('auth.register.password_required')}
                   placeholderTextColor="rgba(255, 255, 255, 0.6)"
                   value={password}
                   onChangeText={setPassword}
@@ -140,7 +142,7 @@ export default function Register() {
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
-                  placeholder="Confirm Password *"
+                  placeholder={t('auth.register.confirm_password_required')}
                   placeholderTextColor="rgba(255, 255, 255, 0.6)"
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
@@ -156,7 +158,7 @@ export default function Register() {
                 end={{ x: 1, y: 1 }}
               >
                 <Button
-                  title={isLoading ? "Creating Account..." : "Create Account"}
+                  title={isLoading ? t('auth.register.creating_account') : t('auth.register.create_account')}
                   onPress={handleRegister}
                   disabled={isLoading}
                   style={styles.registerButtonInner}
@@ -167,22 +169,22 @@ export default function Register() {
               {/* Divider */}
               <View style={styles.divider}>
                 <View style={styles.dividerLine} />
-                <Text style={styles.dividerText}>or</Text>
+                <Text style={styles.dividerText}>{t('auth.register.divider_or')}</Text>
                 <View style={styles.dividerLine} />
               </View>
 
               {/* Google Sign-In Button */}
               <GoogleSignInButton
-                buttonText="Sign up with Google"
+                buttonText={t('auth.google.sign_up_with_google')}
                 onSuccess={() => router.replace('/(tabs)')}
                 disabled={isLoading}
               />
             </View>
             
             <View style={styles.footer}>
-              <Text style={styles.footerText}>Already have an account? </Text>
+              <Text style={styles.footerText}>{t('auth.register.already_have_account')} </Text>
               <Button
-                title="Sign In"
+                title={t('auth.register.sign_in')}
                 onPress={() => router.push('/auth/login')}
                 style={styles.linkButton}
                 textStyle={styles.linkButtonText}

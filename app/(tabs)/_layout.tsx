@@ -7,11 +7,13 @@ import { colors } from '@/constants/colors';
 import { useAuth } from '../../contexts/AuthContext';
 import ErrorBoundary from '../../components/ErrorBoundary';
 import SafeLoadingScreen from '../../components/ui/SafeLoadingScreen';
+import { useI18n } from '../../i18n';
 
 export default function TabLayout() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { t } = useI18n();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -67,8 +69,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Today",
-          tabBarLabel: "Today",
+          title: t('home.start_day_with_lyra') || "Today",
+          tabBarLabel: t('home.start_day_with_lyra') || "Today",
           tabBarIcon: ({ color }) => <Home size={22} color={color} />,
         }}
       />
@@ -99,8 +101,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-          title: "Settings",
-          tabBarLabel: "Settings",
+          title: t('settings.title') || "Settings",
+          tabBarLabel: t('settings.title') || "Settings",
           tabBarIcon: ({ color }) => <Settings size={22} color={color} />,
         }}
       />

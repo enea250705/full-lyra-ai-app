@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { MapPin, AlertTriangle, ShoppingBag, X } from 'lucide-react-native';
+import { useI18n } from '@/i18n';
 
 interface ExpensiveStore {
   name: string;
@@ -30,16 +31,16 @@ const getPriceLevelColor = (priceLevel: string) => {
   }
 };
 
-const getPriceLevelText = (priceLevel: string) => {
+const getPriceLevelText = (priceLevel: string, t: (k: string, p?: any) => string) => {
   switch (priceLevel) {
     case 'expensive':
-      return 'Expensive';
+      return t('stores.price_expensive');
     case 'very_expensive':
-      return 'Very Expensive';
+      return t('stores.price_very_expensive');
     case 'luxury':
-      return 'Luxury';
+      return t('stores.price_luxury');
     default:
-      return 'Expensive';
+      return t('stores.price_expensive');
   }
 };
 
@@ -50,6 +51,7 @@ const ExpensiveStoreAlert: React.FC<ExpensiveStoreAlertProps> = ({
   style 
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { t } = useI18n();
 
   if (stores.length === 0) {
     return null;
@@ -82,25 +84,25 @@ const ExpensiveStoreAlert: React.FC<ExpensiveStoreAlertProps> = ({
     const level = getAlertLevel();
     switch (level) {
       case 'high':
-        return `⚠️ High spending risk! ${luxuryStores.length} luxury stores nearby`;
+        return t('stores.risk_high', { count: String(luxuryStores.length) });
       case 'medium':
-        return `💰 Moderate spending risk! ${nearbyStores.length} expensive stores nearby`;
+        return t('stores.risk_medium', { count: String(nearbyStores.length) });
       case 'low':
-        return `📍 Expensive stores detected in your area`;
+        return t('stores.risk_low');
       default:
-        return 'Expensive stores detected';
+        return t('stores.risk_low');
     }
   };
 
   const handleStorePress = (store: ExpensiveStore) => {
     Alert.alert(
       store.name,
-      `${getPriceLevelText(store.priceLevel)} store - ${store.distance}m away\n\n${store.address}`,
+      `${getPriceLevelText(store.priceLevel, t)} - ${t('stores.details_distance', { distance: String(store.distance) })}\n\n${store.address}`,
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Remind me to budget', style: 'default' },
+        { text: t('stores.actions_cancel'), style: 'cancel' },
+        { text: t('stores.actions_budget'), style: 'default' },
         { 
-          text: 'Avoided shopping here', 
+          text: t('stores.actions_avoided'), 
           style: 'default',
           onPress: () => handleAvoidedShopping(store)
         },
@@ -112,16 +114,16 @@ const ExpensiveStoreAlert: React.FC<ExpensiveStoreAlertProps> = ({
     const estimatedSpending = getEstimatedSpendingForStore(store.priceLevel);
     
     Alert.alert(
-      'Confirm Savings',
-      `How much would you have spent at ${store.name}?`,
+      t('stores.confirm_savings_title'),
+      t('stores.confirm_savings_message', { store: store.name }),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('stores.actions_cancel'), style: 'cancel' },
         { 
           text: `~€${estimatedSpending}`, 
           onPress: () => confirmSavings(estimatedSpending, store)
         },
         { 
-          text: 'Custom amount', 
+          text: t('stores.custom_amount'), 
           onPress: () => showCustomAmountDialog(store)
         },
       ]
@@ -153,8 +155,8 @@ const ExpensiveStoreAlert: React.FC<ExpensiveStoreAlertProps> = ({
 
   const showCustomAmountDialog = (store: ExpensiveStore) => {
     Alert.prompt(
-      'Custom Amount',
-      'How much would you have spent?',
+      t('stores.custom_amount'),
+      t('stores.custom_amount_prompt'),
       (text) => {
         const amount = parseFloat(text);
         if (!isNaN(amount) && amount > 0) {
@@ -205,14 +207,14 @@ const ExpensiveStoreAlert: React.FC<ExpensiveStoreAlertProps> = ({
                     { backgroundColor: getPriceLevelColor(store.priceLevel) }
                   ]}>
                     <Text style={styles.priceBadgeText}>
-                      {getPriceLevelText(store.priceLevel)}
+                      {getPriceLevelText(store.priceLevel, t)}
                     </Text>
                   </View>
                 </View>
                 <View style={styles.storeDetails}>
                   <View style={styles.storeDetailItem}>
                     <MapPin size={12} color="#999" />
-                    <Text style={styles.storeDistance}>{store.distance}m away</Text>
+                    <Text style={styles.storeDistance}>{t('stores.details_distance', { distance: String(store.distance) })}</Text>
                   </View>
                   <Text style={styles.storeAddress}>{store.address}</Text>
                 </View>
@@ -222,7 +224,7 @@ const ExpensiveStoreAlert: React.FC<ExpensiveStoreAlertProps> = ({
           
           {stores.length > 10 && (
             <Text style={styles.moreStoresText}>
-              +{stores.length - 10} more stores nearby
+              {t('stores.more_stores', { count: String(stores.length - 10) })}
             </Text>
           )}
         </ScrollView>
@@ -230,7 +232,7 @@ const ExpensiveStoreAlert: React.FC<ExpensiveStoreAlertProps> = ({
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>
-          💡 Tip: Set a spending budget before shopping to avoid impulse purchases
+          {t('stores.tip')}
         </Text>
       </View>
     </View>

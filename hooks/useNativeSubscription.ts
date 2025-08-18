@@ -219,6 +219,7 @@ export const useNativeSubscription = (): UseNativeSubscriptionReturn => {
    * Initialize on mount
    */
   useEffect(() => {
+    // Avoid initializing IAP in environments where it's not available
     initialize();
   }, [initialize]);
 

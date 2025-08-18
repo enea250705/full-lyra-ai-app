@@ -9,6 +9,9 @@
       "distribution": "internal",
       "ios": {
         "resourceClass": "m1-medium"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://lyra-backend-xn4o.onrender.com/api/v1"
       }
     },
     "preview": {
@@ -16,12 +19,18 @@
       "ios": {
         "simulator": true,
         "resourceClass": "m1-medium"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://lyra-backend-xn4o.onrender.com/api/v1"
       }
     },
     "production": {
       "ios": {
         "autoIncrement": "buildNumber",
         "resourceClass": "m1-medium"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://lyra-backend-xn4o.onrender.com/api/v1"
       }
     },
     "testflight": {
@@ -29,6 +38,9 @@
         "autoIncrement": "buildNumber",
         "distribution": "store",
         "resourceClass": "m1-medium"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://lyra-backend-xn4o.onrender.com/api/v1"
       }
     }
   },

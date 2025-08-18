@@ -1,9 +1,11 @@
+import { useI18n } from '@/i18n';
+
 export const formatDate = (date: Date): string => {
   try {
     if (!date || isNaN(date.getTime())) {
       return 'Invalid date';
     }
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString(undefined, {
       weekday: 'long',
       month: 'long',
       day: 'numeric',
@@ -18,7 +20,7 @@ export const formatTime = (date: Date): string => {
     if (!date || isNaN(date.getTime())) {
       return 'Invalid time';
     }
-    return date.toLocaleTimeString('en-US', {
+    return date.toLocaleTimeString(undefined, {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
@@ -30,13 +32,14 @@ export const formatTime = (date: Date): string => {
   
   export const getGreeting = (): string => {
     const hour = new Date().getHours();
+    // Basic locale-aware greeting; screens should use i18n keys instead
     if (hour < 12) return 'Good morning';
     if (hour < 18) return 'Good afternoon';
     return 'Good evening';
   };
   
   export const getDayOfWeek = (date: Date = new Date()): string => {
-    return date.toLocaleDateString('en-US', { weekday: 'long' });
+    return date.toLocaleDateString(undefined, { weekday: 'long' });
   };
   
   export const getLastNDays = (n: number): Date[] => {
@@ -50,7 +53,7 @@ export const formatTime = (date: Date): string => {
   };
   
   export const formatShortDate = (date: Date): string => {
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString(undefined, {
       month: 'short',
       day: 'numeric',
     });

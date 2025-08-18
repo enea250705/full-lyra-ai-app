@@ -16,6 +16,7 @@
       "entitlements": {
         "com.apple.developer.healthkit": true,
         "com.apple.developer.healthkit.access": [
+          "health-records",
           "health-records"
         ]
       },
@@ -34,6 +35,8 @@
       "package": "com.getlyra.app",
       "permissions": [
         "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION"
       ]
     },
@@ -50,6 +53,12 @@
       "eas": {
         "projectId": "0e478310-4447-4dfa-8de0-5b8df766e190"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/0e478310-4447-4dfa-8de0-5b8df766e190"
     }
   }
 }

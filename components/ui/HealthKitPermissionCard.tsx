@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-nati
 import { LinearGradient } from 'expo-linear-gradient';
 import { Heart, Smartphone, Shield, Activity, Clock } from 'lucide-react-native';
 import { colors } from '@/constants/colors';
+import { useI18n } from '@/i18n';
 
 const { width } = Dimensions.get('window');
 
@@ -19,6 +20,7 @@ export const HealthKitPermissionCard: React.FC<HealthKitPermissionCardProps> = (
   isEnabled = false,
   onDisable,
 }) => {
+  const { t } = useI18n();
   if (isEnabled) {
     return (
       <View style={styles.enabledContainer}>
@@ -30,23 +32,23 @@ export const HealthKitPermissionCard: React.FC<HealthKitPermissionCardProps> = (
             <Heart size={24} color="#FFFFFF" />
           </View>
           <View style={styles.enabledTextContainer}>
-            <Text style={styles.enabledTitle}>HealthKit Connected</Text>
-            <Text style={styles.enabledSubtitle}>Automatic sleep tracking active</Text>
+            <Text style={styles.enabledTitle}>{t('healthkit_card.connected_title')}</Text>
+            <Text style={styles.enabledSubtitle}>{t('healthkit_card.connected_subtitle')}</Text>
           </View>
         </LinearGradient>
         
         <View style={styles.enabledContent}>
           <View style={styles.featureRow}>
             <Activity size={16} color="#10B981" />
-            <Text style={styles.featureText}>Automatic sleep detection</Text>
+            <Text style={styles.featureText}>{t('healthkit_card.auto_detection')}</Text>
           </View>
           <View style={styles.featureRow}>
             <Clock size={16} color="#10B981" />
-            <Text style={styles.featureText}>Sleep stages tracking</Text>
+            <Text style={styles.featureText}>{t('healthkit_card.stages_tracking')}</Text>
           </View>
           <View style={styles.featureRow}>
             <Heart size={16} color="#10B981" />
-            <Text style={styles.featureText}>Heart rate during sleep</Text>
+            <Text style={styles.featureText}>{t('healthkit_card.heart_rate')}</Text>
           </View>
           
           {onDisable && (
@@ -54,7 +56,7 @@ export const HealthKitPermissionCard: React.FC<HealthKitPermissionCardProps> = (
               style={styles.disableButton}
               onPress={onDisable}
             >
-              <Text style={styles.disableButtonText}>Disable HealthKit</Text>
+              <Text style={styles.disableButtonText}>{t('healthkit_card.disable_button')}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -73,9 +75,9 @@ export const HealthKitPermissionCard: React.FC<HealthKitPermissionCardProps> = (
         </View>
         
         <View style={styles.textContainer}>
-          <Text style={styles.title}>Enable Automatic Sleep Tracking</Text>
+          <Text style={styles.title}>{t('healthkit_card.enable_title')}</Text>
           <Text style={styles.subtitle}>
-            Connect with Apple Health to automatically track your sleep patterns without manual input.
+            {t('healthkit_card.enable_subtitle')}
           </Text>
         </View>
       </LinearGradient>
@@ -84,19 +86,19 @@ export const HealthKitPermissionCard: React.FC<HealthKitPermissionCardProps> = (
         <View style={styles.benefitsList}>
           <View style={styles.benefitItem}>
             <Activity size={16} color="#667EEA" />
-            <Text style={styles.benefitText}>Automatic sleep detection</Text>
+            <Text style={styles.benefitText}>{t('healthkit_card.benefit_auto')}</Text>
           </View>
           <View style={styles.benefitItem}>
             <Clock size={16} color="#667EEA" />
-            <Text style={styles.benefitText}>Sleep stages (light, deep, REM)</Text>
+            <Text style={styles.benefitText}>{t('healthkit_card.benefit_stages')}</Text>
           </View>
           <View style={styles.benefitItem}>
             <Heart size={16} color="#667EEA" />
-            <Text style={styles.benefitText}>Heart rate monitoring</Text>
+            <Text style={styles.benefitText}>{t('healthkit_card.benefit_hr')}</Text>
           </View>
           <View style={styles.benefitItem}>
             <Shield size={16} color="#667EEA" />
-            <Text style={styles.benefitText}>Privacy-first data handling</Text>
+            <Text style={styles.benefitText}>{t('healthkit_card.benefit_privacy')}</Text>
           </View>
         </View>
         
@@ -111,13 +113,13 @@ export const HealthKitPermissionCard: React.FC<HealthKitPermissionCardProps> = (
           >
             <Smartphone size={16} color="#FFFFFF" />
             <Text style={styles.buttonText}>
-              {isLoading ? 'Connecting...' : 'Connect Apple Health'}
+              {isLoading ? t('healthkit_card.connecting') : t('healthkit_card.connect_button')}
             </Text>
           </LinearGradient>
         </TouchableOpacity>
         
         <Text style={styles.disclaimer}>
-          Your sleep data stays private and is only used to provide personalized insights.
+          {t('healthkit_card.disclaimer')}
         </Text>
       </View>
     </View>

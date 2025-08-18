@@ -12,11 +12,17 @@ import { useSleep } from '../../hooks/useSleep';
 import { useNativeSubscription } from '../../hooks/useNativeSubscription';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors } from '../../constants/colors';
-import { User, Calendar, Activity, DollarSign, Trash2, Download, VolumeX, Volume1, Volume2, Crown, Moon, Lock } from 'lucide-react-native';
+import { User, Calendar, Activity, DollarSign, Trash2, Download, VolumeX, Volume1, Volume2, Crown, Moon, Lock, Bell } from 'lucide-react-native';
+import { useI18n } from '../../i18n';
+import { apiService } from '../../services/api';
+import * as WebBrowser from 'expo-web-browser';
+import { useGoogleFit } from '../../hooks/useGoogleFit';
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { settings, updateSettings, loading: userDataLoading } = useUserData();
+  const { settings, updateSettings, loading: userDataLoading, notificationSettings, updateNotificationSettings } = useUserData();
+  const { t, languages, setLocale, locale } = useI18n();
+  const googleFit = useGoogleFit();
   const { 
     healthKitAvailable, 
     healthKitEnabled, 
@@ -29,7 +35,7 @@ export default function SettingsScreen() {
     isFree,
     currentPlan
   } = useNativeSubscription();
-  const { user } = useAuth();
+  const { user, deleteAccount } = useAuth();
   
   // Debug logging for developer override
   console.log('[Settings] User email:', user?.email);
@@ -79,6 +85,12 @@ export default function SettingsScreen() {
   };
   
   const [name, setName] = useState(safeSettings.name);
+  React.useEffect(() => {
+    // Keep input in sync with latest saved settings
+    if (safeSettings.name && safeSettings.name !== name) {
+      setName(safeSettings.name);
+    }
+  }, [safeSettings.name]);
   const [upgradeModalVisible, setUpgradeModalVisible] = useState(false);
   const [upgradeContext, setUpgradeContext] = useState({ featureId: '', featureName: '' });
 
@@ -120,8 +132,8 @@ export default function SettingsScreen() {
       <ScreenContainer>
         <SafeLoadingScreen 
           type="settings"
-          message="Loading your settings..."
-          subMessage="Configuring your personalized experience"
+          message={t('settings.loading_message')}
+          subMessage={t('settings.loading_submessage')}
         />
       </ScreenContainer>
     );
@@ -199,24 +211,26 @@ export default function SettingsScreen() {
   };
 
   const handleExportData = () => {
-    Alert.alert(
-      'Export Data',
-      'Your data would be exported as a JSON file in a real app.',
-      [{ text: 'OK' }]
-    );
+    apiService.exportUserData()
+      .then((resp) => {
+        Alert.alert(t('common.success'), t('settings.export_data_message'));
+      })
+      .catch(() => Alert.alert(t('common.error'), t('common.something_went_wrong')));
   };
 
   const handleDeleteData = () => {
     Alert.alert(
-      'Delete All Data',
-      'Are you sure you want to delete all your data? This action cannot be undone.',
+      t('settings.delete_all_data'),
+      t('settings.delete_all_confirm'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         { 
-          text: 'Delete', 
+          text: t('settings.delete'), 
           style: 'destructive',
           onPress: () => {
-            Alert.alert('Data Deleted', 'All your data has been deleted.');
+            apiService.deleteAllUserData()
+              .then(() => Alert.alert(t('settings.data_deleted'), t('settings.data_deleted_message')))
+              .catch(() => Alert.alert(t('common.error'), t('common.something_went_wrong')));
           }
         },
       ]
@@ -228,34 +242,34 @@ export default function SettingsScreen() {
       const success = await enableHealthKitTracking();
       if (success) {
         Alert.alert(
-          'HealthKit Connected',
-          'Automatic sleep tracking is now enabled. Your sleep will be detected automatically.',
-          [{ text: 'OK' }]
+          t('settings.health_connected_title'),
+          t('settings.health_connected_message'),
+          [{ text: t('common.ok') }]
         );
       } else {
         Alert.alert(
-          'Connection Failed',
-          'Could not connect to HealthKit. Please check your permissions in Settings.',
-          [{ text: 'OK' }]
+          t('settings.health_failed_title'),
+          t('settings.health_failed_message'),
+          [{ text: t('common.ok') }]
         );
       }
     } catch (error) {
       Alert.alert(
-        'Error',
-        'An error occurred while connecting to HealthKit.',
-        [{ text: 'OK' }]
+        t('common.error'),
+        t('settings.health_error_message'),
+        [{ text: t('common.ok') }]
       );
     }
   };
 
   const handleDisableHealthKit = () => {
     Alert.alert(
-      'Disable HealthKit',
-      'This will stop automatic sleep tracking. You can re-enable it anytime.',
+      t('settings.disable_health_title'),
+      t('settings.disable_health_message'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         { 
-          text: 'Disable', 
+          text: t('common.confirm'), 
           onPress: () => {
             updateSettings({
               connectedApis: {
@@ -281,11 +295,11 @@ export default function SettingsScreen() {
   return (
     <ScreenContainer>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Settings</Text>
+        <Text style={styles.title}>{t('settings.title')}</Text>
 
         {/* Sleep Tracking Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Sleep Tracking</Text>
+          <Text style={styles.sectionTitle}>{t('settings.sleep_tracking')}</Text>
           
           {healthKitAvailable ? (
             <>
@@ -308,13 +322,13 @@ export default function SettingsScreen() {
             <View style={styles.manualOnlyContainer}>
               <View style={styles.manualOnlyHeader}>
                 <Moon size={20} color={colors.midnightBlue} />
-                <Text style={styles.manualOnlyTitle}>Manual Sleep Tracking</Text>
+                <Text style={styles.manualOnlyTitle}>{t('settings.manual_sleep_title')}</Text>
               </View>
               <Text style={styles.manualOnlyDescription}>
-                HealthKit is not available on this device. You can still track your sleep manually.
+                {t('settings.manual_sleep_desc')}
               </Text>
               <Button
-                title="Log Sleep Manually"
+                title={t('settings.log_sleep_manually')}
                 onPress={handleManualSleepEntry}
                 variant="outline"
                 icon={<Moon size={16} color={colors.midnightBlue} />}
@@ -324,7 +338,7 @@ export default function SettingsScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Profile</Text>
+          <Text style={styles.sectionTitle}>{t('settings.profile')}</Text>
         <View style={styles.profileContainer}>
           <View style={styles.profileIconContainer}>
             <User size={24} color={colors.midnightBlue} />
@@ -334,7 +348,7 @@ export default function SettingsScreen() {
               style={styles.nameInput}
               value={name}
               onChangeText={setName}
-              placeholder="Your name"
+              placeholder={t('settings.your_name')}
               onBlur={handleSaveName}
               onSubmitEditing={handleSaveName}
               returnKeyType="done"
@@ -344,23 +358,40 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Subscription</Text>
+        <Text style={styles.sectionTitle}>{t('settings.subscription')}</Text>
         <Pressable style={styles.subscriptionButton} onPress={handleManageSubscription}>
           <View style={styles.settingLabelContainer}>
             <Crown size={20} color={colors.lightPurple} />
-            <Text style={styles.settingLabel}>Manage Subscription</Text>
+            <Text style={styles.settingLabel}>{t('settings.manage_subscription')}</Text>
           </View>
-          <Text style={styles.subscriptionSubtext}>Plans & Billing</Text>
+          <Text style={styles.subscriptionSubtext}>{t('settings.plans_billing')}</Text>
+        </Pressable>
+        <Pressable style={[styles.subscriptionButton, { marginTop: 12 }]} onPress={async () => {
+          try {
+            const result = await apiService.verifyCalendarConnection();
+            Alert.alert(
+              t('settings.google_calendar'),
+              result.success && result.data?.connected ? t('common.success') : t('common.unavailable')
+            );
+          } catch (e) {
+            Alert.alert(t('settings.google_calendar'), t('common.unavailable'));
+          }
+        }}>
+          <View style={styles.settingLabelContainer}>
+            <Calendar size={20} color={colors.midnightBlue} />
+            <Text style={styles.settingLabel}>{t('settings.google_calendar')}</Text>
+          </View>
+          <Text style={styles.subscriptionSubtext}>{settings?.connectedApis?.googleCalendar ? t('common.success') : t('common.unavailable')}</Text>
         </Pressable>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>API Connections</Text>
+        <Text style={styles.sectionTitle}>{t('settings.api_connections')}</Text>
         
         <View style={styles.settingItem}>
           <View style={styles.settingLabelContainer}>
             <Calendar size={20} color={colors.midnightBlue} />
-            <Text style={styles.settingLabel}>Google Calendar</Text>
+            <Text style={styles.settingLabel}>{t('settings.google_calendar')}</Text>
             {!canAccessFeature('pro') && (
               <View style={styles.lockIconContainer}>
                 <Lock size={14} color={colors.gray[400]} />
@@ -378,7 +409,7 @@ export default function SettingsScreen() {
         <View style={styles.settingItem}>
           <View style={styles.settingLabelContainer}>
             <Activity size={20} color={colors.midnightBlue} />
-            <Text style={styles.settingLabel}>Apple Health</Text>
+            <Text style={styles.settingLabel}>{t('settings.apple_health')}</Text>
             {!canAccessFeature('premium') && (
               <View style={styles.lockIconContainer}>
                 <Lock size={14} color={colors.gray[400]} />
@@ -392,11 +423,37 @@ export default function SettingsScreen() {
             thumbColor={safeSettings.connectedApis.appleHealth ? colors.midnightBlue : colors.gray[100]}
           />
         </View>
+        {/* Google Fit status & actions (Android parity) */}
+        <View style={styles.settingItem}>
+          <View style={styles.settingLabelContainer}>
+            <Activity size={20} color={colors.midnightBlue} />
+            <Text style={styles.settingLabel}>Google Fit</Text>
+          </View>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <Button
+              title={googleFit.isConnected ? 'Disconnect' : (googleFit.isConnecting ? 'Connecting...' : 'Connect')}
+              onPress={async () => {
+                if (googleFit.isConnected) {
+                  await googleFit.disconnectGoogleFit();
+                } else {
+                  await googleFit.connectGoogleFit();
+                }
+                await googleFit.refreshStatus();
+              }}
+              variant="outline"
+            />
+            <Button
+              title={googleFit.isSyncing ? 'Syncing...' : 'Sync Now'}
+              onPress={async () => { await googleFit.syncGoogleFitData(30); await googleFit.refreshStatus(); }}
+              variant="outline"
+            />
+          </View>
+        </View>
         
         <View style={styles.settingItem}>
           <View style={styles.settingLabelContainer}>
             <DollarSign size={20} color={colors.midnightBlue} />
-            <Text style={styles.settingLabel}>Plaid (Finance)</Text>
+            <Text style={styles.settingLabel}>{t('settings.plaid')}</Text>
             {!canAccessFeature('pro') && (
               <View style={styles.lockIconContainer}>
                 <Lock size={14} color={colors.gray[400]} />
@@ -413,7 +470,7 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Enabled Modules</Text>
+        <Text style={styles.sectionTitle}>{t('settings.enabled_modules')}</Text>
         
         {Object.entries(safeSettings.enabledModules).map(([key, value]) => {
           const isFinances = key === 'finances';
@@ -443,7 +500,7 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Voice Style</Text>
+        <Text style={styles.sectionTitle}>{t('settings.voice_style')}</Text>
         
         <View style={styles.voiceStyleContainer}>
           <Pressable
@@ -458,7 +515,7 @@ export default function SettingsScreen() {
               styles.voiceStyleText,
               safeSettings.voiceStyle === 'calm' && styles.voiceStyleTextSelected,
             ]}>
-              Calm
+              {t('settings.voice_calm')}
             </Text>
           </Pressable>
           
@@ -474,7 +531,7 @@ export default function SettingsScreen() {
               styles.voiceStyleText,
               safeSettings.voiceStyle === 'energetic' && styles.voiceStyleTextSelected,
             ]}>
-              Energetic
+              {t('settings.voice_energetic')}
             </Text>
           </Pressable>
           
@@ -490,35 +547,164 @@ export default function SettingsScreen() {
               styles.voiceStyleText,
               safeSettings.voiceStyle === 'minimal' && styles.voiceStyleTextSelected,
             ]}>
-              Minimal
+              {t('settings.voice_minimal')}
             </Text>
           </Pressable>
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Data Management</Text>
+        <Text style={styles.sectionTitle}>{t('common.notifications') || 'Notifications'}</Text>
+        <View style={styles.settingItem}>
+          <View style={styles.settingLabelContainer}>
+            <Bell size={20} color={colors.midnightBlue} />
+            <Text style={styles.settingLabel}>{t('notification.mood_reminder') || 'Mood Reminder'}</Text>
+          </View>
+          <Switch
+            value={!!notificationSettings?.moodReminder}
+            onValueChange={(value) => updateNotificationSettings?.({ moodReminder: value })}
+            trackColor={{ false: colors.gray[300], true: colors.lightPurple }}
+            thumbColor={notificationSettings?.moodReminder ? colors.midnightBlue : colors.gray[100]}
+          />
+        </View>
+        {!!notificationSettings?.moodReminder && (
+          <View style={styles.settingItem}>
+            <Text style={styles.settingLabel}>{t('notification.mood_reminder_time') || 'Reminder Time'}</Text>
+            <TextInput
+              style={styles.nameInput}
+              value={notificationSettings?.moodReminderTime || ''}
+              onChangeText={(text) => updateNotificationSettings?.({ moodReminderTime: text })}
+              placeholder="09:00"
+            />
+          </View>
+        )}
+        <View style={styles.settingItem}>
+          <View style={styles.settingLabelContainer}>
+            <Bell size={20} color={colors.midnightBlue} />
+            <Text style={styles.settingLabel}>{t('notification.journal_reminder') || 'Journal Reminder'}</Text>
+          </View>
+          <Switch
+            value={!!notificationSettings?.journalReminder}
+            onValueChange={(value) => updateNotificationSettings?.({ journalReminder: value })}
+            trackColor={{ false: colors.gray[300], true: colors.lightPurple }}
+            thumbColor={notificationSettings?.journalReminder ? colors.midnightBlue : colors.gray[100]}
+          />
+        </View>
+        {!!notificationSettings?.journalReminder && (
+          <View style={styles.settingItem}>
+            <Text style={styles.settingLabel}>{t('notification.journal_reminder_time') || 'Reminder Time'}</Text>
+            <TextInput
+              style={styles.nameInput}
+              value={notificationSettings?.journalReminderTime || ''}
+              onChangeText={(text) => updateNotificationSettings?.({ journalReminderTime: text })}
+              placeholder="21:00"
+            />
+          </View>
+        )}
+        <View style={styles.settingItem}>
+          <View style={styles.settingLabelContainer}>
+            <Bell size={20} color={colors.midnightBlue} />
+            <Text style={styles.settingLabel}>{t('notification.sleep_reminder') || 'Sleep Reminder'}</Text>
+          </View>
+          <Switch
+            value={!!notificationSettings?.sleepReminder}
+            onValueChange={(value) => updateNotificationSettings?.({ sleepReminder: value })}
+            trackColor={{ false: colors.gray[300], true: colors.lightPurple }}
+            thumbColor={notificationSettings?.sleepReminder ? colors.midnightBlue : colors.gray[100]}
+          />
+        </View>
+        {!!notificationSettings?.sleepReminder && (
+          <View style={styles.settingItem}>
+            <Text style={styles.settingLabel}>{t('notification.sleep_reminder_time') || 'Reminder Time'}</Text>
+            <TextInput
+              style={styles.nameInput}
+              value={notificationSettings?.sleepReminderTime || ''}
+              onChangeText={(text) => updateNotificationSettings?.({ sleepReminderTime: text })}
+              placeholder="22:00"
+            />
+          </View>
+        )}
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t('settings.data_management')}</Text>
         
         <View style={styles.dataButtonsContainer}>
           <Button
-            title="Export Data"
+            title={t('settings.export_data')}
             onPress={handleExportData}
             variant="outline"
             icon={<Download size={18} color={colors.midnightBlue} />}
           />
-          
           <Button
-            title="Delete All Data"
+            title={t('settings.delete_all_data')}
             onPress={handleDeleteData}
             variant="outline"
             icon={<Trash2 size={18} color={colors.error} />}
           />
+          <Button
+            title={t('settings.delete') + ' ' + t('profile')}
+            onPress={() => {
+              Alert.alert(
+                t('common.warning') || 'Warning',
+                t('settings.delete_all_confirm'),
+                [
+                  { text: t('common.cancel'), style: 'cancel' },
+                  { text: t('settings.delete'), style: 'destructive', onPress: async () => {
+                    try { await deleteAccount(); } catch {}
+                  } }
+                ]
+              );
+            }}
+            variant="outline"
+          />
         </View>
       </View>
 
+      {/* Language Selector */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t('settings.language')}</Text>
+        {(() => {
+          const flags: Record<string, string> = {
+            'en': '🇺🇸',
+            'it': '🇮🇹',
+            'ja': '🇯🇵',
+            'ko': '🇰🇷',
+            'ar': '🇸🇦',
+            'zh': '🇨🇳',
+            'de': '🇩🇪',
+            'fr': '🇫🇷',
+            'es': '🇲🇽',
+            'tr': '🇹🇷',
+            'ru': '🇷🇺',
+            'pt-BR': '🇧🇷',
+          };
+          return languages.map((lang) => (
+            <Pressable
+              key={lang.code}
+              style={styles.settingItem}
+              onPress={async () => {
+                await setLocale(lang.code);
+                updateSettings({ language: lang.code as any });
+                Alert.alert(
+                  t('settings.language_updated_title'),
+                  t('settings.language_updated_message', { language: lang.label })
+                );
+              }}
+            >
+              <View style={styles.settingLabelContainer}>
+                <Text style={styles.flagEmoji}>{flags[lang.code] || '🌐'}</Text>
+                <Text style={styles.settingLabel}>{lang.label}</Text>
+              </View>
+              <Text style={[styles.settingLabel, { color: colors.gray[500] }]}>{locale === lang.code ? '✓' : ''}</Text>
+            </Pressable>
+          ));
+        })()}
+      </View>
+
       <View style={styles.footer}>
-        <Text style={styles.versionText}>Lyra v1.0.0</Text>
-        <Text style={styles.copyrightText}>© 2025 Lyra AI</Text>
+        <Text style={styles.versionText}>{t('settings.version', { version: '1.0.0' })}</Text>
+        <Text style={styles.copyrightText}>{t('settings.copyright', { year: '2025' })}</Text>
       </View>
       </ScrollView>
       
@@ -657,6 +843,10 @@ const styles = StyleSheet.create({
   lockIconContainer: {
     marginLeft: 8,
     opacity: 0.6,
+  },
+  flagEmoji: {
+    fontSize: 18,
+    marginRight: 8,
   },
   manualOnlyContainer: {
     backgroundColor: colors.gray[100],

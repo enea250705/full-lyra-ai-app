@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Switch } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Moon, Smartphone, Edit3, Activity } from 'lucide-react-native';
 import { colors } from '@/constants/colors';
+import { useI18n } from '@/i18n';
 
 interface SleepTrackingModeCardProps {
   isAutoTrackingEnabled: boolean;
@@ -19,6 +20,7 @@ export const SleepTrackingModeCard: React.FC<SleepTrackingModeCardProps> = ({
   onManualEntry,
   isLoading = false,
 }) => {
+  const { t } = useI18n();
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -26,7 +28,7 @@ export const SleepTrackingModeCard: React.FC<SleepTrackingModeCardProps> = ({
         style={styles.header}
       >
         <Moon size={24} color="#FFFFFF" />
-        <Text style={styles.headerTitle}>Sleep Tracking</Text>
+        <Text style={styles.headerTitle}>{t('sleep_mode_card.title')}</Text>
       </LinearGradient>
 
       <View style={styles.content}>
@@ -38,9 +40,9 @@ export const SleepTrackingModeCard: React.FC<SleepTrackingModeCardProps> = ({
                 <Smartphone size={18} color="#4F46E5" />
               </View>
               <View style={styles.optionContent}>
-                <Text style={styles.optionTitle}>Automatic Tracking</Text>
+                <Text style={styles.optionTitle}>{t('sleep_mode_card.automatic_tracking')}</Text>
                 <Text style={styles.optionDescription}>
-                  Uses Apple Health to automatically detect and track your sleep
+                  {t('healthkit_card.enable_subtitle')}
                 </Text>
               </View>
               <Switch
@@ -56,15 +58,15 @@ export const SleepTrackingModeCard: React.FC<SleepTrackingModeCardProps> = ({
               <View style={styles.autoTrackingBenefits}>
                 <View style={styles.benefitItem}>
                   <Activity size={12} color="#10B981" />
-                  <Text style={styles.benefitText}>Sleep stages detection</Text>
+                  <Text style={styles.benefitText}>{t('sleep_mode_card.automatic_benefit_1')}</Text>
                 </View>
                 <View style={styles.benefitItem}>
                   <Activity size={12} color="#10B981" />
-                  <Text style={styles.benefitText}>Heart rate monitoring</Text>
+                  <Text style={styles.benefitText}>{t('sleep_mode_card.automatic_benefit_2')}</Text>
                 </View>
                 <View style={styles.benefitItem}>
                   <Activity size={12} color="#10B981" />
-                  <Text style={styles.benefitText}>Sleep efficiency calculation</Text>
+                  <Text style={styles.benefitText}>{t('sleep_mode_card.automatic_benefit_3')}</Text>
                 </View>
               </View>
             )}
@@ -83,9 +85,9 @@ export const SleepTrackingModeCard: React.FC<SleepTrackingModeCardProps> = ({
                 <Edit3 size={18} color="#6B7280" />
               </View>
               <View style={styles.optionContent}>
-                <Text style={styles.optionTitle}>Manual Entry</Text>
+                <Text style={styles.optionTitle}>{t('sleep_mode_card.manual_entry')}</Text>
                 <Text style={styles.optionDescription}>
-                  Manually log your sleep times and quality
+                  {t('settings.manual_sleep_desc')}
                 </Text>
               </View>
               <View style={styles.manualEntryArrow}>
@@ -101,7 +103,7 @@ export const SleepTrackingModeCard: React.FC<SleepTrackingModeCardProps> = ({
             <View style={styles.statusActive}>
               <Activity size={14} color="#10B981" />
               <Text style={styles.statusText}>
-                Automatic tracking is active. Sleep will be detected automatically.
+                {t('healthkit_card.connected_subtitle')}
               </Text>
             </View>
           ) : (
@@ -109,8 +111,8 @@ export const SleepTrackingModeCard: React.FC<SleepTrackingModeCardProps> = ({
               <Moon size={14} color="#6B7280" />
               <Text style={styles.statusText}>
                 {isHealthKitAvailable 
-                  ? 'Use manual entry or enable automatic tracking above.'
-                  : 'Manual entry is your primary tracking method.'
+                  ? t('settings.manual_sleep_desc')
+                  : t('sleep_mode_card.manual_entry')
                 }
               </Text>
             </View>

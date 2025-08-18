@@ -6,16 +6,18 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/Button';
 import { GoogleSignInButton } from '../../components/ui/GoogleSignInButton';
 import { colors } from '../../constants/colors';
+import { useI18n } from '../../i18n';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login, isLoading } = useAuth();
   const router = useRouter();
+  const { t } = useI18n();
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+      Alert.alert(t('common.error'), t('auth.login.error_fill_all'));
       return;
     }
 
@@ -28,18 +30,18 @@ export default function Login() {
       // If login fails with invalid credentials, suggest registration
       if (error instanceof Error && error.message.includes('Invalid credentials')) {
         Alert.alert(
-          'User Not Found', 
-          'This email is not registered. Please create an account first.',
+          t('auth.login.user_not_found'), 
+          t('auth.login.user_not_found_message'),
           [
-            { text: 'Cancel', style: 'cancel' },
+            { text: t('common.cancel'), style: 'cancel' },
             { 
-              text: 'Go to Register', 
+              text: t('auth.login.go_to_register'), 
               onPress: () => router.push('/auth/register')
             }
           ]
         );
       } else {
-        Alert.alert('Login Failed', error instanceof Error ? error.message : 'An error occurred');
+        Alert.alert(t('auth.login.login_failed'), error instanceof Error ? error.message : t('common.something_went_wrong'));
       }
     }
   };
@@ -83,15 +85,15 @@ export default function Login() {
         <View style={styles.content}>
           <View style={styles.titleContainer}>
             <Text style={styles.lyraText}>LYRA</Text>
-            <Text style={styles.title}>Welcome Back</Text>
-            <Text style={styles.subtitle}>Continue your wellness journey</Text>
+            <Text style={styles.title}>{t('auth.login.title')}</Text>
+            <Text style={styles.subtitle}>{t('auth.login.subtitle')}</Text>
           </View>
           
           <View style={styles.form}>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
-                placeholder="Email"
+                placeholder={t('auth.login.email')}
                 placeholderTextColor="rgba(255, 255, 255, 0.6)"
                 value={email}
                 onChangeText={setEmail}
@@ -104,7 +106,7 @@ export default function Login() {
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input}
-                placeholder="Password"
+                placeholder={t('auth.login.password')}
                 placeholderTextColor="rgba(255, 255, 255, 0.6)"
                 value={password}
                 onChangeText={setPassword}
@@ -120,7 +122,7 @@ export default function Login() {
               end={{ x: 1, y: 1 }}
             >
               <Button
-                title={isLoading ? "Signing in..." : "Sign In"}
+                title={isLoading ? t('auth.login.signing_in') : t('auth.login.sign_in')}
                 onPress={handleLogin}
                 disabled={isLoading}
                 style={styles.loginButtonInner}
@@ -131,22 +133,22 @@ export default function Login() {
             {/* Divider */}
             <View style={styles.divider}>
               <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or</Text>
+              <Text style={styles.dividerText}>{t('auth.login.divider_or')}</Text>
               <View style={styles.dividerLine} />
             </View>
 
             {/* Google Sign-In Button */}
             <GoogleSignInButton
-              buttonText="Sign in with Google"
+              buttonText={t('auth.google.sign_in_with_google')}
               onSuccess={() => router.replace('/(tabs)')}
               disabled={isLoading}
             />
           </View>
           
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Don't have an account? </Text>
+            <Text style={styles.footerText}>{t('auth.login.no_account')} </Text>
             <Button
-              title="Sign Up"
+              title={t('auth.login.sign_up')}
               onPress={() => router.push('/auth/register')}
               style={styles.linkButton}
               textStyle={styles.linkButtonText}

@@ -19,6 +19,7 @@ import { useSubscription } from '@/hooks/useSubscription';
 import { usePermissions } from '@/hooks/usePermissions';
 import { colors } from '@/constants/colors';
 import { getGreeting } from '@/utils/dateUtils';
+import { useI18n } from '@/i18n';
 import { Mood } from '@/types';
 import { Moon, Battery, MessageCircle, MapPin, CloudSun } from 'lucide-react-native';
 import SafeLoadingScreen from '@/components/ui/SafeLoadingScreen';
@@ -26,6 +27,7 @@ import SafeLoadingScreen from '@/components/ui/SafeLoadingScreen';
 export default function HomeScreen() {
   const router = useRouter();
   const { userData, updateUserData, loading } = useUserData();
+  const { t } = useI18n();
   const { location, getCurrentLocation } = useLocation();
   const { 
     weather, 
@@ -110,16 +112,26 @@ export default function HomeScreen() {
       
       try {
         setIsInitializing(true);
+        console.log('[HomeScreen] Starting app initialization...');
+        
         // Wait a bit for authentication to settle
         await new Promise(resolve => setTimeout(resolve, 500));
         
         // Check if permissions have been requested
         const hasRequestedPermissions = permissions.location.requested || permissions.healthKit.requested;
+        console.log('[HomeScreen] Permission status:', {
+          location: permissions.location,
+          healthKit: permissions.healthKit,
+          notifications: permissions.notifications,
+          hasRequestedPermissions
+        });
         
         if (!hasRequestedPermissions) {
           // Show permissions modal - let user explicitly request permissions
+          console.log('[HomeScreen] Showing permissions modal');
           setShowPermissionsModal(true);
         } else {
+          console.log('[HomeScreen] Permissions already requested, checking status...');
           // Only request location permission in background if not already granted
           // Don't request HealthKit permissions in background as iOS requires user interaction
           if (!permissions.location.granted) {
@@ -161,14 +173,28 @@ export default function HomeScreen() {
     setShowPermissionsModal(false);
   };
 
+  // Monitor permission changes and update modal
+  useEffect(() => {
+    if (showPermissionsModal) {
+      console.log('[HomeScreen] Permissions modal is visible, current permissions:', permissions);
+      
+      // Check if all permissions are granted
+      const allGranted = permissions.location.granted && permissions.healthKit.granted && permissions.notifications.granted;
+      if (allGranted) {
+        console.log('[HomeScreen] All permissions granted, closing modal');
+        setShowPermissionsModal(false);
+      }
+    }
+  }, [permissions, showPermissionsModal]);
+
   // Show loading screen while data is loading or if no real data
   if (loading || isInitializing || permissionsLoading || !userData) {
     return (
       <ScreenContainer>
         <SafeLoadingScreen 
           type="dashboard"
-          message="Loading your dashboard..."
-          subMessage="Setting up permissions and gathering your latest insights"
+          message={t('home.loading_title')}
+          subMessage={t('home.loading_subtitle')}
         />
       </ScreenContainer>
     );
@@ -224,8 +250,8 @@ export default function HomeScreen() {
   return (
     <ScreenContainer>
       <View style={styles.header}>
-        <Text style={styles.greeting}>{getGreeting()}, {userData?.name || 'User'}</Text>
-        <Text style={styles.date}>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</Text>
+        <Text style={styles.greeting}>{t('home.greeting_with_name', { greeting: t('date.good_morning'), name: userData?.name || 'User' })}</Text>
+        <Text style={styles.date}>{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</Text>
       </View>
 
       {/* Savings Counter */}
@@ -265,15 +291,15 @@ export default function HomeScreen() {
           <View style={styles.metricItem}>
             <View style={styles.metricHeader}>
               <Moon size={18} color={colors.midnightBlue} />
-              <Text style={styles.metricLabel}>Sleep</Text>
+              <Text style={styles.metricLabel}>{t('home.sleep_pattern')}</Text>
             </View>
-            <Text style={styles.metricValue}>{userData?.sleepHours || 0} hours</Text>
+            <Text style={styles.metricValue}>{t('insights.screen.hours_of_sleep')}: {userData?.sleepHours || 0}</Text>
           </View>
           
           <View style={styles.metricItem}>
             <View style={styles.metricHeader}>
               <Battery size={18} color={colors.midnightBlue} />
-              <Text style={styles.metricLabel}>Energy</Text>
+              <Text style={styles.metricLabel}>{t('home.energy')}</Text>
             </View>
             <ProgressBar 
               value={userData?.energyLevel || 0} 
@@ -287,11 +313,11 @@ export default function HomeScreen() {
             <View style={styles.metricItem}>
               <View style={styles.metricHeader}>
                 <CloudSun size={18} color={colors.midnightBlue} />
-                <Text style={styles.metricLabel}>Weather Impact</Text>
+                <Text style={styles.metricLabel}>{t('home.weather_impact')}</Text>
               </View>
               <Text style={styles.metricValue}>
-                {moodCorrelation.correlationScore > 0 ? 'Positive' : 
-                 moodCorrelation.correlationScore < 0 ? 'Negative' : 'Neutral'}
+                {moodCorrelation.correlationScore > 0 ? t('home.impact_positive') : 
+                 moodCorrelation.correlationScore < 0 ? t('home.impact_negative') : t('home.impact_neutral')}
               </Text>
             </View>
           )}
@@ -300,15 +326,15 @@ export default function HomeScreen() {
 
       <View style={styles.actionContainer}>
         <InsightCard
-          title="Today's Focus"
-          description={userData?.suggestedAction || "Take a moment to check in with yourself and set your intentions for the day."}
+          title={t('home.todays_focus')}
+          description={userData?.suggestedAction || t('home.default_focus')}
           variant="info"
         />
         
         {/* Weather-based recommendation */}
         {moodCorrelation && moodCorrelation.recommendations.length > 0 && (
           <InsightCard
-            title="Weather Recommendation"
+            title={t('home.weather_recommendation')}
             description={moodCorrelation.recommendations[0]}
             variant="info"
           />
@@ -317,7 +343,7 @@ export default function HomeScreen() {
 
       <View style={styles.startChatContainer}>
         <Button
-          title="Start day with Lyra"
+          title={t('home.start_day_with_lyra')}
           onPress={handleStartChat}
           variant="primary"
           size="large"
@@ -327,23 +353,23 @@ export default function HomeScreen() {
       </View>
 
       <View style={styles.recentInsightsContainer}>
-        <Text style={styles.sectionTitle}>Recent Insights</Text>
+        <Text style={styles.sectionTitle}>{t('home.recent_insights')}</Text>
         
         <InsightCard
-          title="Sleep Pattern"
-          description="Your sleep has been consistent this week. Keep it up!"
+          title={t('home.sleep_pattern')}
+          description={t('home.sleep_pattern_desc')}
           variant="success"
         />
         
         <InsightCard
-          title="Mood Observation"
-          description="Your mood tends to improve after morning exercise sessions."
+          title={t('home.mood_observation')}
+          description={t('home.mood_observation_desc')}
           variant="default"
         />
         
         <InsightCard
-          title="Energy Management"
-          description="Consider taking short breaks between meetings to maintain energy levels."
+          title={t('home.energy_management')}
+          description={t('home.energy_management_desc')}
           variant="warning"
         />
       </View>

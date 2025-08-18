@@ -4,6 +4,8 @@ import { useLocation } from './useLocation';
 import { useSleep } from './useSleep';
 import { appleHealthKitService } from '@/services/appleHealthKit';
 import * as Notifications from 'expo-notifications';
+import * as Location from 'expo-location';
+import Constants from 'expo-constants';
 import { apiService } from '@/services/api';
 
 interface PermissionsState {
@@ -47,26 +49,30 @@ export const usePermissions = () => {
   const requestNotificationsPermission = useCallback(async () => {
     try {
       setPermissions(prev => ({ ...prev, notifications: { ...prev.notifications, requested: true } }));
+      
+      // First check current status
       const settings = await Notifications.getPermissionsAsync();
       let granted = settings.granted || settings.ios?.status === Notifications.IosAuthorizationStatus.AUTHORIZED || false;
+      
       if (!granted) {
         const req = await Notifications.requestPermissionsAsync();
         granted = req.granted || req.ios?.status === Notifications.IosAuthorizationStatus.AUTHORIZED || false;
       }
+      
       // Save token if granted
       if (granted) {
-        const token = (await Notifications.getExpoPushTokenAsync()).data;
         try {
+          const projectId = (Constants as any)?.easConfig?.projectId || (Constants as any)?.expoConfig?.extra?.eas?.projectId;
+          const token = (await Notifications.getExpoPushTokenAsync(projectId ? { projectId } : undefined)).data;
           const resp = await apiService.saveExpoPushToken(token, { os: Platform.OS });
-          // Optionally store device id if backend returns it
           if (resp?.success && resp?.data?.id) {
-            // You can persist this to AsyncStorage if needed
-            // await AsyncStorage.setItem('pushDeviceId', resp.data.id);
+            console.log('[usePermissions] Push token saved successfully');
           }
         } catch (e) {
           console.warn('[usePermissions] Failed to save push token:', e);
         }
       }
+      
       setPermissions(prev => ({ ...prev, notifications: { granted, requested: true } }));
       return granted;
     } catch (error) {
@@ -76,7 +82,7 @@ export const usePermissions = () => {
     }
   }, []);
 
-  // Check HealthKit availability
+  // Check HealthKit availability and permissions
   const checkHealthKitAvailability = useCallback(async () => {
     try {
       const isAvailable = appleHealthKitService.isHealthKitAvailable();
@@ -99,8 +105,20 @@ export const usePermissions = () => {
         location: { ...prev.location, requested: true }
       }));
 
-      const location = await getCurrentLocation();
-      const granted = !!location;
+      // First check if permission is already granted
+      const { status: existingStatus } = await Location.getForegroundPermissionsAsync();
+      
+      if (existingStatus === 'granted') {
+        setPermissions(prev => ({
+          ...prev,
+          location: { granted: true, requested: true }
+        }));
+        return true;
+      }
+
+      // Request permission if not granted
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      const granted = status === 'granted';
 
       setPermissions(prev => ({
         ...prev,
@@ -116,7 +134,7 @@ export const usePermissions = () => {
       }));
       return false;
     }
-  }, [getCurrentLocation]);
+  }, []);
 
   // Request HealthKit permissions
   const requestHealthKitPermission = useCallback(async () => {
@@ -124,6 +142,10 @@ export const usePermissions = () => {
       const isAvailable = await checkHealthKitAvailability();
       if (!isAvailable) {
         console.log('[usePermissions] HealthKit not available on this device');
+        setPermissions(prev => ({
+          ...prev,
+          healthKit: { granted: false, requested: true, available: false }
+        }));
         return false;
       }
 
@@ -133,7 +155,17 @@ export const usePermissions = () => {
         healthKit: { ...prev.healthKit, requested: true }
       }));
 
-      // Request HealthKit permissions with proper error handling
+      // Check if permission is already granted
+      const isGranted = await appleHealthKitService.isPermissionGranted();
+      if (isGranted) {
+        setPermissions(prev => ({
+          ...prev,
+          healthKit: { granted: true, requested: true, available: isAvailable }
+        }));
+        return true;
+      }
+
+      // Request HealthKit permissions
       const granted = await enableHealthKitTracking();
       
       console.log('[usePermissions] HealthKit permission result:', granted);
@@ -158,18 +190,25 @@ export const usePermissions = () => {
     setIsLoading(true);
     
     try {
-      // Request permissions in parallel
-      const [locationGranted, healthKitGranted, notificationsGranted] = await Promise.allSettled([
-        requestLocationPermission(),
-        requestHealthKitPermission(),
-        requestNotificationsPermission(),
-      ]);
+      console.log('[usePermissions] Starting to request all permissions...');
+      
+      // Request permissions sequentially to ensure proper state updates
+      const locationGranted = await requestLocationPermission();
+      console.log('[usePermissions] Location permission result:', locationGranted);
+      
+      const healthKitGranted = await requestHealthKitPermission();
+      console.log('[usePermissions] HealthKit permission result:', healthKitGranted);
+      
+      const notificationsGranted = await requestNotificationsPermission();
+      console.log('[usePermissions] Notifications permission result:', notificationsGranted);
 
       const results = {
-        location: locationGranted.status === 'fulfilled' ? locationGranted.value : false,
-        healthKit: healthKitGranted.status === 'fulfilled' ? healthKitGranted.value : false,
-        notifications: notificationsGranted.status === 'fulfilled' ? notificationsGranted.value : false,
+        location: locationGranted,
+        healthKit: healthKitGranted,
+        notifications: notificationsGranted,
       };
+
+      console.log('[usePermissions] All permission results:', results);
 
       // Update permissions state
       setPermissions(prev => ({
@@ -181,8 +220,8 @@ export const usePermissions = () => {
       }));
 
       // Show summary to user
-      const grantedPermissions = [];
-      const deniedPermissions = [];
+      const grantedPermissions: string[] = [];
+      const deniedPermissions: string[] = [];
 
       if (results.location) grantedPermissions.push('Location');
       else deniedPermissions.push('Location');
@@ -223,44 +262,52 @@ export const usePermissions = () => {
     setIsLoading(true);
     
     try {
+      console.log('[usePermissions] Checking current permissions...');
+      
       // Check HealthKit availability and permissions
       const healthKitAvailable = await checkHealthKitAvailability();
       let healthKitGranted = false;
       
       if (healthKitAvailable) {
         healthKitGranted = await checkHealthKitPermissions();
+        console.log('[usePermissions] HealthKit status:', { available: healthKitAvailable, granted: healthKitGranted });
+      } else {
+        console.log('[usePermissions] HealthKit not available on this device');
       }
 
-      // Check location permission (this will trigger the permission request if not granted)
-      const locationGranted = await requestLocationPermission();
+      // Check location permission status
+      const { status: locationStatus } = await Location.getForegroundPermissionsAsync();
+      const locationGranted = locationStatus === 'granted';
+      console.log('[usePermissions] Location status:', { status: locationStatus, granted: locationGranted });
 
       // Check notifications status
       const notifPerms = await Notifications.getPermissionsAsync();
       const notificationsGranted = notifPerms.granted || notifPerms.ios?.status === Notifications.IosAuthorizationStatus.AUTHORIZED || false;
+      console.log('[usePermissions] Notifications status:', { granted: notificationsGranted, iosStatus: notifPerms.ios?.status });
 
-      setPermissions({
+      const updatedPermissions = {
         location: { granted: locationGranted, requested: true },
         healthKit: { granted: healthKitGranted, requested: true, available: healthKitAvailable },
         notifications: { granted: notificationsGranted, requested: true },
         isLoading: false,
-      });
+      };
+
+      console.log('[usePermissions] Updated permissions:', updatedPermissions);
+      setPermissions(updatedPermissions);
 
     } catch (error) {
       console.error('[usePermissions] Error checking permissions:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [checkHealthKitAvailability, checkHealthKitPermissions, requestLocationPermission]);
+  }, [checkHealthKitAvailability, checkHealthKitPermissions]);
 
   // Initialize permissions on mount
   useEffect(() => {
-    // Only check permissions if they haven't been requested yet
-    if (!permissions.location.requested && !permissions.healthKit.requested) {
-      checkCurrentPermissions();
-    } else {
-      setIsLoading(false);
-    }
-  }, [checkCurrentPermissions, permissions.location.requested, permissions.healthKit.requested]);
+    // Run once on mount
+    checkCurrentPermissions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     permissions,

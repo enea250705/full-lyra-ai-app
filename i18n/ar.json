@@ -1,0 +1,50 @@
+{
+  "common": {
+    "ok": "حسنًا",
+    "cancel": "إلغاء"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "sleep_tracking": "تتبع النوم",
+    "manual_sleep_title": "تتبع النوم يدويًا",
+    "manual_sleep_desc": "خدمة HealthKit غير متاحة على هذا الجهاز. يمكنك تتبع النوم يدويًا.",
+    "log_sleep_manually": "تسجيل يدوي",
+    "profile": "الملف الشخصي",
+    "your_name": "اسمك",
+    "subscription": "الاشتراك",
+    "manage_subscription": "إدارة الاشتراك",
+    "plans_billing": "الخطط والفوترة",
+    "api_connections": "اتصالات API",
+    "google_calendar": "تقويم Google",
+    "apple_health": "Apple Health",
+    "plaid": "Plaid (المالية)",
+    "enabled_modules": "الوحدات المفعّلة",
+    "voice_style": "أسلوب الصوت",
+    "voice_calm": "هادئ",
+    "voice_energetic": "نشِط",
+    "voice_minimal": "بسيط",
+    "data_management": "إدارة البيانات",
+    "export_data": "تصدير البيانات",
+    "delete_all_data": "حذف كل البيانات",
+    "language": "اللغة",
+    "change_language": "تغيير اللغة"
+  },
+  "languages": {
+    "en": "English",
+    "it": "Italiano",
+    "ja": "日本語",
+    "ko": "한국어",
+    "ar": "العربية",
+    "zh": "简体中文",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "tr": "Türkçe",
+    "ru": "Русский",
+    "pt-BR": "Português (Brasil)"
+  }
+}
+
+
+
+

@@ -1,0 +1,50 @@
+{
+  "common": {
+    "ok": "OK",
+    "cancel": "キャンセル"
+  },
+  "settings": {
+    "title": "設定",
+    "sleep_tracking": "睡眠トラッキング",
+    "manual_sleep_title": "手動睡眠トラッキング",
+    "manual_sleep_desc": "この端末ではHealthKitは利用できません。手動で睡眠を記録できます。",
+    "log_sleep_manually": "手動で記録",
+    "profile": "プロフィール",
+    "your_name": "あなたの名前",
+    "subscription": "サブスクリプション",
+    "manage_subscription": "サブスクリプションを管理",
+    "plans_billing": "プランと請求",
+    "api_connections": "API連携",
+    "google_calendar": "Googleカレンダー",
+    "apple_health": "Appleヘルスケア",
+    "plaid": "Plaid (金融)",
+    "enabled_modules": "有効なモジュール",
+    "voice_style": "音声スタイル",
+    "voice_calm": "落ち着いた",
+    "voice_energetic": "エネルギッシュ",
+    "voice_minimal": "ミニマル",
+    "data_management": "データ管理",
+    "export_data": "データをエクスポート",
+    "delete_all_data": "すべてのデータを削除",
+    "language": "言語",
+    "change_language": "言語を変更"
+  },
+  "languages": {
+    "en": "English",
+    "it": "Italiano",
+    "ja": "日本語",
+    "ko": "한국어",
+    "ar": "العربية",
+    "zh": "简体中文",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "tr": "Türkçe",
+    "ru": "Русский",
+    "pt-BR": "Português (Brasil)"
+  }
+}
+
+
+
+

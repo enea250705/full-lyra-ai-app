@@ -6,10 +6,12 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/Button';
 import { colors } from '../../constants/colors';
 import SafeLoadingScreen from '../../components/ui/SafeLoadingScreen';
+import { useI18n } from '../../i18n';
 
 export default function AuthIndex() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const { t } = useI18n();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -28,8 +30,8 @@ export default function AuthIndex() {
         </View>
         <SafeLoadingScreen 
           type="auth"
-          message="Welcome back..."
-          subMessage="Preparing your personalized wellness experience"
+          message={t('auth.index.welcome_back_loading')}
+          subMessage={t('auth.index.preparing_experience')}
         />
       </LinearGradient>
     );
@@ -83,8 +85,8 @@ export default function AuthIndex() {
       <View style={styles.content}>
         <View style={styles.titleContainer}>
           <Text style={styles.lyraText}>LYRA</Text>
-          <Text style={styles.title}>Welcome</Text>
-          <Text style={styles.subtitle}>Your AI wellness companion</Text>
+          <Text style={styles.title}>{t('auth.index.welcome_title')}</Text>
+          <Text style={styles.subtitle}>{t('auth.index.welcome_subtitle')}</Text>
         </View>
         
         <View style={styles.buttonContainer}>
@@ -95,7 +97,7 @@ export default function AuthIndex() {
             end={{ x: 1, y: 1 }}
           >
             <Button
-              title="Get Started"
+              title={t('auth.index.get_started')}
               onPress={() => router.push('/auth/register')}
               style={styles.primaryButtonInner}
               textStyle={styles.primaryButtonText}
@@ -104,7 +106,7 @@ export default function AuthIndex() {
           
           <View style={styles.secondaryButton}>
             <Button
-              title="I already have an account"
+              title={t('auth.index.have_account')}
               onPress={() => router.push('/auth/login')}
               style={styles.secondaryButtonInner}
               textStyle={styles.secondaryButtonText}

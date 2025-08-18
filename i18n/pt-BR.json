@@ -1,0 +1,50 @@
+{
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancelar"
+  },
+  "settings": {
+    "title": "Configurações",
+    "sleep_tracking": "Acompanhamento do sono",
+    "manual_sleep_title": "Acompanhamento manual do sono",
+    "manual_sleep_desc": "O HealthKit não está disponível neste dispositivo. Você ainda pode registrar seu sono manualmente.",
+    "log_sleep_manually": "Registrar manualmente",
+    "profile": "Perfil",
+    "your_name": "Seu nome",
+    "subscription": "Assinatura",
+    "manage_subscription": "Gerenciar assinatura",
+    "plans_billing": "Planos e cobrança",
+    "api_connections": "Conexões de API",
+    "google_calendar": "Google Agenda",
+    "apple_health": "Apple Saúde",
+    "plaid": "Plaid (Finanças)",
+    "enabled_modules": "Módulos habilitados",
+    "voice_style": "Estilo de voz",
+    "voice_calm": "Calma",
+    "voice_energetic": "Energética",
+    "voice_minimal": "Minimalista",
+    "data_management": "Gerenciamento de dados",
+    "export_data": "Exportar dados",
+    "delete_all_data": "Excluir todos os dados",
+    "language": "Idioma",
+    "change_language": "Alterar idioma"
+  },
+  "languages": {
+    "en": "English",
+    "it": "Italiano",
+    "ja": "日本語",
+    "ko": "한국어",
+    "ar": "العربية",
+    "zh": "简体中文",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "tr": "Türkçe",
+    "ru": "Русский",
+    "pt-BR": "Português (Brasil)"
+  }
+}
+
+
+
+

@@ -48,4 +48,5 @@ export interface UserSettings {
     decisions: boolean;
   };
   voiceStyle: 'calm' | 'energetic' | 'minimal';
+  language?: 'en' | 'it' | 'ja' | 'ko' | 'ar' | 'zh' | 'de' | 'fr' | 'es' | 'tr' | 'ru' | 'pt-BR';
 }

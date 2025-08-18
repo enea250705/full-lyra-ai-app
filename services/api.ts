@@ -187,6 +187,12 @@ class ApiService {
     });
   }
 
+  async deleteAccount() {
+    return this.request('/auth/delete-account', {
+      method: 'DELETE',
+    });
+  }
+
   async getProfile() {
     return this.request<any>('/auth/profile');
   }
@@ -448,6 +454,26 @@ class ApiService {
       method: 'PUT',
       body: JSON.stringify(settings),
     });
+  }
+
+  // Calendar API
+  async verifyCalendarConnection() {
+    return this.request<any>('/calendar/connect', {
+      method: 'POST',
+    });
+  }
+
+  async getCalendarEvents(timeframe: 'today' | 'tomorrow' | 'week' | 'month' = 'week', maxResults = 50) {
+    return this.request<any>(`/calendar/events?timeframe=${timeframe}&maxResults=${maxResults}`);
+  }
+
+  // Data export/delete
+  async exportUserData() {
+    return this.request<any>('/data/export');
+  }
+
+  async deleteAllUserData() {
+    return this.request<any>('/data/delete', { method: 'DELETE' });
   }
 
   // Push Notifications (client helpers)

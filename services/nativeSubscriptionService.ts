@@ -1,4 +1,13 @@
-import RNIap, {
+let RNIap: any;
+try {
+  // Dynamically require to avoid crashing in Expo/web where the native module isn't available
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  RNIap = require('react-native-iap');
+} catch (_e) {
+  RNIap = null;
+}
+
+import type {
   Product,
   Subscription,
   Purchase,
@@ -54,6 +63,11 @@ class NativeSubscriptionService {
   async initialize(): Promise<boolean> {
     try {
       console.log('[IAP] Initializing native subscription service...');
+      if (!RNIap) {
+        console.warn('[IAP] react-native-iap not available (Expo/dev). Skipping init.');
+        this.isInitialized = false;
+        return false;
+      }
       
       // Initialize connection to store
       await RNIap.initConnection();
@@ -79,6 +93,7 @@ class NativeSubscriptionService {
    * Set up purchase listeners
    */
   private setupPurchaseListeners() {
+    if (!RNIap) return;
     // Listen for successful purchases
     this.purchaseUpdateSubscription = purchaseUpdatedListener((purchase: Purchase) => {
       console.log('[IAP] Purchase updated:', purchase);
@@ -98,6 +113,7 @@ class NativeSubscriptionService {
   async loadProducts(): Promise<Subscription[]> {
     try {
       console.log('[IAP] Loading subscription products...');
+      if (!RNIap) return [];
       const products = await RNIap.getSubscriptions({ skus: SUBSCRIPTION_SKUS });
       
       this.availableProducts = products;
@@ -124,6 +140,9 @@ class NativeSubscriptionService {
     try {
       if (!this.isInitialized) {
         await this.initialize();
+      }
+      if (!RNIap) {
+        return { success: false, error: 'IAP not available in this environment' };
       }
 
       console.log('[IAP] Initiating purchase for:', productId);
@@ -348,7 +367,9 @@ class NativeSubscriptionService {
     }
     
     try {
-      await RNIap.endConnection();
+      if (RNIap) {
+        await RNIap.endConnection();
+      }
     } catch (error) {
       console.error('[IAP] Error ending connection:', error);
     }
