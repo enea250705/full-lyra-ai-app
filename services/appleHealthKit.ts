@@ -1,13 +1,6 @@
+import AppleHealthKit from 'react-native-health';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// Dynamic import to avoid crashes in environments where the module isn't available
-let AppleHealthKit: any = null;
-try {
-  AppleHealthKit = require('react-native-health');
-} catch (error) {
-  console.log('[HealthKit] react-native-health not available:', error);
-}
 
 interface SleepSample {
   value: string;
@@ -68,21 +61,15 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
         return false;
       }
 
-      if (!AppleHealthKit) {
-        console.log('[HealthKit] react-native-health module not available');
-        return false;
-      }
-
       console.log('[HealthKit] Initializing HealthKit...');
-      console.log('[HealthKit] Available methods:', Object.keys(AppleHealthKit));
       
-      // Request permissions
+      // Request permissions using the correct API
       const permissions = {
         permissions: {
           read: [
             AppleHealthKit.Constants.Permissions.SleepAnalysis,
             AppleHealthKit.Constants.Permissions.HeartRate,
-            AppleHealthKit.Constants.Permissions.Steps,
+            AppleHealthKit.Constants.Permissions.StepCount,
             AppleHealthKit.Constants.Permissions.ActiveEnergyBurned
           ],
           write: [
@@ -91,34 +78,15 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
         }
       };
 
-      // Check if initHealthKit exists
-      if (typeof AppleHealthKit.initHealthKit !== 'function') {
-        console.log('[HealthKit] initHealthKit not available, trying alternative approach');
-        
-        // Try using isAvailable first
-        if (typeof AppleHealthKit.isAvailable === 'function') {
-          const isAvailable = AppleHealthKit.isAvailable();
-          console.log('[HealthKit] HealthKit available:', isAvailable);
-          
-          if (isAvailable) {
-            this.isInitialized = true;
-            this.hasPermissions = true;
-            return true;
-          }
-        }
-        
-        return false;
-      }
-
       return new Promise((resolve) => {
-        AppleHealthKit.initHealthKit(permissions, (error: string, result: any) => {
+        AppleHealthKit.initHealthKit(permissions, (error: string) => {
           if (error) {
             console.log('[HealthKit] Error initializing HealthKit:', error);
             this.isInitialized = false;
             this.hasPermissions = false;
             resolve(false);
           } else {
-            console.log('[HealthKit] HealthKit initialized successfully');
+            console.log('[HealthKit] HealthKit permissions granted successfully');
             this.isInitialized = true;
             this.hasPermissions = true;
             resolve(true);
@@ -137,11 +105,6 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
     try {
       if (!this.hasPermissions) {
         console.log('[HealthKit] Permissions not granted, returning empty sleep data');
-        return [];
-      }
-
-      if (!this.isHealthKitAvailable()) {
-        console.log('[HealthKit] HealthKit not available, returning empty sleep data');
         return [];
       }
 
@@ -396,7 +359,7 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
       }
 
       return new Promise((resolve) => {
-        AppleHealthKit.getAuthorizationStatusForType(
+        AppleHealthKit.authorizationStatusForType(
           AppleHealthKit.Constants.Permissions.SleepAnalysis,
           (error: string, result: any) => {
             if (error) {
