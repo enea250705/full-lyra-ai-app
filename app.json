@@ -60,7 +60,8 @@
       "ios": {
         "entitlements": {
           "com.apple.developer.healthkit": true,
-          "com.apple.developer.healthkit.access": ["health-records"]
+          "com.apple.developer.healthkit.access": ["health-records"],
+          "com.apple.developer.healthkit.recalibrate-estimates": true
         }
       }
     },
