@@ -1,6 +1,22 @@
-import AppleHealthKit from 'react-native-health';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// Try different import methods
+let AppleHealthKit: any = null;
+try {
+  AppleHealthKit = require('react-native-health');
+} catch (error) {
+  console.log('[HealthKit] react-native-health not available:', error);
+}
+
+// Alternative import method
+if (!AppleHealthKit) {
+  try {
+    AppleHealthKit = require('react-native-health').default;
+  } catch (error) {
+    console.log('[HealthKit] react-native-health default not available:', error);
+  }
+}
 
 interface SleepSample {
   value: string;
@@ -61,8 +77,22 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
         return false;
       }
 
+      if (!AppleHealthKit) {
+        console.log('[HealthKit] react-native-health module not available');
+        return false;
+      }
+
       console.log('[HealthKit] Initializing HealthKit...');
+      console.log('[HealthKit] AppleHealthKit object:', AppleHealthKit);
+      console.log('[HealthKit] Available methods:', Object.keys(AppleHealthKit));
       
+      // Check if initHealthKit exists
+      if (typeof AppleHealthKit.initHealthKit !== 'function') {
+        console.log('[HealthKit] initHealthKit is not a function');
+        console.log('[HealthKit] initHealthKit type:', typeof AppleHealthKit.initHealthKit);
+        return false;
+      }
+
       // Request permissions using the correct API
       const permissions = {
         permissions: {

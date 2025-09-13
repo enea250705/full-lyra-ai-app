@@ -51,8 +51,7 @@
           "color": "#ffffff",
           "defaultChannel": "default"
         }
-      ],
-      "react-native-health"
+      ]
     ],
     "experiments": {
       "typedRoutes": true
