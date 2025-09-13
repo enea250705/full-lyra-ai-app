@@ -1,21 +1,11 @@
 import { 
-  initHealthKit,
-  getSleepSamples,
-  getHeartRateSamples,
-  saveSleepSample,
-  getAuthStatus,
-  isAvailable,
-  Constants
-} from 'react-native-health';
+  HealthKit,
+  HealthKitPermissions,
+  HealthKitDataTypes,
+  HealthKitAuthorizationStatus
+} from '@kingstinct/react-native-healthkit';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-interface HealthKitPermissions {
-  permissions: {
-    read: string[];
-    write: string[];
-  };
-}
 
 interface SleepSample {
   value: string;
@@ -27,6 +17,28 @@ interface HeartRateSample {
   value: number;
   startDate: string;
   endDate: string;
+}
+
+interface ProcessedSleepData {
+  startDate: string;
+  endDate: string;
+  duration: number; // in hours
+  sleepStages: SleepStages;
+  sleepQuality: number; // calculated score 1-10
+  efficiency: number; // sleep efficiency percentage
+  heartRateData: HeartRateData[];
+}
+
+interface SleepStages {
+  deep: number; // minutes
+  light: number; // minutes
+  rem: number; // minutes
+  awake: number; // minutes
+}
+
+interface HeartRateData {
+  value: number;
+  timestamp: string;
 }
 
 interface AppleHealthKitService {
@@ -42,73 +54,46 @@ interface AppleHealthKitService {
   isPermissionGranted(): Promise<boolean>;
 }
 
-interface ProcessedSleepData {
-  startDate: string;
-  endDate: string;
-  duration: number; // in hours
-  sleepStages: SleepStages;
-  sleepQuality: number; // calculated score 1-10
-  efficiency: number; // percentage
-  heartRateData?: HeartRateData[];
-}
-
-interface SleepStages {
-  inBed: number; // minutes
-  asleep: number; // minutes
-  awake: number; // minutes
-  deepSleep?: number; // minutes (if available)
-  lightSleep?: number; // minutes (if available)
-  remSleep?: number; // minutes (if available)
-}
-
-interface HeartRateData {
-  value: number;
-  startDate: string;
-  endDate: string;
-}
-
-const permissions: HealthKitPermissions = {
-  permissions: {
-    read: [
-      Constants.Permissions.SleepAnalysis,
-      Constants.Permissions.HeartRate,
-      Constants.Permissions.RestingHeartRate,
-      Constants.Permissions.HeartRateVariability,
-      Constants.Permissions.OxygenSaturation,
-    ],
-    write: [
-      Constants.Permissions.SleepAnalysis,
-    ],
-  },
-};
-
 class AppleHealthKitServiceImpl implements AppleHealthKitService {
   private isInitialized = false;
   private hasPermissions = false;
+  private readonly LAST_SYNC_KEY = 'healthkit_last_sync';
 
   async initHealthKit(): Promise<boolean> {
     try {
       if (!this.isHealthKitAvailable()) {
-        console.log('[HealthKit] Not available on this device');
+        console.log('[HealthKit] HealthKit not available on this device');
         return false;
       }
 
-      console.log('[HealthKit] Requesting permissions...');
-      return new Promise((resolve) => {
-        initHealthKit(permissions, (error: string) => {
-          if (error) {
-            console.log('[HealthKit] Cannot grant permissions:', error);
-            this.isInitialized = false;
-            this.hasPermissions = false;
-            resolve(false);
-          } else {
-            console.log('[HealthKit] Permissions granted successfully');
-            this.isInitialized = true;
-            this.hasPermissions = true;
-            resolve(true);
-          }
-        });
-      });
+      console.log('[HealthKit] Initializing HealthKit...');
+      
+      // Request permissions
+      const permissions: HealthKitPermissions = {
+        read: [
+          HealthKitDataTypes.SleepAnalysis,
+          HealthKitDataTypes.HeartRate,
+          HealthKitDataTypes.Steps,
+          HealthKitDataTypes.ActiveEnergyBurned
+        ],
+        write: [
+          HealthKitDataTypes.SleepAnalysis
+        ]
+      };
+
+      const result = await HealthKit.requestPermissions(permissions);
+      
+      if (result) {
+        console.log('[HealthKit] Permissions granted successfully');
+        this.isInitialized = true;
+        this.hasPermissions = true;
+        return true;
+      } else {
+        console.log('[HealthKit] Permissions denied');
+        this.isInitialized = false;
+        this.hasPermissions = false;
+        return false;
+      }
     } catch (error) {
       console.error('[HealthKit] Exception in initHealthKit:', error);
       this.isInitialized = false;
@@ -129,28 +114,20 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
         return [];
       }
 
-      return new Promise((resolve, reject) => {
-        const options = {
+      console.log('[HealthKit] Fetching sleep data from', startDate.toISOString(), 'to', endDate.toISOString());
+
+      const sleepData = await HealthKit.getSamples(
+        HealthKitDataTypes.SleepAnalysis,
+        {
           startDate: startDate.toISOString(),
           endDate: endDate.toISOString(),
-        };
+        }
+      );
 
-        getSleepSamples(options, async (err: Object, results: SleepSample[]) => {
-          if (err) {
-            console.error('[HealthKit] Error getting sleep data:', err);
-            resolve([]);
-            return;
-          }
+      console.log('[HealthKit] Raw sleep data:', sleepData);
 
-          try {
-            const processedData = await this.processSleepSamples(results, startDate, endDate);
-            resolve(processedData);
-          } catch (error) {
-            console.error('[HealthKit] Error processing sleep data:', error);
-            resolve([]);
-          }
-        });
-      });
+      const processedData = await this.processSleepSamples(sleepData, startDate, endDate);
+      return processedData;
     } catch (error) {
       console.error('[HealthKit] Exception in getSleepData:', error);
       return [];
@@ -158,7 +135,7 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
   }
 
   private async processSleepSamples(
-    samples: SleepSample[], 
+    samples: any[], 
     startDate: Date, 
     endDate: Date
   ): Promise<ProcessedSleepData[]> {
@@ -196,58 +173,46 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
     return processedSessions.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
   }
 
-  private groupSleepSamplesByNight(samples: SleepSample[]): Map<string, SleepSample[]> {
-    const sessions = new Map<string, SleepSample[]>();
+  private groupSleepSamplesByNight(samples: any[]): Map<string, any[]> {
+    const sessions = new Map<string, any[]>();
 
     samples.forEach(sample => {
       const sleepDate = new Date(sample.startDate);
       // If sleep starts after 6 PM, consider it the next day's sleep
-      if (sleepDate.getHours() >= 18) {
-        sleepDate.setDate(sleepDate.getDate() + 1);
+      const nightKey = sleepDate.getHours() >= 18 
+        ? new Date(sleepDate.getTime() + 24 * 60 * 60 * 1000).toDateString()
+        : sleepDate.toDateString();
+      
+      if (!sessions.has(nightKey)) {
+        sessions.set(nightKey, []);
       }
-      const dateKey = sleepDate.toISOString().split('T')[0];
-
-      if (!sessions.has(dateKey)) {
-        sessions.set(dateKey, []);
-      }
-      sessions.get(dateKey)!.push(sample);
+      sessions.get(nightKey)!.push(sample);
     });
 
     return sessions;
   }
 
-  private calculateSleepStages(samples: SleepSample[]): SleepStages {
-    const stages: SleepStages = {
-      inBed: 0,
-      asleep: 0,
-      awake: 0,
-    };
+  private calculateSleepStages(samples: any[]): SleepStages {
+    const stages: SleepStages = { deep: 0, light: 0, rem: 0, awake: 0 };
 
     samples.forEach(sample => {
       const duration = (new Date(sample.endDate).getTime() - new Date(sample.startDate).getTime()) / (1000 * 60); // minutes
-
+      
       switch (sample.value) {
-        case 'INBED':
-          stages.inBed += duration;
-          break;
-        case 'ASLEEP':
-          stages.asleep += duration;
-          break;
-        case 'AWAKE':
-          stages.awake += duration;
-          break;
         case 'DEEP':
-          stages.deepSleep = (stages.deepSleep || 0) + duration;
-          stages.asleep += duration;
-          break;
-        case 'REM':
-          stages.remSleep = (stages.remSleep || 0) + duration;
-          stages.asleep += duration;
+        case 'Core':
+          stages.deep += duration;
           break;
         case 'LIGHT':
-          stages.lightSleep = (stages.lightSleep || 0) + duration;
-          stages.asleep += duration;
+        case 'REM':
+          stages.light += duration;
           break;
+        case 'AWAKE':
+        case 'Awake':
+          stages.awake += duration;
+          break;
+        default:
+          stages.light += duration;
       }
     });
 
@@ -255,52 +220,30 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
   }
 
   private calculateSleepEfficiency(stages: SleepStages): number {
-    const totalTime = stages.inBed || (stages.asleep + stages.awake);
-    if (totalTime === 0) return 0;
-    
-    return Math.round((stages.asleep / totalTime) * 100);
+    const totalSleep = stages.deep + stages.light + stages.rem;
+    const totalTime = totalSleep + stages.awake;
+    return totalTime > 0 ? Math.round((totalSleep / totalTime) * 100) : 0;
   }
 
   private calculateSleepQuality(stages: SleepStages, efficiency: number, duration: number): number {
-    let quality = 5; // Base quality
-
-    // Duration factor (7-9 hours is optimal)
+    // Base score from efficiency
+    let score = efficiency / 10;
+    
+    // Bonus for good sleep duration (7-9 hours)
     if (duration >= 7 && duration <= 9) {
-      quality += 1;
-    } else if (duration < 6 || duration > 10) {
-      quality -= 1;
+      score += 1;
+    } else if (duration >= 6 && duration <= 10) {
+      score += 0.5;
     }
-
-    // Efficiency factor
-    if (efficiency >= 85) {
-      quality += 2;
-    } else if (efficiency >= 75) {
-      quality += 1;
-    } else if (efficiency < 65) {
-      quality -= 1;
+    
+    // Bonus for good deep sleep ratio (15-25%)
+    const totalSleep = stages.deep + stages.light + stages.rem;
+    const deepSleepRatio = totalSleep > 0 ? (stages.deep / totalSleep) * 100 : 0;
+    if (deepSleepRatio >= 15 && deepSleepRatio <= 25) {
+      score += 1;
     }
-
-    // Deep sleep factor (if available)
-    if (stages.deepSleep) {
-      const deepSleepPercent = (stages.deepSleep / stages.asleep) * 100;
-      if (deepSleepPercent >= 20 && deepSleepPercent <= 25) {
-        quality += 1;
-      } else if (deepSleepPercent < 15) {
-        quality -= 1;
-      }
-    }
-
-    // REM sleep factor (if available)
-    if (stages.remSleep) {
-      const remPercent = (stages.remSleep / stages.asleep) * 100;
-      if (remPercent >= 20 && remPercent <= 25) {
-        quality += 1;
-      } else if (remPercent < 15) {
-        quality -= 1;
-      }
-    }
-
-    return Math.max(1, Math.min(10, quality));
+    
+    return Math.min(10, Math.max(1, Math.round(score)));
   }
 
   async getHeartRateData(startDate: Date, endDate: Date): Promise<HeartRateData[]> {
@@ -309,121 +252,58 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
         return [];
       }
 
-      if (!this.isHealthKitAvailable()) {
-        console.log('[HealthKit] HealthKit not available, returning empty heart rate data');
-        return [];
-      }
-
-      return new Promise((resolve) => {
-        const options = {
+      const heartRateData = await HealthKit.getSamples(
+        HealthKitDataTypes.HeartRate,
+        {
           startDate: startDate.toISOString(),
           endDate: endDate.toISOString(),
-          limit: 1000, // Limit to avoid too much data
-        };
+        }
+      );
 
-        getHeartRateSamples(options, (err: Object, results: HeartRateSample[]) => {
-          if (err) {
-            console.error('[HealthKit] Error getting heart rate data:', err);
-            resolve([]);
-            return;
-          }
-
-          const heartRateData: HeartRateData[] = results.map(sample => ({
-            value: sample.value,
-            startDate: sample.startDate,
-            endDate: sample.endDate,
-          }));
-
-          resolve(heartRateData);
-        });
-      });
+      return heartRateData.map((sample: any) => ({
+        value: sample.value,
+        timestamp: sample.startDate,
+      }));
     } catch (error) {
-      console.error('[HealthKit] Exception in getHeartRateData:', error);
+      console.error('[HealthKit] Error getting heart rate data:', error);
       return [];
     }
   }
 
   async requestPermissions(): Promise<boolean> {
-    try {
-      if (!this.isHealthKitAvailable()) {
-        console.log('[HealthKit] HealthKit not available on this device');
-        return false;
-      }
-
-      console.log('[HealthKit] Starting permission request...');
-      
-      // First check if permissions are already granted
-      const alreadyGranted = await this.isPermissionGranted();
-      if (alreadyGranted) {
-        console.log('[HealthKit] Permissions already granted');
-        this.isInitialized = true;
-        this.hasPermissions = true;
-        return true;
-      }
-
-      // Request permissions through initHealthKit
-      const granted = await this.initHealthKit();
-      
-      if (granted) {
-        console.log('[HealthKit] Permission request successful');
-        return true;
-      } else {
-        console.log('[HealthKit] Permission request failed or denied');
-        return false;
-      }
-    } catch (error) {
-      console.error('[HealthKit] Error in requestPermissions:', error);
-      return false;
-    }
+    return this.initHealthKit();
   }
 
   isHealthKitAvailable(): boolean {
-    try {
-      if (Platform.OS !== 'ios') {
-        return false;
-      }
-      
-      // Check if react-native-health is available and HealthKit is supported
-      if (typeof isAvailable !== 'function') {
-        return false;
-      }
-      const healthKitAvailable = isAvailable();
-      console.log('[HealthKit] isHealthKitAvailable check:', { platform: Platform.OS, healthKitAvailable });
-      return healthKitAvailable;
-    } catch (error) {
-      console.warn('[HealthKit] isAvailable check failed:', error);
-      return false;
-    }
+    return Platform.OS === 'ios';
   }
 
   async writeSleepData(startDate: Date, endDate: Date): Promise<boolean> {
-    if (!this.hasPermissions) {
-      return false;
-    }
+    try {
+      if (!this.hasPermissions) {
+        console.log('[HealthKit] No permissions to write sleep data');
+        return false;
+      }
 
-    return new Promise((resolve) => {
       const sleepData = {
-        value: 'ASLEEP',
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
+        value: 'IN_BED',
       };
 
-      saveSleepSample(sleepData, (err: Object) => {
-        if (err) {
-          console.error('[HealthKit] Error writing sleep data:', err);
-          resolve(false);
-        } else {
-          console.log('[HealthKit] Sleep data written successfully');
-          resolve(true);
-        }
-      });
-    });
+      await HealthKit.saveSample(HealthKitDataTypes.SleepAnalysis, sleepData);
+      console.log('[HealthKit] Sleep data written successfully');
+      return true;
+    } catch (error) {
+      console.error('[HealthKit] Error writing sleep data:', error);
+      return false;
+    }
   }
 
   async getLastSyncDate(): Promise<Date | null> {
     try {
-      const dateString = await AsyncStorage.getItem('healthkit_last_sync');
-      return dateString ? new Date(dateString) : null;
+      const lastSync = await AsyncStorage.getItem(this.LAST_SYNC_KEY);
+      return lastSync ? new Date(lastSync) : null;
     } catch (error) {
       console.error('[HealthKit] Error getting last sync date:', error);
       return null;
@@ -432,20 +312,26 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
 
   async setLastSyncDate(date: Date): Promise<void> {
     try {
-      await AsyncStorage.setItem('healthkit_last_sync', date.toISOString());
+      await AsyncStorage.setItem(this.LAST_SYNC_KEY, date.toISOString());
     } catch (error) {
       console.error('[HealthKit] Error setting last sync date:', error);
     }
   }
 
   async syncRecentSleepData(): Promise<ProcessedSleepData[]> {
-    const lastSync = await this.getLastSyncDate();
-    const endDate = new Date();
-    const startDate = lastSync || new Date(endDate.getTime() - 7 * 24 * 60 * 60 * 1000); // 7 days ago if no last sync
-
     try {
+      const lastSync = await this.getLastSyncDate();
+      const endDate = new Date();
+      const startDate = lastSync || new Date(endDate.getTime() - 7 * 24 * 60 * 60 * 1000); // Last 7 days
+
+      console.log('[HealthKit] Syncing sleep data from', startDate.toISOString(), 'to', endDate.toISOString());
+
       const sleepData = await this.getSleepData(startDate, endDate);
-      await this.setLastSyncDate(endDate);
+      
+      if (sleepData.length > 0) {
+        await this.setLastSyncDate(endDate);
+      }
+
       return sleepData;
     } catch (error) {
       console.error('[HealthKit] Error syncing recent sleep data:', error);
@@ -454,30 +340,19 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
   }
 
   async isPermissionGranted(): Promise<boolean> {
-    if (!this.isHealthKitAvailable()) {
-      console.log('[HealthKit] HealthKit not available, permission check skipped');
+    try {
+      if (!this.isHealthKitAvailable()) {
+        return false;
+      }
+
+      const status = await HealthKit.getAuthorizationStatus(HealthKitDataTypes.SleepAnalysis);
+      return status === HealthKitAuthorizationStatus.Authorized;
+    } catch (error) {
+      console.error('[HealthKit] Error checking permission status:', error);
       return false;
     }
-
-    return new Promise((resolve) => {
-      getAuthStatus(permissions, (err: Object, result: any) => {
-        if (err) {
-          console.log('[HealthKit] Error checking auth status:', err);
-          resolve(false);
-        } else {
-          console.log('[HealthKit] Auth status result:', result);
-          const sleepPermission = result[Constants.Permissions.SleepAnalysis];
-          const isGranted = sleepPermission === Constants.AuthorizationStatusCodes.Granted;
-          console.log('[HealthKit] Sleep permission status:', { sleepPermission, isGranted });
-          resolve(isGranted);
-        }
-      });
-    });
   }
 }
 
-// Export singleton instance
-export const appleHealthKitService: AppleHealthKitService = new AppleHealthKitServiceImpl();
-
-// Export types for use in other components
-export type { ProcessedSleepData, SleepStages, HeartRateData };
+export const appleHealthKitService = new AppleHealthKitServiceImpl();
+export default appleHealthKitService;

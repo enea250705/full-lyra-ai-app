@@ -229,9 +229,11 @@
     "fallback_get_started": "Welcome! I'm here to help you with your well-being journey. How can I assist you today?",
     "fallback_anxiety": "I understand you might be feeling anxious. Let's work through this together. What's on your mind?",
     "fallback_generic": "I'm here to help! What would you like to talk about?",
+    "fallback_mood": "I see you're feeling {mood} today. How can I help you with that?",
     "copied_title": "Copied",
     "copied_message": "Message copied to clipboard",
-    "feedback_title": "Feedback"
+    "feedback_title": "Feedback",
+    "feedback_message": "Thank you for your {reaction} feedback!"
   },
   "home": {
     "start_day_with_lyra": "Today",
@@ -257,7 +259,14 @@
     "impact_negative": "Weather might be affecting your mood",
     "impact_neutral": "Weather has minimal impact on your mood",
     "todays_focus": "Today's Focus",
-    "default_focus": "Focus on your well-being today"
+    "default_focus": "Focus on your well-being today",
+    "weather_recommendation": "Weather Recommendation",
+    "recent_insights": "Recent Insights",
+    "sleep_pattern_desc": "Track your sleep patterns and quality",
+    "mood_observation": "Mood Observation",
+    "mood_observation_desc": "Monitor your daily mood trends",
+    "energy_management": "Energy Management",
+    "energy_management_desc": "Optimize your energy throughout the day"
   },
   "savings": {
     "title": "Savings Tracker",
@@ -325,7 +334,9 @@
     "weather_impact": "Weather Impact on Mood",
     "sunny_mood": "Sunny weather can boost your mood!",
     "rainy_mood": "Rainy weather might affect your energy levels.",
-    "cloudy_mood": "Cloudy weather can sometimes feel calming."
+    "cloudy_mood": "Cloudy weather can sometimes feel calming.",
+    "feels_like": "Feels like {temp}°",
+    "visibility": "Visibility: {value}km"
   },
   "stores": {
     "title": "App Stores",
@@ -339,7 +350,23 @@
     "whats_new": "What's New",
     "bug_fixes": "Bug fixes and improvements",
     "new_features": "New features and enhancements",
-    "performance": "Performance improvements"
+    "performance": "Performance improvements",
+    "price_expensive": "Expensive",
+    "price_very_expensive": "Very Expensive",
+    "price_luxury": "Luxury",
+    "risk_high": "High spending risk ({count} luxury stores nearby)",
+    "risk_medium": "Medium spending risk ({count} stores nearby)",
+    "risk_low": "Low spending risk",
+    "details_distance": "{distance}m away",
+    "actions_cancel": "Cancel",
+    "actions_budget": "Set Budget",
+    "actions_avoided": "I Avoided This",
+    "confirm_savings_title": "Confirm Savings",
+    "confirm_savings_message": "How much did you save by avoiding {store}?",
+    "custom_amount": "Custom Amount",
+    "custom_amount_prompt": "Enter the amount you saved",
+    "more_stores": "+{count} more stores",
+    "tip": "💡 Tip: Set a shopping budget to avoid overspending"
   },
   "plaid": {
     "title": "Financial Data",
@@ -399,7 +426,8 @@
       "no_lessons": "No lessons recorded yet",
       "actionable_suggestions": "Actionable Suggestions",
       "getting_started": "Getting Started",
-      "getting_started_desc": "Complete your profile to get personalized insights"
+      "getting_started_desc": "Complete your profile to get personalized insights",
+      "suggestion_n": "Suggestion {n}"
     },
     "comprehensive": {
       "title": "Comprehensive Analysis",
@@ -430,7 +458,22 @@
     "sync_now": "Sync Now",
     "not_available": "HealthKit not available",
     "permission_required": "Permission required",
-    "grant_permission": "Grant Permission"
+    "grant_permission": "Grant Permission",
+    "connected_title": "HealthKit Connected",
+    "connected_subtitle": "Automatic sleep tracking is now enabled",
+    "auto_detection": "Automatic sleep detection",
+    "stages_tracking": "Sleep stages tracking",
+    "heart_rate": "Heart rate monitoring",
+    "disable_button": "Disable",
+    "enable_title": "Enable HealthKit",
+    "enable_subtitle": "Connect to Apple Health for automatic sleep tracking",
+    "benefit_auto": "Automatic sleep detection",
+    "benefit_stages": "Sleep stages tracking",
+    "benefit_hr": "Heart rate monitoring",
+    "benefit_privacy": "Your data stays private",
+    "connecting": "Connecting...",
+    "connect_button": "Connect HealthKit",
+    "disclaimer": "Your health data is encrypted and stored securely on your device"
   },
   "sleep_mode_card": {
     "title": "Sleep Mode",
@@ -458,6 +501,20 @@
     "journal_reminder_time": "Reminder Time",
     "sleep_reminder": "Sleep Reminder",
     "sleep_reminder_time": "Reminder Time"
+  },
+  "onboarding": {
+    "welcome_title": "Welcome to Lyra",
+    "welcome_subtitle": "Your AI-powered life companion",
+    "step_1_title": "Personalized Insights",
+    "step_1_desc": "Get AI-powered insights about your mood, sleep, and daily patterns",
+    "step_2_title": "Smart Tracking",
+    "step_2_desc": "Automatically track your sleep, mood, and health data",
+    "step_3_title": "Privacy First",
+    "step_3_desc": "Your data stays secure and private on your device",
+    "get_started": "Get Started",
+    "skip": "Skip",
+    "next": "Next",
+    "finish": "Finish Setup"
   },
   "profile": "Profile"
 }
