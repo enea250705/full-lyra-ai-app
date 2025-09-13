@@ -1,4 +1,4 @@
-import AppleHealthKit, { HealthValue, HealthKitPermissions } from 'react-native-health';
+import AppleHealthKit from 'react-native-health';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -64,7 +64,7 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
       console.log('[HealthKit] Initializing HealthKit...');
       
       // Request permissions
-      const permissions: HealthKitPermissions = {
+      const permissions = {
         permissions: {
           read: [
             AppleHealthKit.Constants.Permissions.SleepAnalysis,
@@ -121,7 +121,7 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
           endDate: endDate.toISOString(),
         };
 
-        AppleHealthKit.getSleepSamples(options, (error: string, results: HealthValue[]) => {
+        AppleHealthKit.getSleepSamples(options, (error: string, results: any[]) => {
           if (error) {
             console.error('[HealthKit] Error getting sleep data:', error);
             resolve([]);
@@ -138,7 +138,7 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
   }
 
   private async processSleepSamples(
-    samples: HealthValue[], 
+    samples: any[], 
     startDate: Date, 
     endDate: Date
   ): Promise<ProcessedSleepData[]> {
@@ -176,8 +176,8 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
     return processedSessions.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
   }
 
-  private groupSleepSamplesByNight(samples: HealthValue[]): Map<string, HealthValue[]> {
-    const sessions = new Map<string, HealthValue[]>();
+  private groupSleepSamplesByNight(samples: any[]): Map<string, any[]> {
+    const sessions = new Map<string, any[]>();
 
     samples.forEach(sample => {
       const sleepDate = new Date(sample.startDate);
@@ -195,7 +195,7 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
     return sessions;
   }
 
-  private calculateSleepStages(samples: HealthValue[]): SleepStages {
+  private calculateSleepStages(samples: any[]): SleepStages {
     const stages: SleepStages = { deep: 0, light: 0, rem: 0, awake: 0 };
 
     samples.forEach(sample => {
@@ -261,12 +261,12 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
           endDate: endDate.toISOString(),
         };
 
-        AppleHealthKit.getHeartRateSamples(options, (error: string, results: HealthValue[]) => {
+        AppleHealthKit.getHeartRateSamples(options, (error: string, results: any[]) => {
           if (error) {
             console.error('[HealthKit] Error getting heart rate data:', error);
             resolve([]);
           } else {
-            const heartRateData = results.map((sample: HealthValue) => ({
+            const heartRateData = results.map((sample: any) => ({
               value: sample.value,
               timestamp: sample.startDate,
             }));
