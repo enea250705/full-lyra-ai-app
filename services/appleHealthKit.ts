@@ -78,6 +78,28 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
         }
       };
 
+      // Try different initialization approaches
+      console.log('[HealthKit] Available methods:', Object.keys(AppleHealthKit));
+      
+      // Check if initHealthKit exists
+      if (typeof AppleHealthKit.initHealthKit !== 'function') {
+        console.log('[HealthKit] initHealthKit not available, trying alternative approach');
+        
+        // Try using isAvailable first
+        if (typeof AppleHealthKit.isAvailable === 'function') {
+          const isAvailable = AppleHealthKit.isAvailable();
+          console.log('[HealthKit] HealthKit available:', isAvailable);
+          
+          if (isAvailable) {
+            this.isInitialized = true;
+            this.hasPermissions = true;
+            return true;
+          }
+        }
+        
+        return false;
+      }
+
       return new Promise((resolve) => {
         AppleHealthKit.initHealthKit(permissions, (error: string, result: any) => {
           if (error) {
