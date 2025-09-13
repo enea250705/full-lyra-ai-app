@@ -14,8 +14,6 @@ import type {
   PurchaseError,
   SubscriptionPurchase,
   ProductPurchase,
-  purchaseErrorListener,
-  purchaseUpdatedListener,
 } from 'react-native-iap';
 import { Platform, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -95,13 +93,13 @@ class NativeSubscriptionService {
   private setupPurchaseListeners() {
     if (!RNIap) return;
     // Listen for successful purchases
-    this.purchaseUpdateSubscription = purchaseUpdatedListener((purchase: Purchase) => {
+    this.purchaseUpdateSubscription = RNIap.purchaseUpdatedListener((purchase: Purchase) => {
       console.log('[IAP] Purchase updated:', purchase);
       this.handlePurchaseUpdate(purchase);
     });
 
     // Listen for purchase errors
-    this.purchaseErrorSubscription = purchaseErrorListener((error: PurchaseError) => {
+    this.purchaseErrorSubscription = RNIap.purchaseErrorListener((error: PurchaseError) => {
       console.warn('[IAP] Purchase error:', error);
       this.handlePurchaseError(error);
     });
