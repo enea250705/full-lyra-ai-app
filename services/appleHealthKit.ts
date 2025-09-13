@@ -70,10 +70,19 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
             AppleHealthKit.Constants.Permissions.SleepAnalysis,
             AppleHealthKit.Constants.Permissions.HeartRate,
             AppleHealthKit.Constants.Permissions.StepCount,
-            AppleHealthKit.Constants.Permissions.ActiveEnergyBurned
+            AppleHealthKit.Constants.Permissions.ActiveEnergyBurned,
+            AppleHealthKit.Constants.Permissions.RestingHeartRate,
+            AppleHealthKit.Constants.Permissions.HeartRateVariability,
+            AppleHealthKit.Constants.Permissions.OxygenSaturation,
+            AppleHealthKit.Constants.Permissions.BodyMass,
+            AppleHealthKit.Constants.Permissions.BodyFatPercentage,
+            AppleHealthKit.Constants.Permissions.DistanceWalkingRunning,
+            AppleHealthKit.Constants.Permissions.FlightsClimbed
           ],
           write: [
-            AppleHealthKit.Constants.Permissions.SleepAnalysis
+            AppleHealthKit.Constants.Permissions.SleepAnalysis,
+            AppleHealthKit.Constants.Permissions.BodyMass,
+            AppleHealthKit.Constants.Permissions.BodyFatPercentage
           ]
         }
       };
