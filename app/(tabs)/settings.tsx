@@ -21,7 +21,7 @@ import { useGoogleFit } from '../../hooks/useGoogleFit';
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { settings, updateSettings, loading: userDataLoading, notificationSettings, updateNotificationSettings } = useUserData();
+  const { settings, updateSettings, loading: userDataLoading, notificationSettings, updateNotificationSettings, refreshData } = useUserData();
   const { t, languages, setLocale, locale } = useI18n();
   const googleFit = useGoogleFit();
   const { 
@@ -309,6 +309,9 @@ export default function SettingsScreen() {
       console.log('[Settings] Sleep log creation result:', result);
       
       if (result) {
+        // Refresh user data to update sleep hours and insights
+        await refreshData();
+        
         Alert.alert(
           t('common.success'),
           t('sleep.entry_saved'),

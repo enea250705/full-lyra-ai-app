@@ -391,8 +391,11 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
 
   const refreshData = useCallback(async () => {
     if (isMockUser) return;
-    await loadUserData();
-  }, [isMockUser, loadUserData]);
+    await Promise.all([
+      loadUserData(),
+      loadInsightData(),
+    ]);
+  }, [isMockUser, loadUserData, loadInsightData]);
 
   const updateNotificationSettings = useCallback(async (newSettings: any) => {
     if (isMockUser) {
