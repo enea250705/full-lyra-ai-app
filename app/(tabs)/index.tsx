@@ -40,7 +40,7 @@ export default function HomeScreen() {
   
   const { savings, loading: savingsLoading, recordSavings, fetchSavingsStats } = useSavings();
   const { subscription } = useSubscription();
-  const { permissions, requestAllPermissions, requestLocationPermission, isLoading: permissionsLoading } = usePermissions();
+  const { permissions, requestAllPermissions, requestLocationPermission, requestHealthKitPermission, requestNotificationsPermission, isLoading: permissionsLoading } = usePermissions();
   
   const [currentMood, setCurrentMood] = useState<Mood>(userData?.mood || 'neutral');
   const [showStoreAlert, setShowStoreAlert] = useState(true);
@@ -385,6 +385,9 @@ export default function HomeScreen() {
         visible={showPermissionsModal}
         permissions={permissions}
         onRequestPermissions={handlePermissionsRequest}
+        onRequestLocationPermission={requestLocationPermission}
+        onRequestHealthKitPermission={requestHealthKitPermission}
+        onRequestNotificationsPermission={requestNotificationsPermission}
         onSkip={handleSkipPermissions}
         onContinue={handleContinueWithoutPermissions}
       />

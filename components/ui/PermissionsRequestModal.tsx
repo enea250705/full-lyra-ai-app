@@ -38,6 +38,9 @@ interface PermissionsRequestModalProps {
     notifications: { granted: boolean; requested: boolean };
   };
   onRequestPermissions: () => Promise<void>;
+  onRequestLocationPermission: () => Promise<boolean>;
+  onRequestHealthKitPermission: () => Promise<boolean>;
+  onRequestNotificationsPermission: () => Promise<boolean>;
   onSkip: () => void;
   onContinue: () => void;
 }
@@ -46,6 +49,9 @@ export const PermissionsRequestModal: React.FC<PermissionsRequestModalProps> = (
   visible,
   permissions,
   onRequestPermissions,
+  onRequestLocationPermission,
+  onRequestHealthKitPermission,
+  onRequestNotificationsPermission,
   onSkip,
   onContinue,
 }) => {
@@ -113,6 +119,49 @@ export const PermissionsRequestModal: React.FC<PermissionsRequestModalProps> = (
     onSkip();
   };
 
+  const handleIndividualPermissionRequest = async (permissionId: string) => {
+    try {
+      setIsRequesting(true);
+      console.log(`[PermissionsRequestModal] Requesting ${permissionId} permission...`);
+      
+      let granted = false;
+      switch (permissionId) {
+        case 'location':
+          granted = await onRequestLocationPermission();
+          break;
+        case 'healthKit':
+          granted = await onRequestHealthKitPermission();
+          break;
+        case 'notifications':
+          granted = await onRequestNotificationsPermission();
+          break;
+        default:
+          console.warn(`[PermissionsRequestModal] Unknown permission: ${permissionId}`);
+          return;
+      }
+      
+      console.log(`[PermissionsRequestModal] ${permissionId} permission result:`, granted);
+      
+      if (granted) {
+        // Show success message
+        Alert.alert(
+          t('common.success'),
+          `${permissionId === 'location' ? 'Location' : permissionId === 'healthKit' ? 'Health & Sleep Data' : 'Notifications'} permission granted!`,
+          [{ text: t('common.ok') }]
+        );
+      }
+    } catch (error) {
+      console.error(`[PermissionsRequestModal] Error requesting ${permissionId} permission:`, error);
+      Alert.alert(
+        t('common.error'),
+        `Failed to request ${permissionId === 'location' ? 'location' : permissionId === 'healthKit' ? 'health' : 'notification'} permission`,
+        [{ text: t('common.ok') }]
+      );
+    } finally {
+      setIsRequesting(false);
+    }
+  };
+
   const grantedCount = permissionItems.filter(item => item.granted).length;
   const totalCount = permissionItems.length;
 
@@ -160,7 +209,16 @@ export const PermissionsRequestModal: React.FC<PermissionsRequestModalProps> = (
             </Text>
 
             {permissionItems.map((item) => (
-              <View key={item.id} style={styles.permissionItem}>
+              <TouchableOpacity 
+                key={item.id} 
+                style={[
+                  styles.permissionItem,
+                  item.granted && styles.permissionItemGranted
+                ]}
+                onPress={() => !item.granted && handleIndividualPermissionRequest(item.id)}
+                disabled={item.granted || isRequesting}
+                activeOpacity={item.granted ? 1 : 0.7}
+              >
                 <View style={styles.permissionIcon}>
                   {item.icon}
                 </View>
@@ -177,7 +235,7 @@ export const PermissionsRequestModal: React.FC<PermissionsRequestModalProps> = (
                     <XCircle size={20} color={colors.gray[300]} />
                   )}
                 </View>
-              </View>
+              </TouchableOpacity>
             ))}
           </View>
 
@@ -306,6 +364,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gray[100],
     borderRadius: 12,
     marginBottom: 12,
+  },
+  permissionItemGranted: {
+    backgroundColor: colors.success + '15', // Light green background
+    borderWidth: 1,
+    borderColor: colors.success + '30',
   },
   permissionIcon: {
     width: 48,
