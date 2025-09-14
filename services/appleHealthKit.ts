@@ -1,4 +1,12 @@
-import HealthKit from '@kingstinct/react-native-healthkit';
+import HealthKit, { 
+  requestAuthorization, 
+  queryCategorySamples,
+  queryQuantitySamples, 
+  saveCategorySample,
+  authorizationStatusFor,
+  AuthorizationStatus,
+  CategoryValueSleepAnalysis
+} from '@kingstinct/react-native-healthkit';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -63,29 +71,28 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
 
       console.log('[HealthKit] Initializing HealthKit...');
       
-      // Request permissions using the correct API
-      const permissions = {
-        read: [
-          'SleepAnalysis',
-          'HeartRate',
-          'StepCount',
-          'ActiveEnergyBurned',
-          'RestingHeartRate',
-          'HeartRateVariability',
-          'OxygenSaturation',
-          'BodyMass',
-          'BodyFatPercentage',
-          'DistanceWalkingRunning',
-          'FlightsClimbed'
-        ],
-        write: [
-          'SleepAnalysis',
-          'BodyMass',
-          'BodyFatPercentage'
-        ]
-      };
+      // Request permissions using the correct API with proper identifiers
+      const readPermissions = [
+        'HKQuantityTypeIdentifierHeartRate',
+        'HKQuantityTypeIdentifierStepCount',
+        'HKQuantityTypeIdentifierActiveEnergyBurned',
+        'HKQuantityTypeIdentifierRestingHeartRate',
+        'HKQuantityTypeIdentifierHeartRateVariabilitySDNN',
+        'HKQuantityTypeIdentifierOxygenSaturation',
+        'HKQuantityTypeIdentifierBodyMass',
+        'HKQuantityTypeIdentifierBodyFatPercentage',
+        'HKQuantityTypeIdentifierDistanceWalkingRunning',
+        'HKQuantityTypeIdentifierFlightsClimbed',
+        'HKCategoryTypeIdentifierSleepAnalysis'
+      ] as const;
 
-      const result = await HealthKit.requestAuthorization(permissions.read as any, permissions.write as any);
+      const writePermissions = [
+        'HKQuantityTypeIdentifierBodyMass',
+        'HKQuantityTypeIdentifierBodyFatPercentage',
+        'HKCategoryTypeIdentifierSleepAnalysis'
+      ] as const;
+
+      const result = await requestAuthorization(readPermissions, writePermissions);
       
       if (result) {
         console.log('[HealthKit] HealthKit permissions granted successfully');
@@ -115,7 +122,12 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
 
       console.log('[HealthKit] Fetching sleep data from', startDate.toISOString(), 'to', endDate.toISOString());
 
-      const sleepData = await HealthKit.queryQuantitySamples('SleepAnalysis' as any, {} as any);
+      const sleepData = await queryCategorySamples('HKCategoryTypeIdentifierSleepAnalysis', {
+        filter: {
+          startDate: startDate,
+          endDate: endDate,
+        }
+      });
 
       console.log('[HealthKit] Raw sleep data:', sleepData);
       const processedData = await this.processSleepSamples(sleepData as any, startDate, endDate);
@@ -244,7 +256,12 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
         return [];
       }
 
-      const heartRateData = await HealthKit.queryQuantitySamples('HeartRate' as any, {} as any);
+      const heartRateData = await queryQuantitySamples('HKQuantityTypeIdentifierHeartRate', {
+        filter: {
+          startDate: startDate,
+          endDate: endDate,
+        }
+      });
 
       return heartRateData.map((sample: any) => ({
         value: sample.value,
@@ -277,7 +294,7 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
         value: 'IN_BED',
       };
 
-      await HealthKit.saveQuantitySample('SleepAnalysis' as any, 1 as any, sleepData.startDate as any, sleepData.endDate as any, 'hour' as any, 'hour' as any);
+      await saveCategorySample('HKCategoryTypeIdentifierSleepAnalysis', CategoryValueSleepAnalysis.inBed, new Date(sleepData.startDate), new Date(sleepData.endDate), {});
       console.log('[HealthKit] Sleep data written successfully');
       return true;
     } catch (error) {
@@ -331,8 +348,8 @@ class AppleHealthKitServiceImpl implements AppleHealthKitService {
         return false;
       }
 
-      const status = await HealthKit.authorizationStatusFor('SleepAnalysis' as any);
-      return status === 'Authorized' as any;
+      const status = await authorizationStatusFor('HKCategoryTypeIdentifierSleepAnalysis');
+      return status === AuthorizationStatus.sharingAuthorized;
     } catch (error) {
       console.error('[HealthKit] Error checking permission status:', error);
       return false;
