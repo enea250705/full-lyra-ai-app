@@ -18,7 +18,7 @@ const ComprehensiveInsights: React.FC<ComprehensiveInsightsProps> = ({
   userId, 
   style 
 }) => {
-  const { location, getCurrentLocation, isLoading: locationLoading } = useLocation();
+  const { location, getCurrentLocation, isLoading: locationLoading, permissionStatus } = useLocation();
   const { currentMood, getMoodTrends } = useMood();
   const { 
     comprehensiveData, 
@@ -29,8 +29,11 @@ const ComprehensiveInsights: React.FC<ComprehensiveInsightsProps> = ({
 
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [hasTriedToFetch, setHasTriedToFetch] = useState(false);
 
   const fetchComprehensiveData = async () => {
+    setHasTriedToFetch(true);
+    
     if (!location && !locationLoading) {
       const currentLocation = await getCurrentLocation();
       if (!currentLocation) {
@@ -62,23 +65,12 @@ const ComprehensiveInsights: React.FC<ComprehensiveInsightsProps> = ({
   };
 
   useEffect(() => {
-    if (location && currentMood) {
+    if (location && currentMood && !hasTriedToFetch) {
       fetchComprehensiveData();
     }
-  }, [location, currentMood]);
+  }, [location, currentMood, hasTriedToFetch]);
 
   const isLoading = locationLoading || weatherMoodLoading;
-
-  if (isLoading && !comprehensiveData) {
-    return (
-      <LoadingScreen 
-        type="insights"
-        size="medium"
-        message="Loading comprehensive insights..."
-        subMessage="Analyzing your data patterns"
-      />
-    );
-  }
 
   if (error) {
     return (
@@ -89,12 +81,37 @@ const ComprehensiveInsights: React.FC<ComprehensiveInsightsProps> = ({
     );
   }
 
-  if (!comprehensiveData) {
+  // Show location permission message only if location is explicitly denied
+  if (permissionStatus === 'denied' || (permissionStatus === 'undetermined' && !location && !locationLoading)) {
     return (
       <View style={[styles.container, styles.emptyContainer, style]}>
         <MapPin size={32} color="#666" />
         <Text style={styles.emptyText}>
           Enable location services to get personalized insights
+        </Text>
+      </View>
+    );
+  }
+
+  // Show loading if we're still loading or haven't tried to fetch yet
+  if (isLoading || (!comprehensiveData && !hasTriedToFetch)) {
+    return (
+      <LoadingScreen 
+        type="insights"
+        size="medium"
+        message="Loading comprehensive insights..."
+        subMessage="Analyzing your data patterns"
+      />
+    );
+  }
+
+  // Show empty state only if we've tried to fetch but got no data
+  if (!comprehensiveData && hasTriedToFetch) {
+    return (
+      <View style={[styles.container, styles.emptyContainer, style]}>
+        <MapPin size={32} color="#666" />
+        <Text style={styles.emptyText}>
+          No weather data available. Try refreshing.
         </Text>
       </View>
     );
