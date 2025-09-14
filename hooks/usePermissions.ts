@@ -48,29 +48,45 @@ export const usePermissions = () => {
 
   const requestNotificationsPermission = useCallback(async () => {
     try {
+      console.log('[usePermissions] Requesting notification permissions...');
       setPermissions(prev => ({ ...prev, notifications: { ...prev.notifications, requested: true } }));
       
-      // First check current status
-      const settings = await Notifications.getPermissionsAsync();
-      let granted = settings.granted || settings.ios?.status === Notifications.IosAuthorizationStatus.AUTHORIZED || false;
+      // Request notification permissions with all necessary options
+      const requestResult = await Notifications.requestPermissionsAsync({
+        ios: {
+          allowAlert: true,
+          allowBadge: true,
+          allowSound: true,
+          allowAnnouncements: true,
+          allowCriticalAlerts: false,
+          provideAppNotificationSettings: true,
+          allowProvisional: false,
+        },
+      });
       
-      if (!granted) {
-        const req = await Notifications.requestPermissionsAsync();
-        granted = req.granted || req.ios?.status === Notifications.IosAuthorizationStatus.AUTHORIZED || false;
-      }
+      console.log('[usePermissions] Notification permission request result:', requestResult);
+      
+      const granted = requestResult.granted || requestResult.ios?.status === Notifications.IosAuthorizationStatus.AUTHORIZED || false;
       
       // Save token if granted
       if (granted) {
         try {
+          console.log('[usePermissions] Notification permission granted, getting push token...');
           const projectId = (Constants as any)?.easConfig?.projectId || (Constants as any)?.expoConfig?.extra?.eas?.projectId;
           const token = (await Notifications.getExpoPushTokenAsync(projectId ? { projectId } : undefined)).data;
+          console.log('[usePermissions] Got push token:', token);
+          
           const resp = await apiService.saveExpoPushToken(token, { os: Platform.OS });
           if (resp?.success && resp?.data?.id) {
             console.log('[usePermissions] Push token saved successfully');
+          } else {
+            console.warn('[usePermissions] Failed to save push token to backend');
           }
         } catch (e) {
           console.warn('[usePermissions] Failed to save push token:', e);
         }
+      } else {
+        console.log('[usePermissions] Notification permission denied');
       }
       
       setPermissions(prev => ({ ...prev, notifications: { granted, requested: true } }));

@@ -18,7 +18,8 @@
         "com.apple.developer.healthkit.access": [
           "health-records"
         ],
-        "com.apple.developer.healthkit.recalibrate-estimates": true
+        "com.apple.developer.healthkit.recalibrate-estimates": true,
+        "aps-environment": "development"
       },
       "infoPlist": {
         "NSHealthShareUsageDescription": "Lyra needs access to your sleep data to provide personalized insights and track your sleep patterns automatically.",
@@ -69,7 +70,8 @@
         "entitlements": {
           "com.apple.developer.healthkit": true,
           "com.apple.developer.healthkit.access": ["health-records"],
-          "com.apple.developer.healthkit.recalibrate-estimates": true
+          "com.apple.developer.healthkit.recalibrate-estimates": true,
+          "aps-environment": "development"
         }
       }
     },
