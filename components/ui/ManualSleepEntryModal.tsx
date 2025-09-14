@@ -21,7 +21,6 @@ import {
   Save
 } from 'lucide-react-native';
 import { useI18n } from '@/i18n';
-import DateTimePicker from '@react-native-community/datetimepicker';
 
 interface ManualSleepEntryModalProps {
   visible: boolean;
@@ -61,51 +60,81 @@ export const ManualSleepEntryModal: React.FC<ManualSleepEntryModalProps> = ({
   const [endTime, setEndTime] = useState(getDefaultEndTime());
   const [qualityRating, setQualityRating] = useState(5);
   const [notes, setNotes] = useState('');
-  const [showStartPicker, setShowStartPicker] = useState(false);
-  const [showEndPicker, setShowEndPicker] = useState(false);
+  
+  // Time input states
+  const [startDateInput, setStartDateInput] = useState('');
+  const [startTimeInput, setStartTimeInput] = useState('');
+  const [endDateInput, setEndDateInput] = useState('');
+  const [endTimeInput, setEndTimeInput] = useState('');
 
   // Reset form when modal becomes visible
   useEffect(() => {
     if (visible) {
-      setStartTime(getDefaultStartTime());
-      setEndTime(getDefaultEndTime());
+      const defaultStart = getDefaultStartTime();
+      const defaultEnd = getDefaultEndTime();
+      
+      setStartTime(defaultStart);
+      setEndTime(defaultEnd);
       setQualityRating(5);
       setNotes('');
-      setShowStartPicker(false);
-      setShowEndPicker(false);
+      
+      // Initialize input fields
+      setStartDateInput(defaultStart.toLocaleDateString());
+      setStartTimeInput(defaultStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      setEndDateInput(defaultEnd.toLocaleDateString());
+      setEndTimeInput(defaultEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
     }
   }, [visible]);
 
   const handleSubmit = async () => {
-    console.log('[ManualSleepEntryModal] Submitting sleep entry:', {
-      startTime: startTime.toISOString(),
-      endTime: endTime.toISOString(),
-      qualityRating,
-      notes: notes.trim()
-    });
-    
-    if (startTime >= endTime) {
-      Alert.alert(
-        t('common.error'),
-        'End time must be after start time',
-        [{ text: t('common.ok') }]
-      );
-      return;
-    }
-
     try {
+      // Parse the input fields to create Date objects
+      const startDateTime = new Date(`${startDateInput} ${startTimeInput}`);
+      const endDateTime = new Date(`${endDateInput} ${endTimeInput}`);
+      
+      console.log('[ManualSleepEntryModal] Parsed times:', {
+        startDateTime: startDateTime.toISOString(),
+        endDateTime: endDateTime.toISOString(),
+        qualityRating,
+        notes: notes.trim()
+      });
+      
+      if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
+        Alert.alert(
+          t('common.error'),
+          'Please enter valid date and time values',
+          [{ text: t('common.ok') }]
+        );
+        return;
+      }
+      
+      if (startDateTime >= endDateTime) {
+        Alert.alert(
+          t('common.error'),
+          'End time must be after start time',
+          [{ text: t('common.ok') }]
+        );
+        return;
+      }
+
       await onSubmit({
-        startTime: startTime.toISOString(),
-        endTime: endTime.toISOString(),
+        startTime: startDateTime.toISOString(),
+        endTime: endDateTime.toISOString(),
         qualityRating,
         notes: notes.trim() || undefined,
       });
       
       // Reset form with default times
-      setStartTime(getDefaultStartTime());
-      setEndTime(getDefaultEndTime());
+      const defaultStart = getDefaultStartTime();
+      const defaultEnd = getDefaultEndTime();
+      setStartTime(defaultStart);
+      setEndTime(defaultEnd);
       setQualityRating(5);
       setNotes('');
+      setStartDateInput(defaultStart.toLocaleDateString());
+      setStartTimeInput(defaultStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      setEndDateInput(defaultEnd.toLocaleDateString());
+      setEndTimeInput(defaultEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
       onClose();
     } catch (error) {
       console.error('Error submitting sleep entry:', error);
@@ -115,18 +144,6 @@ export const ManualSleepEntryModal: React.FC<ManualSleepEntryModalProps> = ({
         [{ text: t('common.ok') }]
       );
     }
-  };
-
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  };
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString([], { 
-      weekday: 'short', 
-      month: 'short', 
-      day: 'numeric' 
-    });
   };
 
   const qualityLabels = [
@@ -172,42 +189,46 @@ export const ManualSleepEntryModal: React.FC<ManualSleepEntryModalProps> = ({
               <Text style={styles.sectionTitle}>{t('sleep.sleep_times')}</Text>
               
               {/* Start Time */}
-              <TouchableOpacity
-                style={styles.timeButton}
-                onPress={() => {
-                  console.log('[ManualSleepEntryModal] Start time button pressed');
-                  setShowStartPicker(true);
-                }}
-              >
-                <View style={styles.timeButtonContent}>
-                  <Clock size={20} color={colors.midnightBlue} />
-                  <View style={styles.timeButtonText}>
-                    <Text style={styles.timeButtonLabel}>{t('sleep.bedtime')}</Text>
-                    <Text style={styles.timeButtonValue}>
-                      {formatDate(startTime)} at {formatTime(startTime)}
-                    </Text>
-                  </View>
+              <View style={styles.timeInputContainer}>
+                <Text style={styles.timeInputLabel}>{t('sleep.bedtime')}</Text>
+                <View style={styles.timeInputRow}>
+                  <TextInput
+                    style={styles.dateInput}
+                    value={startDateInput}
+                    onChangeText={setStartDateInput}
+                    placeholder="MM/DD/YYYY"
+                    placeholderTextColor={colors.gray[400]}
+                  />
+                  <TextInput
+                    style={styles.timeInput}
+                    value={startTimeInput}
+                    onChangeText={setStartTimeInput}
+                    placeholder="HH:MM"
+                    placeholderTextColor={colors.gray[400]}
+                  />
                 </View>
-              </TouchableOpacity>
+              </View>
 
               {/* End Time */}
-              <TouchableOpacity
-                style={styles.timeButton}
-                onPress={() => {
-                  console.log('[ManualSleepEntryModal] End time button pressed');
-                  setShowEndPicker(true);
-                }}
-              >
-                <View style={styles.timeButtonContent}>
-                  <Clock size={20} color={colors.midnightBlue} />
-                  <View style={styles.timeButtonText}>
-                    <Text style={styles.timeButtonLabel}>{t('sleep.wake_time')}</Text>
-                    <Text style={styles.timeButtonValue}>
-                      {formatDate(endTime)} at {formatTime(endTime)}
-                    </Text>
-                  </View>
+              <View style={styles.timeInputContainer}>
+                <Text style={styles.timeInputLabel}>{t('sleep.wake_time')}</Text>
+                <View style={styles.timeInputRow}>
+                  <TextInput
+                    style={styles.dateInput}
+                    value={endDateInput}
+                    onChangeText={setEndDateInput}
+                    placeholder="MM/DD/YYYY"
+                    placeholderTextColor={colors.gray[400]}
+                  />
+                  <TextInput
+                    style={styles.timeInput}
+                    value={endTimeInput}
+                    onChangeText={setEndTimeInput}
+                    placeholder="HH:MM"
+                    placeholderTextColor={colors.gray[400]}
+                  />
                 </View>
-              </TouchableOpacity>
+              </View>
             </View>
 
             {/* Sleep Quality Section */}
@@ -286,41 +307,6 @@ export const ManualSleepEntryModal: React.FC<ManualSleepEntryModalProps> = ({
           </View>
         </LinearGradient>
       </View>
-
-      {/* Date/Time Pickers */}
-      {showStartPicker && (
-        <DateTimePicker
-          value={startTime}
-          mode="datetime"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={(event, selectedDate) => {
-            console.log('[ManualSleepEntryModal] Start time picker onChange:', { event, selectedDate });
-            setShowStartPicker(false);
-            if (selectedDate) {
-              setStartTime(selectedDate);
-            }
-          }}
-          minimumDate={new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)} // 7 days ago
-          maximumDate={new Date()} // Today
-        />
-      )}
-
-      {showEndPicker && (
-        <DateTimePicker
-          value={endTime}
-          mode="datetime"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={(event, selectedDate) => {
-            console.log('[ManualSleepEntryModal] End time picker onChange:', { event, selectedDate });
-            setShowEndPicker(false);
-            if (selectedDate) {
-              setEndTime(selectedDate);
-            }
-          }}
-          minimumDate={new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)} // 7 days ago
-          maximumDate={new Date()} // Today
-        />
-      )}
     </Modal>
   );
 };
@@ -477,6 +463,39 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#FFFFFF',
+  },
+  timeInputContainer: {
+    marginBottom: 16,
+  },
+  timeInputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.midnightBlue,
+    marginBottom: 8,
+  },
+  timeInputRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  dateInput: {
+    flex: 1,
+    backgroundColor: colors.gray[100],
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: colors.midnightBlue,
+    borderWidth: 1,
+    borderColor: colors.gray[200],
+  },
+  timeInput: {
+    flex: 1,
+    backgroundColor: colors.gray[100],
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: colors.midnightBlue,
+    borderWidth: 1,
+    borderColor: colors.gray[200],
   },
 });
 
