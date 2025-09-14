@@ -117,29 +117,24 @@ export default function HomeScreen() {
         // Wait a bit for authentication to settle
         await new Promise(resolve => setTimeout(resolve, 500));
         
-        // Check if permissions have been requested
-        const hasRequestedPermissions = permissions.location.requested || permissions.healthKit.requested;
+        // Check if all permissions are granted
+        const allPermissionsGranted = permissions.location.granted && 
+                                     permissions.healthKit.granted && 
+                                     permissions.notifications.granted;
+        
         console.log('[HomeScreen] Permission status:', {
           location: permissions.location,
           healthKit: permissions.healthKit,
           notifications: permissions.notifications,
-          hasRequestedPermissions
+          allPermissionsGranted
         });
         
-        if (!hasRequestedPermissions) {
-          // Show permissions modal - let user explicitly request permissions
-          console.log('[HomeScreen] Showing permissions modal');
+        if (!allPermissionsGranted) {
+          // Show permissions modal if any permission is not granted
+          console.log('[HomeScreen] Some permissions not granted, showing permissions modal');
           setShowPermissionsModal(true);
         } else {
-          console.log('[HomeScreen] Permissions already requested, checking status...');
-          // Only request location permission in background if not already granted
-          // Don't request HealthKit permissions in background as iOS requires user interaction
-          if (!permissions.location.granted) {
-            console.log('[HomeScreen] Requesting location permission in background...');
-            requestLocationPermission().catch((error: any) => {
-              console.error('Background location permission request failed:', error);
-            });
-          }
+          console.log('[HomeScreen] All permissions granted, skipping modal');
         }
         
         // Try to get location but don't fail if it doesn't work
@@ -154,7 +149,7 @@ export default function HomeScreen() {
     };
 
     initializeApp();
-  }, [userData, permissions.location.requested, permissions.healthKit.requested]); // Only run when userData or permissions change
+  }, [userData, permissions.location.granted, permissions.healthKit.granted, permissions.notifications.granted]); // Run when any permission status changes
 
   const handlePermissionsRequest = async () => {
     try {
