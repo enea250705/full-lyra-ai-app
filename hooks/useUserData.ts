@@ -306,93 +306,18 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
       }
       
       console.log('[useUserData] Final transformed insights:', transformedInsights);
-      
-      // If no data was loaded, create some sample data for demonstration
-      if (transformedInsights.moodTrend.length === 0 && 
-          transformedInsights.sleepData.length === 0 && 
-          transformedInsights.wins.length === 0 && 
-          transformedInsights.lessons.length === 0 && 
-          transformedInsights.suggestions.length === 0) {
-        console.log('[useUserData] No insights data found, creating sample data...');
-        transformedInsights.moodTrend = [
-          { date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000), mood: 'good' as Mood },
-          { date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), mood: 'neutral' as Mood },
-          { date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), mood: 'great' as Mood },
-          { date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), mood: 'good' as Mood },
-          { date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), mood: 'bad' as Mood },
-          { date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), mood: 'good' as Mood },
-          { date: new Date(), mood: 'great' as Mood },
-        ];
-        transformedInsights.sleepData = [
-          { date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000), hours: 7.5 },
-          { date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), hours: 8.0 },
-          { date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), hours: 6.5 },
-          { date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), hours: 7.0 },
-          { date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), hours: 8.5 },
-          { date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), hours: 7.2 },
-          { date: new Date(), hours: 8.0 },
-        ];
-        transformedInsights.wins = [
-          'Completed morning workout',
-          'Avoided impulse purchase at lunch',
-          'Had a productive work session',
-        ];
-        transformedInsights.lessons = [
-          'Sleep below 6h increases spending risk next day',
-          'Exercise in the morning improves mood throughout the day',
-          'Planning meals reduces unhealthy snacking',
-        ];
-        transformedInsights.suggestions = [
-          'Try going to bed 30 minutes earlier tonight',
-          'Set a grocery list before shopping',
-          'Take a 10-minute walk after lunch',
-        ];
-        console.log('[useUserData] Sample data created');
-      }
-      
       setInsightData(transformedInsights);
     } catch (error) {
       console.error('[useUserData] Error loading insight data:', error);
-      
-      // Create sample data even if API calls fail
-      console.log('[useUserData] API calls failed, creating sample data...');
-      const sampleInsights: InsightData = {
-        moodTrend: [
-          { date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000), mood: 'good' as Mood },
-          { date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), mood: 'neutral' as Mood },
-          { date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), mood: 'great' as Mood },
-          { date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), mood: 'good' as Mood },
-          { date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), mood: 'bad' as Mood },
-          { date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), mood: 'good' as Mood },
-          { date: new Date(), mood: 'great' as Mood },
-        ],
-        sleepData: [
-          { date: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000), hours: 7.5 },
-          { date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), hours: 8.0 },
-          { date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000), hours: 6.5 },
-          { date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), hours: 7.0 },
-          { date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), hours: 8.5 },
-          { date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), hours: 7.2 },
-          { date: new Date(), hours: 8.0 },
-        ],
+      // Set empty insights data if API calls fail
+      setInsightData({
+        moodTrend: [],
+        sleepData: [],
         spendingData: [],
-        wins: [
-          'Completed morning workout',
-          'Avoided impulse purchase at lunch',
-          'Had a productive work session',
-        ],
-        lessons: [
-          'Sleep below 6h increases spending risk next day',
-          'Exercise in the morning improves mood throughout the day',
-          'Planning meals reduces unhealthy snacking',
-        ],
-        suggestions: [
-          'Try going to bed 30 minutes earlier tonight',
-          'Set a grocery list before shopping',
-          'Take a 10-minute walk after lunch',
-        ],
-      };
-      setInsightData(sampleInsights);
+        wins: [],
+        lessons: [],
+        suggestions: [],
+      });
     }
   }, [isAuthenticated, isMockUser]);
 
