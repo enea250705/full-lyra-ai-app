@@ -100,12 +100,17 @@ export const PermissionsRequestModal: React.FC<PermissionsRequestModalProps> = (
   const handleSkip = () => {
     Alert.alert(
       t('common.info'),
-      t('permissions.denied_message', { list: '' }),
+      t('permissions.denied_message'),
       [
         { text: t('common.cancel'), style: 'cancel' },
         { text: t('permissions.skip'), onPress: onSkip },
       ]
     );
+  };
+
+  const handleClose = () => {
+    // Allow direct dismissal without confirmation
+    onSkip();
   };
 
   const grantedCount = permissionItems.filter(item => item.granted).length;
@@ -124,6 +129,7 @@ export const PermissionsRequestModal: React.FC<PermissionsRequestModalProps> = (
       visible={visible}
       animationType="slide"
       presentationStyle="pageSheet"
+      onRequestClose={handleClose}
     >
       <View style={styles.container}>
         <LinearGradient
@@ -131,6 +137,13 @@ export const PermissionsRequestModal: React.FC<PermissionsRequestModalProps> = (
           style={styles.gradient}
         >
           <View style={styles.header}>
+            <TouchableOpacity 
+              style={styles.closeButton}
+              onPress={handleClose}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <XCircle size={24} color={colors.midnightBlue} />
+            </TouchableOpacity>
             <View style={styles.iconContainer}>
               <Shield size={32} color={colors.midnightBlue} />
             </View>
@@ -235,6 +248,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 60,
     marginBottom: 40,
+    position: 'relative',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: -20,
+    right: 0,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.05)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   iconContainer: {
     width: 80,

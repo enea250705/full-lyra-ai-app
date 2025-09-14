@@ -47,6 +47,7 @@ export default function HomeScreen() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
   const [showPermissionsModal, setShowPermissionsModal] = useState(false);
+  const [permissionsDismissed, setPermissionsDismissed] = useState(false);
 
   // Update mood when userData changes
   useEffect(() => {
@@ -129,12 +130,12 @@ export default function HomeScreen() {
           allPermissionsGranted
         });
         
-        if (!allPermissionsGranted) {
-          // Show permissions modal if any permission is not granted
+        if (!allPermissionsGranted && !permissionsDismissed) {
+          // Show permissions modal if any permission is not granted and user hasn't dismissed it
           console.log('[HomeScreen] Some permissions not granted, showing permissions modal');
           setShowPermissionsModal(true);
         } else {
-          console.log('[HomeScreen] All permissions granted, skipping modal');
+          console.log('[HomeScreen] All permissions granted or user dismissed modal, skipping modal');
         }
         
         // Try to get location but don't fail if it doesn't work
@@ -162,10 +163,12 @@ export default function HomeScreen() {
 
   const handleSkipPermissions = () => {
     setShowPermissionsModal(false);
+    setPermissionsDismissed(true);
   };
 
   const handleContinueWithoutPermissions = () => {
     setShowPermissionsModal(false);
+    setPermissionsDismissed(true);
   };
 
   // Monitor permission changes and update modal
