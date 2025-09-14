@@ -494,6 +494,26 @@
     "automatic_benefit_2": "Sleep stages tracking",
     "automatic_benefit_3": "Heart rate monitoring"
   },
+  "sleep": {
+    "manual_entry_title": "Log Sleep Manually",
+    "manual_entry_subtitle": "Record your sleep details manually",
+    "sleep_times": "Sleep Times",
+    "bedtime": "Bedtime",
+    "wake_time": "Wake Time",
+    "sleep_quality": "Sleep Quality",
+    "quality_description": "How would you rate your sleep quality?",
+    "quality_terrible": "Terrible",
+    "quality_poor": "Poor",
+    "quality_fair": "Fair",
+    "quality_good": "Good",
+    "quality_excellent": "Excellent",
+    "notes": "Notes",
+    "notes_description": "Add any notes about your sleep (optional)",
+    "notes_placeholder": "How did you feel? Any dreams or disturbances?",
+    "save_entry": "Save Sleep Entry",
+    "entry_saved": "Sleep entry saved successfully",
+    "entry_error": "Failed to save sleep entry"
+  },
   "journal": {
     "title": "Journal",
     "write_entry": "Write Entry",

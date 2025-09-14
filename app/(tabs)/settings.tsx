@@ -5,6 +5,7 @@ import { ScreenContainer } from '../../components/layout/ScreenContainer';
 import { Button } from '../../components/ui/Button';
 import { HealthKitPermissionCard } from '../../components/ui/HealthKitPermissionCard';
 import { SleepTrackingModeCard } from '../../components/ui/SleepTrackingModeCard';
+import { ManualSleepEntryModal } from '../../components/ui/ManualSleepEntryModal';
 import SubscriptionUpgradeModal from '../../components/ui/SubscriptionUpgradeModal';
 import SafeLoadingScreen from '../../components/ui/SafeLoadingScreen';
 import { useUserData } from '../../hooks/useUserData';
@@ -27,6 +28,7 @@ export default function SettingsScreen() {
     healthKitAvailable, 
     healthKitEnabled, 
     enableHealthKitTracking, 
+    createSleepLog,
     isLoading 
   } = useSleep();
   const {
@@ -93,6 +95,7 @@ export default function SettingsScreen() {
   }, [safeSettings.name]);
   const [upgradeModalVisible, setUpgradeModalVisible] = useState(false);
   const [upgradeContext, setUpgradeContext] = useState({ featureId: '', featureName: '' });
+  const [showManualSleepModal, setShowManualSleepModal] = useState(false);
 
   // Define which features require which subscription tiers
   const featureRequirements = {
@@ -284,12 +287,41 @@ export default function SettingsScreen() {
   };
 
   const handleManualSleepEntry = () => {
-    // Navigate to sleep entry screen or show modal
-    Alert.alert(
-      'Manual Sleep Entry',
-      'This would open a manual sleep entry form in a real app.',
-      [{ text: 'OK' }]
-    );
+    setShowManualSleepModal(true);
+  };
+
+  const handleSleepEntrySubmit = async (sleepData: {
+    startTime: string;
+    endTime: string;
+    qualityRating: number;
+    notes?: string;
+  }) => {
+    try {
+      // Use the createSleepLog function from useSleep hook
+      const result = await createSleepLog(
+        sleepData.startTime,
+        sleepData.endTime,
+        sleepData.qualityRating,
+        sleepData.notes
+      );
+      
+      if (result) {
+        Alert.alert(
+          t('common.success'),
+          t('sleep.entry_saved'),
+          [{ text: t('common.ok') }]
+        );
+      } else {
+        throw new Error('Failed to create sleep log');
+      }
+    } catch (error) {
+      console.error('Error creating sleep log:', error);
+      Alert.alert(
+        t('common.error'),
+        t('sleep.entry_error'),
+        [{ text: t('common.ok') }]
+      );
+    }
   };
 
   return (
@@ -311,12 +343,12 @@ export default function SettingsScreen() {
                 isLoading={isLoading}
               />
               
-              {!healthKitEnabled && (
-                <HealthKitPermissionCard
-                  onRequestPermission={handleEnableHealthKit}
-                  isLoading={isLoading}
-                />
-              )}
+              <HealthKitPermissionCard
+                onRequestPermission={handleEnableHealthKit}
+                isLoading={isLoading}
+                isEnabled={healthKitEnabled}
+                onDisable={handleDisableHealthKit}
+              />
             </>
           ) : (
             <View style={styles.manualOnlyContainer}>
@@ -712,6 +744,13 @@ export default function SettingsScreen() {
         visible={upgradeModalVisible}
         onClose={() => setUpgradeModalVisible(false)}
         featureName={upgradeContext.featureName}
+      />
+      
+      <ManualSleepEntryModal
+        visible={showManualSleepModal}
+        onClose={() => setShowManualSleepModal(false)}
+        onSubmit={handleSleepEntrySubmit}
+        isLoading={isLoading}
       />
     </ScreenContainer>
   );
