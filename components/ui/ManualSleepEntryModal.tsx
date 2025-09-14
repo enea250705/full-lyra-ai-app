@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -42,14 +42,48 @@ export const ManualSleepEntryModal: React.FC<ManualSleepEntryModalProps> = ({
   isLoading = false,
 }) => {
   const { t } = useI18n();
-  const [startTime, setStartTime] = useState(new Date());
-  const [endTime, setEndTime] = useState(new Date());
+  
+  // Initialize with sensible default times (yesterday evening to this morning)
+  const getDefaultStartTime = () => {
+    const date = new Date();
+    date.setDate(date.getDate() - 1); // Yesterday
+    date.setHours(22, 0, 0, 0); // 10 PM
+    return date;
+  };
+  
+  const getDefaultEndTime = () => {
+    const date = new Date();
+    date.setHours(7, 0, 0, 0); // 7 AM today
+    return date;
+  };
+  
+  const [startTime, setStartTime] = useState(getDefaultStartTime());
+  const [endTime, setEndTime] = useState(getDefaultEndTime());
   const [qualityRating, setQualityRating] = useState(5);
   const [notes, setNotes] = useState('');
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
 
+  // Reset form when modal becomes visible
+  useEffect(() => {
+    if (visible) {
+      setStartTime(getDefaultStartTime());
+      setEndTime(getDefaultEndTime());
+      setQualityRating(5);
+      setNotes('');
+      setShowStartPicker(false);
+      setShowEndPicker(false);
+    }
+  }, [visible]);
+
   const handleSubmit = async () => {
+    console.log('[ManualSleepEntryModal] Submitting sleep entry:', {
+      startTime: startTime.toISOString(),
+      endTime: endTime.toISOString(),
+      qualityRating,
+      notes: notes.trim()
+    });
+    
     if (startTime >= endTime) {
       Alert.alert(
         t('common.error'),
@@ -67,9 +101,9 @@ export const ManualSleepEntryModal: React.FC<ManualSleepEntryModalProps> = ({
         notes: notes.trim() || undefined,
       });
       
-      // Reset form
-      setStartTime(new Date());
-      setEndTime(new Date());
+      // Reset form with default times
+      setStartTime(getDefaultStartTime());
+      setEndTime(getDefaultEndTime());
       setQualityRating(5);
       setNotes('');
       onClose();
@@ -140,7 +174,10 @@ export const ManualSleepEntryModal: React.FC<ManualSleepEntryModalProps> = ({
               {/* Start Time */}
               <TouchableOpacity
                 style={styles.timeButton}
-                onPress={() => setShowStartPicker(true)}
+                onPress={() => {
+                  console.log('[ManualSleepEntryModal] Start time button pressed');
+                  setShowStartPicker(true);
+                }}
               >
                 <View style={styles.timeButtonContent}>
                   <Clock size={20} color={colors.midnightBlue} />
@@ -156,7 +193,10 @@ export const ManualSleepEntryModal: React.FC<ManualSleepEntryModalProps> = ({
               {/* End Time */}
               <TouchableOpacity
                 style={styles.timeButton}
-                onPress={() => setShowEndPicker(true)}
+                onPress={() => {
+                  console.log('[ManualSleepEntryModal] End time button pressed');
+                  setShowEndPicker(true);
+                }}
               >
                 <View style={styles.timeButtonContent}>
                   <Clock size={20} color={colors.midnightBlue} />
@@ -254,11 +294,14 @@ export const ManualSleepEntryModal: React.FC<ManualSleepEntryModalProps> = ({
           mode="datetime"
           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
           onChange={(event, selectedDate) => {
+            console.log('[ManualSleepEntryModal] Start time picker onChange:', { event, selectedDate });
             setShowStartPicker(false);
             if (selectedDate) {
               setStartTime(selectedDate);
             }
           }}
+          minimumDate={new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)} // 7 days ago
+          maximumDate={new Date()} // Today
         />
       )}
 
@@ -268,11 +311,14 @@ export const ManualSleepEntryModal: React.FC<ManualSleepEntryModalProps> = ({
           mode="datetime"
           display={Platform.OS === 'ios' ? 'spinner' : 'default'}
           onChange={(event, selectedDate) => {
+            console.log('[ManualSleepEntryModal] End time picker onChange:', { event, selectedDate });
             setShowEndPicker(false);
             if (selectedDate) {
               setEndTime(selectedDate);
             }
           }}
+          minimumDate={new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)} // 7 days ago
+          maximumDate={new Date()} // Today
         />
       )}
     </Modal>

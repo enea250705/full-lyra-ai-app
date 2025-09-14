@@ -296,6 +296,7 @@ export default function SettingsScreen() {
     qualityRating: number;
     notes?: string;
   }) => {
+    console.log('[Settings] Submitting sleep entry:', sleepData);
     try {
       // Use the createSleepLog function from useSleep hook
       const result = await createSleepLog(
@@ -304,6 +305,8 @@ export default function SettingsScreen() {
         sleepData.qualityRating,
         sleepData.notes
       );
+      
+      console.log('[Settings] Sleep log creation result:', result);
       
       if (result) {
         Alert.alert(
@@ -315,7 +318,7 @@ export default function SettingsScreen() {
         throw new Error('Failed to create sleep log');
       }
     } catch (error) {
-      console.error('Error creating sleep log:', error);
+      console.error('[Settings] Error creating sleep log:', error);
       Alert.alert(
         t('common.error'),
         t('sleep.entry_error'),
