@@ -12,15 +12,30 @@ import { useI18n } from '@/i18n';
 
 export default function InsightsScreen() {
   const { t } = useI18n();
-  const { insightData, userData, loading } = useUserData();
+  const { insightData, userData, loading, refreshData } = useUserData();
   const [refreshing, setRefreshing] = useState(false);
 
-  const handleRefresh = () => {
+  // Debug logging
+  console.log('[InsightsScreen] Debug data:', {
+    loading,
+    insightData,
+    userData,
+    hasMoodData: insightData?.moodTrend?.length || 0,
+    hasSleepData: insightData?.sleepData?.length || 0,
+    hasWins: insightData?.wins?.length || 0,
+    hasLessons: insightData?.lessons?.length || 0,
+    hasSuggestions: insightData?.suggestions?.length || 0,
+  });
+
+  const handleRefresh = async () => {
     setRefreshing(true);
-    // Simulate refresh
-    setTimeout(() => {
+    try {
+      await refreshData();
+    } catch (error) {
+      console.error('[InsightsScreen] Refresh error:', error);
+    } finally {
       setRefreshing(false);
-    }, 1000);
+    }
   };
 
   // Convert mood to numeric value for graph
@@ -61,8 +76,8 @@ export default function InsightsScreen() {
     label: `${item.hours}h`,
   })) || [];
 
-  // Show loading state if data is not available
-  if (loading || !insightData) {
+  // Show loading state only if still loading and no data at all
+  if (loading && !insightData && !userData) {
     return (
       <ScreenContainer>
         <SafeLoadingScreen 
@@ -74,12 +89,31 @@ export default function InsightsScreen() {
     );
   }
 
+  // Check if we have any data at all
+  const hasAnyData = insightData && (
+    (insightData.moodTrend && insightData.moodTrend.length > 0) ||
+    (insightData.sleepData && insightData.sleepData.length > 0) ||
+    (insightData.wins && insightData.wins.length > 0) ||
+    (insightData.lessons && insightData.lessons.length > 0) ||
+    (insightData.suggestions && insightData.suggestions.length > 0)
+  );
+
   return (
     <ScreenContainer onRefresh={handleRefresh} refreshing={refreshing}>
       <Text style={styles.title}>{t('insights.screen.title')}</Text>
       <Text style={styles.subtitle}>
         {t('insights.screen.subtitle')}
       </Text>
+
+      {/* Show message if no data available */}
+      {!hasAnyData && !loading && (
+        <View style={styles.emptyStateContainer}>
+          <Text style={styles.emptyStateText}>No insights data available yet</Text>
+          <Text style={styles.emptyStateSubtext}>
+            Start tracking your mood, sleep, and activities to see personalized insights here.
+          </Text>
+        </View>
+      )}
 
       {/* Comprehensive Weather & Location Insights */}
       {userData && (
@@ -129,7 +163,7 @@ export default function InsightsScreen() {
         
         <View style={styles.reflectionContainer}>
           <Text style={styles.reflectionTitle}>{t('insights.screen.wins_title')}</Text>
-          {insightData?.wins?.length > 0 ? (
+          {insightData?.wins && insightData.wins.length > 0 ? (
             insightData.wins.map((win, index) => (
               <View key={`win-${index}`} style={styles.reflectionItem}>
                 <Text style={styles.reflectionBullet}>•</Text>
@@ -143,7 +177,7 @@ export default function InsightsScreen() {
         
         <View style={styles.reflectionContainer}>
           <Text style={styles.reflectionTitle}>{t('insights.screen.lessons_title')}</Text>
-          {insightData?.lessons?.length > 0 ? (
+          {insightData?.lessons && insightData.lessons.length > 0 ? (
             insightData.lessons.map((lesson, index) => (
               <View key={`lesson-${index}`} style={styles.reflectionItem}>
                 <Text style={styles.reflectionBullet}>•</Text>
@@ -158,7 +192,7 @@ export default function InsightsScreen() {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t('insights.screen.actionable_suggestions')}</Text>
-        {insightData?.suggestions?.length > 0 ? (
+        {insightData?.suggestions && insightData.suggestions.length > 0 ? (
           insightData.suggestions.map((suggestion, index) => (
             <InsightCard
               key={`suggestion-${index}`}
