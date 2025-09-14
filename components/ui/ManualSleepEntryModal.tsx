@@ -78,19 +78,58 @@ export const ManualSleepEntryModal: React.FC<ManualSleepEntryModalProps> = ({
       setQualityRating(5);
       setNotes('');
       
-      // Initialize input fields
-      setStartDateInput(defaultStart.toLocaleDateString());
-      setStartTimeInput(defaultStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-      setEndDateInput(defaultEnd.toLocaleDateString());
-      setEndTimeInput(defaultEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      // Initialize input fields with consistent format
+      const formatDateForInput = (date: Date) => {
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${month}/${day}/${year}`;
+      };
+      
+      const formatTimeForInput = (date: Date) => {
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
+      };
+      
+      setStartDateInput(formatDateForInput(defaultStart));
+      setStartTimeInput(formatTimeForInput(defaultStart));
+      setEndDateInput(formatDateForInput(defaultEnd));
+      setEndTimeInput(formatTimeForInput(defaultEnd));
     }
   }, [visible]);
 
   const handleSubmit = async () => {
     try {
       // Parse the input fields to create Date objects
-      const startDateTime = new Date(`${startDateInput} ${startTimeInput}`);
-      const endDateTime = new Date(`${endDateInput} ${endTimeInput}`);
+      // Convert date format from MM/DD/YYYY to YYYY-MM-DD for proper parsing
+      const parseDate = (dateStr: string, timeStr: string) => {
+        // Handle different date formats
+        let datePart = dateStr;
+        if (dateStr.includes('/')) {
+          // Convert MM/DD/YYYY to YYYY-MM-DD
+          const parts = dateStr.split('/');
+          if (parts.length === 3) {
+            const month = parts[0].padStart(2, '0');
+            const day = parts[1].padStart(2, '0');
+            const year = parts[2];
+            datePart = `${year}-${month}-${day}`;
+          }
+        }
+        
+        // Combine date and time
+        const dateTimeStr = `${datePart} ${timeStr}`;
+        console.log('[ManualSleepEntryModal] Parsing date string:', dateTimeStr);
+        
+        const parsedDate = new Date(dateTimeStr);
+        if (isNaN(parsedDate.getTime())) {
+          throw new Error(`Invalid date: ${dateTimeStr}`);
+        }
+        return parsedDate;
+      };
+      
+      const startDateTime = parseDate(startDateInput, startTimeInput);
+      const endDateTime = parseDate(endDateInput, endTimeInput);
       
       console.log('[ManualSleepEntryModal] Parsed times:', {
         startDateTime: startDateTime.toISOString(),
@@ -98,15 +137,6 @@ export const ManualSleepEntryModal: React.FC<ManualSleepEntryModalProps> = ({
         qualityRating,
         notes: notes.trim()
       });
-      
-      if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
-        Alert.alert(
-          t('common.error'),
-          'Please enter valid date and time values',
-          [{ text: t('common.ok') }]
-        );
-        return;
-      }
       
       if (startDateTime >= endDateTime) {
         Alert.alert(
@@ -131,16 +161,31 @@ export const ManualSleepEntryModal: React.FC<ManualSleepEntryModalProps> = ({
       setEndTime(defaultEnd);
       setQualityRating(5);
       setNotes('');
-      setStartDateInput(defaultStart.toLocaleDateString());
-      setStartTimeInput(defaultStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-      setEndDateInput(defaultEnd.toLocaleDateString());
-      setEndTimeInput(defaultEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+      
+      // Reset input fields with consistent format
+      const formatDateForInput = (date: Date) => {
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${month}/${day}/${year}`;
+      };
+      
+      const formatTimeForInput = (date: Date) => {
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
+      };
+      
+      setStartDateInput(formatDateForInput(defaultStart));
+      setStartTimeInput(formatTimeForInput(defaultStart));
+      setEndDateInput(formatDateForInput(defaultEnd));
+      setEndTimeInput(formatTimeForInput(defaultEnd));
       onClose();
     } catch (error) {
       console.error('Error submitting sleep entry:', error);
       Alert.alert(
         t('common.error'),
-        'Failed to save sleep entry',
+        `Failed to save sleep entry: ${error.message}`,
         [{ text: t('common.ok') }]
       );
     }
