@@ -19,7 +19,7 @@ const ComprehensiveInsights: React.FC<ComprehensiveInsightsProps> = ({
   style 
 }) => {
   const { location, getCurrentLocation, isLoading: locationLoading, permissionStatus } = useLocation();
-  const { currentMood, getMoodTrends } = useMood();
+  const { moodEntries, getMoodTrends } = useMood();
   const { 
     comprehensiveData, 
     getComprehensiveData, 
@@ -30,6 +30,9 @@ const ComprehensiveInsights: React.FC<ComprehensiveInsightsProps> = ({
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [hasTriedToFetch, setHasTriedToFetch] = useState(false);
+
+  // Get the latest mood entry or use a default value
+  const currentMood = moodEntries.length > 0 ? moodEntries[0].moodValue : 3; // Default to neutral (3)
 
   const fetchComprehensiveData = async () => {
     setHasTriedToFetch(true);
@@ -45,7 +48,7 @@ const ComprehensiveInsights: React.FC<ComprehensiveInsightsProps> = ({
       }
     }
 
-    if (location && currentMood) {
+    if (location) {
       const data = await getComprehensiveData(
         currentMood,
         location.latitude,
@@ -65,10 +68,10 @@ const ComprehensiveInsights: React.FC<ComprehensiveInsightsProps> = ({
   };
 
   useEffect(() => {
-    if (location && currentMood && !hasTriedToFetch) {
+    if (location && !hasTriedToFetch) {
       fetchComprehensiveData();
     }
-  }, [location, currentMood, hasTriedToFetch]);
+  }, [location, hasTriedToFetch]);
 
   const isLoading = locationLoading || weatherMoodLoading;
 
