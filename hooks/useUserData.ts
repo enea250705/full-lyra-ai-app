@@ -194,13 +194,16 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
   }, [isAuthenticated, isMockUser]);
 
   useEffect(() => {
+    console.log('[useUserData] useEffect triggered:', { isAuthenticated, isMockUser });
     if (isAuthenticated) {
       loadUserData();
       if (!isMockUser) {
+        console.log('[useUserData] Loading real user data...');
         loadMessages();
         loadJournalEntries();
         loadInsightData();
       } else {
+        console.log('[useUserData] Using mock user data...');
         setMessages(prev => (prev.length ? prev : [
           { id: 'm1', text: 'Plan my day to avoid overspending', sender: 'user', timestamp: new Date(), isVoice: false },
           { id: 'm2', text: 'Here is a simple spending plan and 3 ways to save today 💡', sender: 'lyra', timestamp: new Date(), isVoice: false },
@@ -261,25 +264,52 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
     if (!isAuthenticated) return;
     if (isMockUser) return;
     try {
+      console.log('[useUserData] Loading insight data...');
       const [emotionInsights, correlations, trends] = await Promise.all([
         apiService.getEmotionInsights(),
         apiService.getCorrelations(),
         apiService.getTrends('month'),
       ]);
+      
+      console.log('[useUserData] API responses:', {
+        emotionInsights: emotionInsights.success ? 'success' : 'failed',
+        correlations: correlations.success ? 'success' : 'failed', 
+        trends: trends.success ? 'success' : 'failed',
+        emotionData: emotionInsights.data,
+        trendsData: trends.data,
+      });
+      
       const transformedInsights: InsightData = { moodTrend: [], sleepData: [], spendingData: [], wins: [], lessons: [], suggestions: [] };
+      
       if (trends.success && trends.data) {
         const trendsData = trends.data;
-        if (trendsData.moodTrends) transformedInsights.moodTrend = trendsData.moodTrends.map((t: any) => ({ date: new Date(t.date), mood: t.moodCategory || 'neutral' }));
-        if (trendsData.sleepTrends) transformedInsights.sleepData = trendsData.sleepTrends.map((t: any) => ({ date: new Date(t.date), hours: t.duration / 60 }));
+        if (trendsData.moodTrends) {
+          transformedInsights.moodTrend = trendsData.moodTrends.map((t: any) => ({ date: new Date(t.date), mood: t.moodCategory || 'neutral' }));
+          console.log('[useUserData] Mood trends loaded:', transformedInsights.moodTrend.length);
+        }
+        if (trendsData.sleepTrends) {
+          transformedInsights.sleepData = trendsData.sleepTrends.map((t: any) => ({ date: new Date(t.date), hours: t.duration / 60 }));
+          console.log('[useUserData] Sleep trends loaded:', transformedInsights.sleepData.length);
+        }
       }
+      
       if (emotionInsights.success && emotionInsights.data) {
         const insights = emotionInsights.data;
         transformedInsights.wins = insights.wins || [];
         transformedInsights.lessons = insights.lessons || [];
         transformedInsights.suggestions = insights.suggestions || [];
+        console.log('[useUserData] Emotion insights loaded:', {
+          wins: transformedInsights.wins.length,
+          lessons: transformedInsights.lessons.length,
+          suggestions: transformedInsights.suggestions.length,
+        });
       }
+      
+      console.log('[useUserData] Final transformed insights:', transformedInsights);
       setInsightData(transformedInsights);
-    } catch {}
+    } catch (error) {
+      console.error('[useUserData] Error loading insight data:', error);
+    }
   }, [isAuthenticated, isMockUser]);
 
   const updateUserData = useCallback(async (newData: Partial<UserData>) => {
