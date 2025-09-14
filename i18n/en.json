@@ -51,8 +51,6 @@
     "disable": "Disable",
     "on": "On",
     "off": "Off",
-    "yes": "Yes",
-    "no": "No",
     "maybe": "Maybe",
     "later": "Later",
     "now": "Now",
@@ -336,7 +334,15 @@
     "rainy_mood": "Rainy weather might affect your energy levels.",
     "cloudy_mood": "Cloudy weather can sometimes feel calming.",
     "feels_like": "Feels like {temp}°",
-    "visibility": "Visibility: {value}km"
+    "visibility": "Visibility: {value}km",
+    "type_sunny": "Sunny",
+    "type_cloudy": "Cloudy",
+    "type_rainy": "Rainy",
+    "type_snowy": "Snowy",
+    "type_stormy": "Stormy",
+    "type_foggy": "Foggy",
+    "type_partly_cloudy": "Partly Cloudy",
+    "type_overcast": "Overcast"
   },
   "stores": {
     "title": "App Stores",
@@ -463,7 +469,7 @@
     "connected_subtitle": "Automatic sleep tracking is now enabled",
     "auto_detection": "Automatic sleep detection",
     "stages_tracking": "Sleep stages tracking",
-    "heart_rate": "Heart rate monitoring",
+    "heart_rate_monitoring": "Heart rate monitoring",
     "disable_button": "Disable",
     "enable_title": "Enable HealthKit",
     "enable_subtitle": "Connect to Apple Health for automatic sleep tracking",
@@ -481,7 +487,12 @@
     "wake_time": "Wake Time",
     "sleep_duration": "Sleep Duration",
     "sleep_quality": "Sleep Quality",
-    "sleep_score": "Sleep Score"
+    "sleep_score": "Sleep Score",
+    "automatic_tracking": "Automatic Tracking",
+    "manual_entry": "Manual Entry",
+    "automatic_benefit_1": "Automatic sleep detection",
+    "automatic_benefit_2": "Sleep stages tracking",
+    "automatic_benefit_3": "Heart rate monitoring"
   },
   "journal": {
     "title": "Journal",
@@ -516,5 +527,15 @@
     "next": "Next",
     "finish": "Finish Setup"
   },
-  "profile": "Profile"
+  "profile": {
+    "title": "Profile",
+    "personal_info": "Personal Information",
+    "account_settings": "Account Settings",
+    "privacy_settings": "Privacy Settings",
+    "preferences": "Preferences",
+    "edit_profile": "Edit Profile",
+    "save_changes": "Save Changes",
+    "profile_updated": "Profile updated successfully",
+    "profile_error": "Failed to update profile"
+  }
 }
