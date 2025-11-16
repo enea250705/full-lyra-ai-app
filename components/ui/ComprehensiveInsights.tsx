@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, RefreshControl, Alert, TouchableOpacity } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { useWeatherMood } from '../../hooks/useWeatherMood';
 import { useMood } from '../../hooks/useMood';
 import { useLocation } from '../../hooks/useLocation';
 import WeatherCard from './WeatherCard';
 import MoodWeatherCorrelation from './MoodWeatherCorrelation';
 import ExpensiveStoreAlert from './ExpensiveStoreAlert';
-import { Loader2, MapPin, AlertCircle } from 'lucide-react-native';
+import { Loader2, MapPin, AlertCircle, RefreshCw } from 'lucide-react-native';
 import LoadingScreen from './LoadingScreen';
 
 interface ComprehensiveInsightsProps {
@@ -18,8 +19,10 @@ const ComprehensiveInsights: React.FC<ComprehensiveInsightsProps> = ({
   userId, 
   style 
 }) => {
+  console.log('[ComprehensiveInsights] Component mounted with userId:', userId);
+  
   const { location, getCurrentLocation, isLoading: locationLoading, permissionStatus } = useLocation();
-  const { moodEntries, getMoodTrends } = useMood();
+  const { moodEntries, getMoodTrends, refreshMoodEntries } = useMood();
   const { 
     comprehensiveData, 
     getComprehensiveData, 
@@ -29,17 +32,53 @@ const ComprehensiveInsights: React.FC<ComprehensiveInsightsProps> = ({
 
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [hasTriedToFetch, setHasTriedToFetch] = useState(false);
+
+  // Refresh mood entries when component mounts to get latest mood data
+  useEffect(() => {
+    console.log('[ComprehensiveInsights] Refreshing mood entries on mount');
+    refreshMoodEntries();
+  }, [refreshMoodEntries]);
+
+  // Refresh mood entries when component is focused (user navigates to insights page)
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('[ComprehensiveInsights] Component focused, refreshing mood entries');
+      refreshMoodEntries();
+    }, [refreshMoodEntries])
+  );
+
+  // Refetch comprehensive data when moodEntries change
+  useEffect(() => {
+    if (moodEntries.length > 0 && location) {
+      console.log('[ComprehensiveInsights] Mood entries updated, refetching comprehensive data');
+      console.log('[ComprehensiveInsights] Current mood:', moodEntries[0]?.moodValue);
+      fetchComprehensiveData();
+    }
+  }, [moodEntries.length, moodEntries[0]?.moodValue, location]);
+
+  console.log('[ComprehensiveInsights] Hook values:', {
+    hasLocation: !!location,
+    locationCoords: location ? `${location.latitude}, ${location.longitude}` : 'no location',
+    locationLoading,
+    permissionStatus,
+    moodEntriesLength: moodEntries.length,
+    moodEntries: moodEntries.slice(0, 3), // Show first 3 entries for debugging
+    weatherMoodLoading,
+    error,
+    hasComprehensiveData: !!comprehensiveData,
+  });
 
   // Get the latest mood entry or use a default value
-  const currentMood = moodEntries.length > 0 ? moodEntries[0].moodValue : 3; // Default to neutral (3)
+  const currentMood = moodEntries.length > 0 ? moodEntries[0].moodValue : 5; // Default to neutral (5)
 
   const fetchComprehensiveData = async () => {
-    setHasTriedToFetch(true);
+    console.log('[ComprehensiveInsights] fetchComprehensiveData called');
     
     if (!location && !locationLoading) {
+      console.log('[ComprehensiveInsights] No location, trying to get current location...');
       const currentLocation = await getCurrentLocation();
       if (!currentLocation) {
+        console.log('[ComprehensiveInsights] Failed to get current location');
         Alert.alert(
           'Location Required',
           'Please enable location services to get weather and location insights.'
@@ -49,29 +88,68 @@ const ComprehensiveInsights: React.FC<ComprehensiveInsightsProps> = ({
     }
 
     if (location) {
+      console.log('[ComprehensiveInsights] Calling getComprehensiveData with:', {
+        currentMood,
+        moodEntriesCount: moodEntries.length,
+        latestMoodEntry: moodEntries[0],
+        latitude: location.latitude,
+        longitude: location.longitude
+      });
+      
       const data = await getComprehensiveData(
         currentMood,
         location.latitude,
         location.longitude
       );
       
+      console.log('[ComprehensiveInsights] getComprehensiveData result:', data);
+      
       if (data) {
         setLastUpdated(new Date());
       }
+    } else {
+      console.log('[ComprehensiveInsights] No location available for comprehensive data');
     }
   };
 
   const onRefresh = async () => {
+    console.log('[ComprehensiveInsights] Manual refresh triggered');
     setRefreshing(true);
+    await refreshMoodEntries(); // Refresh mood entries first
     await fetchComprehensiveData();
     setRefreshing(false);
   };
 
   useEffect(() => {
-    if (location && !hasTriedToFetch) {
+    console.log('[ComprehensiveInsights] useEffect called');
+    console.log('[ComprehensiveInsights] useEffect triggered:', {
+      hasLocation: !!location,
+      locationLoading,
+      permissionStatus,
+      locationCoords: location ? `${location.latitude}, ${location.longitude}` : 'no location'
+    });
+    
+    if (location) {
+      console.log('[ComprehensiveInsights] Location available, calling fetchComprehensiveData');
       fetchComprehensiveData();
+    } else if (!locationLoading && permissionStatus !== 'undetermined') {
+      console.log('[ComprehensiveInsights] No location but permission determined, trying to get location');
+      // If location is not loading and permission is determined (granted/denied), try to get location
+      getCurrentLocation().then((currentLocation) => {
+        if (currentLocation) {
+          console.log('[ComprehensiveInsights] Got current location, calling fetchComprehensiveData');
+          fetchComprehensiveData();
+        } else {
+          console.log('[ComprehensiveInsights] Failed to get current location');
+        }
+      });
+    } else {
+      console.log('[ComprehensiveInsights] Not calling fetchComprehensiveData:', {
+        locationLoading,
+        permissionStatus
+      });
     }
-  }, [location, hasTriedToFetch]);
+  }, [location, locationLoading, permissionStatus]);
 
   const isLoading = locationLoading || weatherMoodLoading;
 
@@ -96,8 +174,8 @@ const ComprehensiveInsights: React.FC<ComprehensiveInsightsProps> = ({
     );
   }
 
-  // Show loading if we're still loading or haven't tried to fetch yet
-  if (isLoading || (!comprehensiveData && !hasTriedToFetch)) {
+  // Show loading only if we're actively loading location or weather data
+  if (isLoading) {
     return (
       <LoadingScreen 
         type="insights"
@@ -108,8 +186,8 @@ const ComprehensiveInsights: React.FC<ComprehensiveInsightsProps> = ({
     );
   }
 
-  // Show empty state only if we've tried to fetch but got no data
-  if (!comprehensiveData && hasTriedToFetch) {
+  // Show empty state only if we have no comprehensive data
+  if (!comprehensiveData) {
     return (
       <View style={[styles.container, styles.emptyContainer, style]}>
         <MapPin size={32} color="#666" />
@@ -119,6 +197,49 @@ const ComprehensiveInsights: React.FC<ComprehensiveInsightsProps> = ({
       </View>
     );
   }
+
+  // Safety check: if comprehensiveData exists but is null or has no useful data
+  if (!comprehensiveData || (!comprehensiveData.weather && !comprehensiveData.moodCorrelation && !comprehensiveData.nearbyStores)) {
+    console.log('[ComprehensiveInsights] comprehensiveData is null or empty:', comprehensiveData);
+    console.log('[ComprehensiveInsights] Debug info:', {
+      hasComprehensiveData: !!comprehensiveData,
+      hasWeather: !!comprehensiveData?.weather,
+      hasMoodCorrelation: !!comprehensiveData?.moodCorrelation,
+      hasNearbyStores: !!comprehensiveData?.nearbyStores,
+      weatherMoodLoading,
+      error,
+      location: location ? `${location.latitude}, ${location.longitude}` : 'no location'
+    });
+    
+    return (
+      <View style={[styles.container, styles.emptyContainer, style]}>
+        <MapPin size={32} color="#666" />
+        <Text style={styles.emptyText}>
+          No comprehensive data available. Try refreshing.
+        </Text>
+        <Text style={styles.debugText}>
+          Debug: {error || 'No error'} | Loading: {weatherMoodLoading ? 'Yes' : 'No'}
+        </Text>
+               <TouchableOpacity style={styles.refreshButton} onPress={onRefresh}>
+                 <RefreshCw size={16} color="#666" />
+                 <Text style={styles.refreshButtonText}>Refresh</Text>
+               </TouchableOpacity>
+               <TouchableOpacity style={[styles.refreshButton, { marginTop: 8 }]} onPress={fetchComprehensiveData}>
+                 <RefreshCw size={16} color="#666" />
+                 <Text style={styles.refreshButtonText}>Force Fetch</Text>
+               </TouchableOpacity>
+      </View>
+    );
+  }
+
+  console.log('[ComprehensiveInsights] Rendering with comprehensiveData:', {
+    hasWeather: !!comprehensiveData.weather,
+    hasMoodCorrelation: !!comprehensiveData.moodCorrelation,
+    hasNearbyStores: !!comprehensiveData.nearbyStores,
+    hasSleepAdjustment: !!comprehensiveData.sleepAdjustment,
+    hasRecommendations: !!comprehensiveData.recommendations,
+    comprehensiveDataKeys: Object.keys(comprehensiveData),
+  });
 
   return (
     <ScrollView
@@ -201,11 +322,11 @@ const ComprehensiveInsights: React.FC<ComprehensiveInsightsProps> = ({
       )}
 
       {/* Location Info */}
-      {location && (
+      {location && comprehensiveData?.weather?.location && (
         <View style={styles.locationContainer}>
           <Text style={styles.locationTitle}>📍 Current Location</Text>
           <Text style={styles.locationText}>
-            {comprehensiveData.weather?.location.city}, {comprehensiveData.weather?.location.country}
+            {comprehensiveData.weather.location.city}, {comprehensiveData.weather.location.country}
           </Text>
           <Text style={styles.locationCoordinates}>
             {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}
@@ -252,6 +373,27 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 12,
     textAlign: 'center',
+  },
+  debugText: {
+    fontSize: 12,
+    color: '#999',
+    textAlign: 'center',
+    marginTop: 8,
+    fontStyle: 'italic',
+  },
+  refreshButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginTop: 16,
+  },
+  refreshButtonText: {
+    fontSize: 14,
+    color: '#666',
+    marginLeft: 8,
   },
   lastUpdatedContainer: {
     padding: 10,

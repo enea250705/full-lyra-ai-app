@@ -265,32 +265,78 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
     if (isMockUser) return;
     try {
       console.log('[useUserData] Loading insight data...');
-      const [emotionInsights, correlations, trends] = await Promise.all([
+      const [emotionInsights, correlations, trends, moodEntries, sleepLogs] = await Promise.all([
         apiService.getEmotionInsights(),
         apiService.getCorrelations(),
         apiService.getTrends('month'),
+        apiService.getMoodEntries(1, 30), // Get last 30 mood entries
+        apiService.getSleepLogs(1, 30), // Get last 30 sleep logs
       ]);
       
       console.log('[useUserData] API responses:', {
         emotionInsights: emotionInsights.success ? 'success' : 'failed',
         correlations: correlations.success ? 'success' : 'failed', 
         trends: trends.success ? 'success' : 'failed',
+        moodEntries: moodEntries.success ? 'success' : 'failed',
+        sleepLogs: sleepLogs.success ? 'success' : 'failed',
         emotionData: emotionInsights.data,
         trendsData: trends.data,
+        moodEntriesCount: moodEntries.data?.data?.length || 0,
+        sleepLogsCount: sleepLogs.data?.data?.length || 0,
       });
       
       const transformedInsights: InsightData = { moodTrend: [], sleepData: [], spendingData: [], wins: [], lessons: [], suggestions: [] };
       
       if (trends.success && trends.data) {
         const trendsData = trends.data;
-        if (trendsData.moodTrends) {
-          transformedInsights.moodTrend = trendsData.moodTrends.map((t: any) => ({ date: new Date(t.date), mood: t.moodCategory || 'neutral' }));
+        console.log('[useUserData] Raw trends data:', trendsData);
+        
+        // Transform mood trends data
+        if (trendsData.trends?.mood) {
+          transformedInsights.moodTrend = trendsData.trends.mood.map((t: any) => ({
+            date: new Date(t.date),
+            mood: t.value >= 8 ? 'great' : t.value >= 6 ? 'good' : t.value >= 4 ? 'neutral' : t.value >= 2 ? 'bad' : 'terrible'
+          }));
           console.log('[useUserData] Mood trends loaded:', transformedInsights.moodTrend.length);
         }
-        if (trendsData.sleepTrends) {
-          transformedInsights.sleepData = trendsData.sleepTrends.map((t: any) => ({ date: new Date(t.date), hours: t.duration / 60 }));
+        
+        // Transform sleep trends data
+        if (trendsData.trends?.sleep) {
+          transformedInsights.sleepData = trendsData.trends.sleep.map((t: any) => ({
+            date: new Date(t.date),
+            hours: t.duration
+          }));
           console.log('[useUserData] Sleep trends loaded:', transformedInsights.sleepData.length);
         }
+        
+        // Log data points for debugging
+        if (trendsData.dataPoints) {
+          console.log('[useUserData] Data points:', trendsData.dataPoints);
+        }
+      }
+      
+      // Fallback: If trends don't have enough data, use raw entries
+      if (transformedInsights.moodTrend.length < 7 && moodEntries.success && moodEntries.data?.data) {
+        console.log('[useUserData] Using raw mood entries as fallback');
+        transformedInsights.moodTrend = moodEntries.data.data.map((entry: any) => ({
+          date: new Date(entry.createdAt),
+          mood: entry.moodValue >= 8 ? 'great' : entry.moodValue >= 6 ? 'good' : entry.moodValue >= 4 ? 'neutral' : entry.moodValue >= 2 ? 'bad' : 'terrible'
+        }));
+        console.log('[useUserData] Fallback mood trends loaded:', transformedInsights.moodTrend.length);
+      }
+      
+      if (transformedInsights.sleepData.length < 7 && sleepLogs.success && sleepLogs.data?.data) {
+        console.log('[useUserData] Using raw sleep logs as fallback');
+        transformedInsights.sleepData = sleepLogs.data.data.map((log: any) => {
+          const startTime = new Date(log.startTime);
+          const endTime = new Date(log.endTime);
+          const duration = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60); // Convert to hours
+          return {
+            date: new Date(log.createdAt),
+            hours: duration
+          };
+        });
+        console.log('[useUserData] Fallback sleep data loaded:', transformedInsights.sleepData.length);
       }
       
       if (emotionInsights.success && emotionInsights.data) {

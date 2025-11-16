@@ -17,6 +17,7 @@ import { useLocation } from '@/hooks/useLocation';
 import { useSavings } from '@/hooks/useSavings';
 import { useSubscription } from '@/hooks/useSubscription';
 import { usePermissions } from '@/hooks/usePermissions';
+import { useMood } from '@/hooks/useMood';
 import { colors } from '@/constants/colors';
 import { getGreeting } from '@/utils/dateUtils';
 import { useI18n } from '@/i18n';
@@ -41,6 +42,7 @@ export default function HomeScreen() {
   const { savings, loading: savingsLoading, recordSavings, fetchSavingsStats } = useSavings();
   const { subscription } = useSubscription();
   const { permissions, requestAllPermissions, requestLocationPermission, requestHealthKitPermission, requestNotificationsPermission, isLoading: permissionsLoading } = usePermissions();
+  const { createMoodEntry } = useMood();
   
   const [currentMood, setCurrentMood] = useState<Mood>(userData?.mood || 'neutral');
   const [showStoreAlert, setShowStoreAlert] = useState(true);
@@ -68,9 +70,18 @@ export default function HomeScreen() {
     return moodMap[mood] || 5;
   };
 
-  const handleMoodChange = (mood: Mood) => {
+  const handleMoodChange = async (mood: Mood) => {
     setCurrentMood(mood);
     updateUserData({ mood });
+    
+    // Create a mood entry in the database
+    try {
+      const moodNumber = moodToNumber(mood);
+      await createMoodEntry(moodNumber, mood, `Mood updated on ${new Date().toLocaleDateString()}`);
+      console.log('[HomeScreen] Mood entry created successfully:', mood);
+    } catch (error) {
+      console.error('[HomeScreen] Failed to create mood entry:', error);
+    }
     
     // Correlate mood with weather when mood changes (only if location is available)
     if (location && location.latitude && location.longitude) {

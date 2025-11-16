@@ -168,22 +168,17 @@ export default function SubscriptionScreen() {
           </View>
         </LinearGradient>
 
-        {/* Quick Actions */}
-        <View style={styles.quickActions}>
-          <TouchableOpacity 
-            style={styles.primaryAction}
-            onPress={handleUpgrade}
-          >
-            <LinearGradient
-              colors={['#8B5CF6', '#6366F1']}
-              style={styles.primaryActionGradient}
-            >
-              <Zap size={20} color={colors.white} />
-              <Text style={styles.primaryActionText}>
-                {subscription?.plan === 'free' ? 'Upgrade Plan' : 'Change Plan'}
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
+        {/* Launch Special Banner */}
+        <View style={styles.launchBanner}>
+          <View style={styles.launchBannerContent}>
+            <Text style={styles.launchBannerTitle}>🎉 Launch Special - Everything FREE!</Text>
+            <Text style={styles.launchBannerText}>
+              All premium features are currently free during our launch period. Enjoy unlimited access!
+            </Text>
+            <Text style={styles.launchBannerSubtext}>
+              Subscription plans coming in future updates
+            </Text>
+          </View>
         </View>
 
         {/* Features Section */}
@@ -227,25 +222,28 @@ export default function SubscriptionScreen() {
           </View>
         </View>
 
-        {/* Billing & Account Section */}
+        {/* Billing & Account Section - Disabled during free launch */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Billing & Account</Text>
+          <Text style={styles.sectionTitle}>Account Features</Text>
           <View style={styles.modernActionsList}>
-            {subscription?.plan !== 'free' && (
-              <TouchableOpacity 
-                style={styles.modernActionItem}
-                onPress={handleManageBilling}
-                disabled={isLoading}
-              >
-                <View style={styles.actionIconContainer}>
-                  <CreditCard size={20} color="#8B5CF6" />
-                </View>
-                <View style={styles.actionTextContainer}>
-                  <Text style={styles.actionTitle}>Manage Billing</Text>
-                  <Text style={styles.actionSubtitle}>Update payment method</Text>
-                </View>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity 
+              style={styles.modernActionItem}
+              onPress={() => {
+                Alert.alert(
+                  'Coming Soon',
+                  'Billing management will be available when subscription plans launch!',
+                  [{ text: 'OK' }]
+                );
+              }}
+            >
+              <View style={styles.actionIconContainer}>
+                <CreditCard size={20} color="#8B5CF6" />
+              </View>
+              <View style={styles.actionTextContainer}>
+                <Text style={[styles.actionTitle, { color: '#9CA3AF' }]}>Manage Billing</Text>
+                <Text style={styles.actionSubtitle}>Coming with subscription plans</Text>
+              </View>
+            </TouchableOpacity>
 
             <TouchableOpacity 
               style={styles.modernActionItem}
@@ -256,28 +254,10 @@ export default function SubscriptionScreen() {
                 <Download size={20} color="#10B981" />
               </View>
               <View style={styles.actionTextContainer}>
-                <Text style={styles.actionTitle}>Download Invoices</Text>
-                <Text style={styles.actionSubtitle}>Get your billing history</Text>
+                <Text style={styles.actionTitle}>Export Your Data</Text>
+                <Text style={styles.actionSubtitle}>Download all your information</Text>
               </View>
             </TouchableOpacity>
-
-            {subscription?.plan !== 'free' && (
-              <TouchableOpacity 
-                style={styles.modernActionItem}
-                onPress={handleCancelSubscription}
-                disabled={isLoading}
-              >
-                <View style={styles.actionIconContainer}>
-                  <Shield size={20} color="#EF4444" />
-                </View>
-                <View style={styles.actionTextContainer}>
-                  <Text style={[styles.actionTitle, { color: '#EF4444' }]}>
-                    Cancel Subscription
-                  </Text>
-                  <Text style={styles.actionSubtitle}>Cancel at any time</Text>
-                </View>
-              </TouchableOpacity>
-            )}
           </View>
         </View>
 
@@ -557,5 +537,41 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.gray[600],
     textAlign: 'center',
+  },
+  launchBanner: {
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 2,
+    borderColor: colors.lightPurple,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  launchBannerContent: {
+    alignItems: 'center',
+  },
+  launchBannerTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.midnightBlue,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  launchBannerText: {
+    fontSize: 16,
+    color: colors.gray[700],
+    textAlign: 'center',
+    marginBottom: 8,
+    lineHeight: 22,
+  },
+  launchBannerSubtext: {
+    fontSize: 14,
+    color: colors.gray[500],
+    textAlign: 'center',
+    fontStyle: 'italic' as const,
   },
 });

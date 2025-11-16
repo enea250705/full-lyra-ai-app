@@ -30,14 +30,16 @@ interface UseNativeSubscriptionReturn {
 export const useNativeSubscription = (): UseNativeSubscriptionReturn => {
   const { user } = useAuth();
   
-  // Developer override: Grant full Premium access to eneamuja87@gmail.com
+  // 🚀 LAUNCH VERSION - Everyone gets Premium access for free!
+  // This will be updated when subscription plans are introduced
   const isDeveloperAccount = user?.email === 'eneamuja87@gmail.com';
+  const isLaunchVersion = true; // Set to false when enabling subscriptions
   
   const [subscriptionStatus, setSubscriptionStatus] = useState<SubscriptionStatus>({
-    isActive: isDeveloperAccount,
-    isPro: isDeveloperAccount,
-    isPremium: isDeveloperAccount,
-    plan: isDeveloperAccount ? 'premium' : 'free',
+    isActive: true, // Everyone is active during launch
+    isPro: true, // Everyone has Pro features
+    isPremium: true, // Everyone has Premium features
+    plan: 'premium', // Everyone is on Premium plan
   });
   
   const [availableProducts, setAvailableProducts] = useState<Subscription[]>([]);
@@ -60,8 +62,17 @@ export const useNativeSubscription = (): UseNativeSubscriptionReturn => {
         const status = await nativeSubscriptionService.getSubscriptionStatus();
         
         setAvailableProducts(products);
-        // Override status for developer account
-        if (isDeveloperAccount) {
+        
+        // 🚀 LAUNCH VERSION - Grant everyone Premium access
+        if (isLaunchVersion) {
+          setSubscriptionStatus({
+            isActive: true,
+            isPro: true,
+            isPremium: true,
+            plan: 'premium',
+          });
+        } else if (isDeveloperAccount) {
+          // Developer override for post-launch testing
           setSubscriptionStatus({
             isActive: true,
             isPro: true,
@@ -85,7 +96,7 @@ export const useNativeSubscription = (): UseNativeSubscriptionReturn => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [isLaunchVersion, isDeveloperAccount]);
 
   /**
    * Purchase a subscription
@@ -180,8 +191,17 @@ export const useNativeSubscription = (): UseNativeSubscriptionReturn => {
   const refreshStatus = useCallback(async (): Promise<void> => {
     try {
       const status = await nativeSubscriptionService.getSubscriptionStatus();
-      // Override status for developer account
-      if (isDeveloperAccount) {
+      
+      // 🚀 LAUNCH VERSION - Grant everyone Premium access
+      if (isLaunchVersion) {
+        setSubscriptionStatus({
+          isActive: true,
+          isPro: true,
+          isPremium: true,
+          plan: 'premium',
+        });
+      } else if (isDeveloperAccount) {
+        // Developer override for post-launch testing
         setSubscriptionStatus({
           isActive: true,
           isPro: true,
@@ -197,23 +217,29 @@ export const useNativeSubscription = (): UseNativeSubscriptionReturn => {
       setError(errorMsg);
       console.error('[useNativeSubscription] Refresh status error:', err);
     }
-  }, [isDeveloperAccount]);
+  }, [isLaunchVersion, isDeveloperAccount]);
 
   /**
    * Check feature access
    */
   const hasAccessToFeature = useCallback(async (featureId: string): Promise<boolean> => {
     try {
+      // 🚀 LAUNCH VERSION - Everyone has access to all features!
+      if (isLaunchVersion) {
+        return true;
+      }
+      
       // Developer override: Grant access to all features
       if (isDeveloperAccount) {
         return true;
       }
+      
       return await nativeSubscriptionService.hasAccessToFeature(featureId);
     } catch (err: any) {
       console.error('[useNativeSubscription] Feature access check error:', err);
       return false;
     }
-  }, [isDeveloperAccount]);
+  }, [isLaunchVersion, isDeveloperAccount]);
 
   /**
    * Initialize on mount

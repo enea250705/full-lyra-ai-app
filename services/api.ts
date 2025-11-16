@@ -8,10 +8,6 @@ const API_BASE_URL = (process.env.EXPO_PUBLIC_API_URL && process.env.EXPO_PUBLIC
 // Add timeout and additional options for better error handling
 const API_TIMEOUT = 30000; // 30 seconds
 
-// Debug environment variable loading
-console.log('Environment variable EXPO_PUBLIC_API_URL:', process.env.EXPO_PUBLIC_API_URL);
-console.log('Using API_BASE_URL:', API_BASE_URL);
-
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
@@ -34,6 +30,13 @@ export interface PaginatedResponse<T> {
 
 class ApiService {
   private baseURL = API_BASE_URL;
+  private requestQueue = new Map<string, Promise<any>>();
+  private lastRequestTime = new Map<string, number>();
+  private cache = new Map<string, { data: any; timestamp: number }>();
+  private globalLastRequestTime = 0; // Global rate limiter
+  private readonly RATE_LIMIT_DELAY = 2000; // 2 seconds between requests to same endpoint
+  private readonly GLOBAL_RATE_LIMIT_DELAY = 500; // 500ms between any requests globally
+  private readonly CACHE_DURATION = 60000; // 60 seconds cache for GET requests
 
   private async getAuthHeaders(): Promise<Record<string, string>> {
     const token = await AsyncStorage.getItem('authToken');
@@ -46,6 +49,31 @@ class ApiService {
     }
     
     return headers;
+  }
+
+  private async throttleRequest(endpoint: string): Promise<void> {
+    const now = Date.now();
+    
+    // Global rate limiting - ensure minimum delay between any requests
+    const globalTimeSinceLastRequest = now - this.globalLastRequestTime;
+    if (globalTimeSinceLastRequest < this.GLOBAL_RATE_LIMIT_DELAY) {
+      const globalDelay = this.GLOBAL_RATE_LIMIT_DELAY - globalTimeSinceLastRequest;
+      console.log(`[API] Global throttling for ${globalDelay}ms`);
+      await new Promise(resolve => setTimeout(resolve, globalDelay));
+    }
+    
+    // Endpoint-specific rate limiting
+    const lastRequest = this.lastRequestTime.get(endpoint) || 0;
+    const timeSinceLastRequest = now - lastRequest;
+    
+    if (timeSinceLastRequest < this.RATE_LIMIT_DELAY) {
+      const delay = this.RATE_LIMIT_DELAY - timeSinceLastRequest;
+      console.log(`[API] Throttling request to ${endpoint} for ${delay}ms`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+    
+    this.lastRequestTime.set(endpoint, Date.now());
+    this.globalLastRequestTime = Date.now();
   }
 
   private async validateAndRefreshToken(): Promise<boolean> {
@@ -84,66 +112,135 @@ class ApiService {
     options: RequestInit = {}
   ): Promise<ApiResponse<T>> {
     try {
+      // Check cache for GET requests
+      if (!options.method || options.method === 'GET') {
+        const cacheKey = `${endpoint}_${JSON.stringify(options)}`;
+        const cached = this.cache.get(cacheKey);
+        if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
+          console.log(`[API] Using cached response for ${endpoint}`);
+          return cached.data;
+        }
+      }
+
+      // Check if there's already a request in progress for this endpoint
+      const requestKey = `${endpoint}_${JSON.stringify(options)}`;
+      if (this.requestQueue.has(requestKey)) {
+        console.log(`[API] Deduplicating request to ${endpoint}`);
+        return await this.requestQueue.get(requestKey);
+      }
+
+      // Throttle requests to prevent rate limiting
+      await this.throttleRequest(endpoint);
+
       const headers = await this.getAuthHeaders();
       const fullUrl = `${this.baseURL}${endpoint}`;
       
-      console.log(`Making API request to: ${fullUrl}`);
-      console.log('Request options:', { ...options, headers });
+      console.log(`[API] Making request to: ${fullUrl}`);
       
       // Create AbortController for timeout
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
       
-      const response = await fetch(fullUrl, {
+      // Create the request promise
+      const requestPromise = fetch(fullUrl, {
         ...options,
         headers: {
           ...headers,
           ...options.headers,
         },
         signal: controller.signal,
+      }).then(async (response) => {
+        clearTimeout(timeoutId);
+        
+        console.log(`[API] Response status: ${response.status}`);
+        
+        // Handle rate limiting specifically
+        if (response.status === 429) {
+          console.warn(`[API] Rate limited on ${endpoint}, implementing exponential backoff`);
+          const retryAfter = response.headers.get('Retry-After');
+          const backoffDelay = retryAfter ? parseInt(retryAfter) * 1000 : 5000; // Default 5 seconds
+          console.log(`[API] Waiting ${backoffDelay}ms before retry`);
+          await new Promise(resolve => setTimeout(resolve, backoffDelay));
+          throw new Error('Rate limited - retrying with backoff');
+        }
+
+        let data;
+        try {
+          data = await response.json();
+        } catch (jsonError) {
+          console.error('Failed to parse JSON response:', jsonError);
+          throw new Error('Invalid response format from server');
+        }
+        
+        if (!response.ok) {
+          console.error('API request failed with status:', response.status);
+          console.error('Response data:', data);
+          throw new Error(data.error || data.message || 'API request failed');
+        }
+
+        // Cache successful GET responses
+        if (!options.method || options.method === 'GET') {
+          const cacheKey = `${endpoint}_${JSON.stringify(options)}`;
+          this.cache.set(cacheKey, { data, timestamp: Date.now() });
+          console.log(`[API] Cached response for ${endpoint}`);
+        }
+
+        return data;
+      }).catch((error) => {
+        clearTimeout(timeoutId);
+        console.error(`[API] Error for ${endpoint}:`, error);
+        
+        // Handle rate limiting with exponential backoff
+        if (error.message.includes('Rate limited')) {
+          return {
+            success: false,
+            error: 'Rate limited - please wait before trying again',
+            retryAfter: 5000, // 5 seconds
+          };
+        }
+        
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error occurred',
+        };
+      }).finally(() => {
+        // Remove from queue when done
+        this.requestQueue.delete(requestKey);
       });
 
-      clearTimeout(timeoutId);
+      // Add to queue
+      this.requestQueue.set(requestKey, requestPromise);
       
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
-
-      let data;
-      try {
-        data = await response.json();
-      } catch (jsonError) {
-        console.error('Failed to parse JSON response:', jsonError);
-        throw new Error('Invalid response format from server');
-      }
-      
-      console.log('Response data:', data);
-
-      if (!response.ok) {
-        console.error('API request failed with status:', response.status);
-        console.error('Response data:', data);
-        throw new Error(data.error || data.message || 'API request failed');
-      }
-
-      return data;
+      return await requestPromise;
     } catch (error) {
       console.error('API Error:', error);
-      console.error('Base URL:', this.baseURL);
-      console.error('Endpoint:', endpoint);
-      
-      if (error instanceof Error) {
-        if (error.name === 'AbortError') {
-          throw new Error('Request timeout - server took too long to respond');
-        }
-        if (error.message.includes('Network request failed')) {
-          throw new Error('Network error - please check your internet connection');
-        }
-        if (error.message.includes('Invalid response format')) {
-          throw new Error('Server error - please try again later');
-        }
-      }
-      
-      throw error;
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
+      };
     }
+  }
+
+  // Clear request queue (useful for testing or reset)
+  clearRequestQueue(): void {
+    this.requestQueue.clear();
+    this.lastRequestTime.clear();
+    this.cache.clear();
+    console.log('[API] Request queue and cache cleared');
+  }
+
+  // Get current queue status for debugging
+  getQueueStatus(): { queueSize: number; cacheSize: number; lastRequests: Record<string, number> } {
+    const lastRequests: Record<string, number> = {};
+    this.lastRequestTime.forEach((time, endpoint) => {
+      lastRequests[endpoint] = time;
+    });
+    
+    return {
+      queueSize: this.requestQueue.size,
+      cacheSize: this.cache.size,
+      lastRequests,
+    };
   }
 
   // Authentication API

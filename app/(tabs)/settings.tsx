@@ -13,7 +13,7 @@ import { useSleep } from '../../hooks/useSleep';
 import { useNativeSubscription } from '../../hooks/useNativeSubscription';
 import { useAuth } from '../../contexts/AuthContext';
 import { colors } from '../../constants/colors';
-import { User, Calendar, Activity, DollarSign, Trash2, Download, VolumeX, Volume1, Volume2, Crown, Moon, Lock, Bell } from 'lucide-react-native';
+import { User, Calendar, Activity, DollarSign, Trash2, Download, VolumeX, Volume1, Volume2, Crown, Moon, Lock, Bell, LogOut } from 'lucide-react-native';
 import { useI18n } from '../../i18n';
 import { apiService } from '../../services/api';
 import * as WebBrowser from 'expo-web-browser';
@@ -37,12 +37,7 @@ export default function SettingsScreen() {
     isFree,
     currentPlan
   } = useNativeSubscription();
-  const { user, deleteAccount } = useAuth();
-  
-  // Debug logging for developer override
-  console.log('[Settings] User email:', user?.email);
-  console.log('[Settings] isDeveloperAccount:', user?.email === 'eneamuja87@gmail.com');
-  console.log('[Settings] Subscription status:', { isProActive, isPremiumActive, isFree, currentPlan });
+  const { user, deleteAccount, logout } = useAuth();
   
   // Provide default settings if null or undefined
   const defaultSettings = {
@@ -61,10 +56,6 @@ export default function SettingsScreen() {
     },
     voiceStyle: 'calm' as const,
   };
-  
-  // Debug logging
-  console.log('Settings from useUserData:', settings);
-  console.log('Settings type:', typeof settings);
   
   const currentSettings = settings || defaultSettings;
   
@@ -97,36 +88,30 @@ export default function SettingsScreen() {
   const [upgradeContext, setUpgradeContext] = useState({ featureId: '', featureName: '' });
   const [showManualSleepModal, setShowManualSleepModal] = useState(false);
 
-  // Define which features require which subscription tiers
+  // 🚀 LAUNCH VERSION - Everything is FREE for now!
+  // Features will be monetized in future versions
   const featureRequirements = {
-    // Free features (no restriction)
+    // All features are free for initial launch
     mood: 'free',
-    
-    // Pro features  
-    finances: 'pro',
-    calendar_sync: 'pro',
-    savings_tracking: 'pro',
-    basic_ai_coaching: 'pro',
-    
-    // Premium features
-    advanced_sleep_analysis: 'premium',
-    location_alerts: 'premium',
-    sms_alerts: 'premium',
-    crisis_support: 'premium',
+    finances: 'free',
+    calendar_sync: 'free',
+    savings_tracking: 'free',
+    basic_ai_coaching: 'free',
+    advanced_sleep_analysis: 'free',
+    location_alerts: 'free',
+    sms_alerts: 'free',
+    crisis_support: 'free',
   };
 
-  // Check if user can access a feature
+  // Check if user can access a feature - ALWAYS TRUE for launch version
   const canAccessFeature = (requiredTier: string) => {
-    if (requiredTier === 'free') return true;
-    if (requiredTier === 'pro') return isProActive || isPremiumActive;
-    if (requiredTier === 'premium') return isPremiumActive;
-    return true;
+    return true; // 🎉 Everything is free during initial launch!
   };
 
-  // Show upgrade modal for restricted features
+  // Show upgrade modal for restricted features - DISABLED for launch
   const showUpgradeModal = (featureId: string, featureName: string) => {
-    setUpgradeContext({ featureId, featureName });
-    setUpgradeModalVisible(true);
+    // Disabled for free launch - will be enabled in future versions
+    return;
   };
   
   // Show loading state if user data is still loading
@@ -330,6 +315,40 @@ export default function SettingsScreen() {
     }
   };
 
+  const handleLogout = async () => {
+    Alert.alert(
+      t('settings.logout'),
+      t('settings.logout_confirm'),
+      [
+        {
+          text: t('common.cancel'),
+          style: 'cancel',
+        },
+        {
+          text: t('settings.logout'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await logout();
+              Alert.alert(
+                t('settings.logout_success'),
+                '',
+                [{ text: t('common.ok') }]
+              );
+            } catch (error) {
+              console.error('Logout error:', error);
+              Alert.alert(
+                t('settings.logout_error'),
+                error instanceof Error ? error.message : 'Unknown error',
+                [{ text: t('common.ok') }]
+              );
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <ScreenContainer>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -396,13 +415,24 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t('settings.subscription')}</Text>
-        <Pressable style={styles.subscriptionButton} onPress={handleManageSubscription}>
+        <View style={styles.sectionHeaderWithBadge}>
+          <Text style={styles.sectionTitle}>{t('settings.subscription')}</Text>
+          <View style={styles.comingSoonBadge}>
+            <Text style={styles.comingSoonText}>Coming Soon</Text>
+          </View>
+        </View>
+        <Pressable style={styles.subscriptionButton} onPress={() => {
+          Alert.alert(
+            '🎉 Everything is Free!',
+            'All features are currently free during our launch period! Subscription plans will be available in future updates.',
+            [{ text: 'Awesome!' }]
+          );
+        }}>
           <View style={styles.settingLabelContainer}>
             <Crown size={20} color={colors.lightPurple} />
-            <Text style={styles.settingLabel}>{t('settings.manage_subscription')}</Text>
+            <Text style={styles.settingLabel}>All Features Free (Launch Special)</Text>
           </View>
-          <Text style={styles.subscriptionSubtext}>{t('settings.plans_billing')}</Text>
+          <Text style={styles.subscriptionSubtext}>Enjoy unlimited access during launch</Text>
         </Pressable>
         <Pressable style={[styles.subscriptionButton, { marginTop: 12 }]} onPress={async () => {
           try {
@@ -430,11 +460,7 @@ export default function SettingsScreen() {
           <View style={styles.settingLabelContainer}>
             <Calendar size={20} color={colors.midnightBlue} />
             <Text style={styles.settingLabel}>{t('settings.google_calendar')}</Text>
-            {!canAccessFeature('pro') && (
-              <View style={styles.lockIconContainer}>
-                <Lock size={14} color={colors.gray[400]} />
-              </View>
-            )}
+            {/* Lock removed - all features free during launch */}
           </View>
           <Switch
             value={safeSettings.connectedApis.googleCalendar}
@@ -448,11 +474,7 @@ export default function SettingsScreen() {
           <View style={styles.settingLabelContainer}>
             <Activity size={20} color={colors.midnightBlue} />
             <Text style={styles.settingLabel}>{t('settings.apple_health')}</Text>
-            {!canAccessFeature('premium') && (
-              <View style={styles.lockIconContainer}>
-                <Lock size={14} color={colors.gray[400]} />
-              </View>
-            )}
+            {/* Lock removed - all features free during launch */}
           </View>
           <Switch
             value={safeSettings.connectedApis.appleHealth}
@@ -492,11 +514,7 @@ export default function SettingsScreen() {
           <View style={styles.settingLabelContainer}>
             <DollarSign size={20} color={colors.midnightBlue} />
             <Text style={styles.settingLabel}>{t('settings.plaid')}</Text>
-            {!canAccessFeature('pro') && (
-              <View style={styles.lockIconContainer}>
-                <Lock size={14} color={colors.gray[400]} />
-              </View>
-            )}
+            {/* Lock removed - all features free during launch */}
           </View>
           <Switch
             value={safeSettings.connectedApis.plaid}
@@ -511,8 +529,7 @@ export default function SettingsScreen() {
         <Text style={styles.sectionTitle}>{t('settings.enabled_modules')}</Text>
         
         {Object.entries(safeSettings.enabledModules).map(([key, value]) => {
-          const isFinances = key === 'finances';
-          const requiresUpgrade = isFinances && !canAccessFeature('pro');
+          // All features are free during launch - no upgrade required
           
           return (
             <View key={key} style={styles.settingItem}>
@@ -520,11 +537,7 @@ export default function SettingsScreen() {
                 <Text style={styles.settingLabel}>
                   {key.charAt(0).toUpperCase() + key.slice(1)}
                 </Text>
-                {requiresUpgrade && (
-                  <View style={styles.lockIconContainer}>
-                    <Lock size={14} color={colors.gray[400]} />
-                  </View>
-                )}
+                {/* Lock removed - all features free during launch */}
               </View>
               <Switch
                 value={value}
@@ -538,21 +551,30 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t('settings.voice_style')}</Text>
+        <View style={styles.sectionHeaderWithBadge}>
+          <Text style={styles.sectionTitle}>{t('settings.voice_style')}</Text>
+          <View style={styles.comingSoonBadge}>
+            <Text style={styles.comingSoonText}>Coming Soon</Text>
+          </View>
+        </View>
         
         <View style={styles.voiceStyleContainer}>
           <Pressable
             style={[
               styles.voiceStyleOption,
               safeSettings.voiceStyle === 'calm' && styles.voiceStyleSelected,
+              styles.voiceStyleDisabled,
             ]}
-            onPress={() => handleSetVoiceStyle('calm')}
+            onPress={() => {
+              Alert.alert(
+                'Coming Soon! 🎙️',
+                'Voice customization will be available in the next update. Stay tuned!',
+                [{ text: 'OK' }]
+              );
+            }}
           >
-            <VolumeX size={24} color={safeSettings.voiceStyle === 'calm' ? colors.white : colors.midnightBlue} />
-            <Text style={[
-              styles.voiceStyleText,
-              safeSettings.voiceStyle === 'calm' && styles.voiceStyleTextSelected,
-            ]}>
+            <VolumeX size={24} color={colors.gray[400]} />
+            <Text style={styles.voiceStyleTextDisabled}>
               {t('settings.voice_calm')}
             </Text>
           </Pressable>
@@ -560,15 +582,18 @@ export default function SettingsScreen() {
           <Pressable
             style={[
               styles.voiceStyleOption,
-              safeSettings.voiceStyle === 'energetic' && styles.voiceStyleSelected,
+              styles.voiceStyleDisabled,
             ]}
-            onPress={() => handleSetVoiceStyle('energetic')}
+            onPress={() => {
+              Alert.alert(
+                'Coming Soon! 🎙️',
+                'Voice customization will be available in the next update. Stay tuned!',
+                [{ text: 'OK' }]
+              );
+            }}
           >
-            <Volume2 size={24} color={safeSettings.voiceStyle === 'energetic' ? colors.white : colors.midnightBlue} />
-            <Text style={[
-              styles.voiceStyleText,
-              safeSettings.voiceStyle === 'energetic' && styles.voiceStyleTextSelected,
-            ]}>
+            <Volume2 size={24} color={colors.gray[400]} />
+            <Text style={styles.voiceStyleTextDisabled}>
               {t('settings.voice_energetic')}
             </Text>
           </Pressable>
@@ -576,15 +601,18 @@ export default function SettingsScreen() {
           <Pressable
             style={[
               styles.voiceStyleOption,
-              safeSettings.voiceStyle === 'minimal' && styles.voiceStyleSelected,
+              styles.voiceStyleDisabled,
             ]}
-            onPress={() => handleSetVoiceStyle('minimal')}
+            onPress={() => {
+              Alert.alert(
+                'Coming Soon! 🎙️',
+                'Voice customization will be available in the next update. Stay tuned!',
+                [{ text: 'OK' }]
+              );
+            }}
           >
-            <Volume1 size={24} color={safeSettings.voiceStyle === 'minimal' ? colors.white : colors.midnightBlue} />
-            <Text style={[
-              styles.voiceStyleText,
-              safeSettings.voiceStyle === 'minimal' && styles.voiceStyleTextSelected,
-            ]}>
+            <Volume1 size={24} color={colors.gray[400]} />
+            <Text style={styles.voiceStyleTextDisabled}>
               {t('settings.voice_minimal')}
             </Text>
           </Pressable>
@@ -740,6 +768,18 @@ export default function SettingsScreen() {
         })()}
       </View>
 
+      {/* Account Management Section */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Account</Text>
+        <Pressable style={styles.logoutButton} onPress={handleLogout}>
+          <View style={styles.settingLabelContainer}>
+            <LogOut size={20} color={colors.error} />
+            <Text style={[styles.settingLabel, { color: colors.error }]}>{t('settings.logout')}</Text>
+          </View>
+          <Text style={styles.logoutSubtext}>{t('settings.logout_desc')}</Text>
+        </Pressable>
+      </View>
+
       <View style={styles.footer}>
         <Text style={styles.versionText}>{t('settings.version', { version: '1.0.0' })}</Text>
         <Text style={styles.copyrightText}>{t('settings.copyright', { year: '2025' })}</Text>
@@ -842,6 +882,23 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginLeft: 32,
   },
+  logoutButton: {
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.error,
+    shadowColor: colors.gray[400],
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  logoutSubtext: {
+    fontSize: 12,
+    color: colors.error,
+    marginTop: 4,
+  },
   voiceStyleContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -892,6 +949,32 @@ const styles = StyleSheet.create({
   flagEmoji: {
     fontSize: 18,
     marginRight: 8,
+  },
+  sectionHeaderWithBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  comingSoonBadge: {
+    backgroundColor: colors.lightPurple,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginLeft: 12,
+  },
+  comingSoonText: {
+    fontSize: 11,
+    fontWeight: '600' as const,
+    color: colors.white,
+  },
+  voiceStyleDisabled: {
+    opacity: 0.5,
+  },
+  voiceStyleTextDisabled: {
+    fontSize: 14,
+    fontWeight: '500' as const,
+    color: colors.gray[400],
+    marginTop: 8,
   },
   manualOnlyContainer: {
     backgroundColor: colors.gray[100],

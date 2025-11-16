@@ -161,6 +161,7 @@ export const useWeatherMood = (userId?: string) => {
   };
 
   const fetchNearbyExpensiveStores = async (lat?: number, lon?: number) => {
+    console.log('[useWeatherMood] fetchNearbyExpensiveStores called:', { lat, lon });
     setState(prev => ({ ...prev, isLoading: true, error: null }));
     
     try {
@@ -168,8 +169,10 @@ export const useWeatherMood = (userId?: string) => {
       let longitude = lon;
       
       if (!latitude || !longitude) {
+        console.log('[useWeatherMood] Getting current location for nearby stores...');
         const currentLocation = await getCurrentLocation();
         if (!currentLocation) {
+          console.log('[useWeatherMood] Failed to get current location for nearby stores');
           setState(prev => ({ 
             ...prev, 
             isLoading: false, 
@@ -179,9 +182,17 @@ export const useWeatherMood = (userId?: string) => {
         }
         latitude = currentLocation.latitude;
         longitude = currentLocation.longitude;
+        console.log('[useWeatherMood] Got location for nearby stores:', { latitude, longitude });
       }
 
+      console.log('[useWeatherMood] Calling getNearbyExpensiveStores API with:', { latitude, longitude });
       const response = await apiService.getNearbyExpensiveStores(latitude, longitude);
+      
+      console.log('[useWeatherMood] getNearbyExpensiveStores API response:', { 
+        success: response.success, 
+        error: response.error, 
+        dataLength: response.data?.length || 0 
+      });
       
       if (response.success) {
         setState(prev => ({ 
@@ -191,6 +202,7 @@ export const useWeatherMood = (userId?: string) => {
         }));
         return response.data;
       } else {
+        console.log('[useWeatherMood] getNearbyExpensiveStores API failed:', response.error);
         setState(prev => ({ 
           ...prev, 
           isLoading: false, 
@@ -199,6 +211,7 @@ export const useWeatherMood = (userId?: string) => {
         return [];
       }
     } catch (error) {
+      console.error('[useWeatherMood] Error in fetchNearbyExpensiveStores:', error);
       setState(prev => ({ 
         ...prev, 
         isLoading: false, 
@@ -209,7 +222,10 @@ export const useWeatherMood = (userId?: string) => {
   };
 
   const getComprehensiveData = async (currentMood: number, lat?: number, lon?: number) => {
+    console.log('[useWeatherMood] getComprehensiveData called:', { userId, currentMood, lat, lon });
+    
     if (!userId) {
+      console.log('[useWeatherMood] No userId provided');
       setState(prev => ({ 
         ...prev, 
         error: 'User ID is required for comprehensive data' 
@@ -224,8 +240,10 @@ export const useWeatherMood = (userId?: string) => {
       let longitude = lon;
       
       if (!latitude || !longitude) {
+        console.log('[useWeatherMood] Getting current location...');
         const currentLocation = await getCurrentLocation();
         if (!currentLocation) {
+          console.log('[useWeatherMood] Failed to get current location');
           setState(prev => ({ 
             ...prev, 
             isLoading: false, 
@@ -235,8 +253,10 @@ export const useWeatherMood = (userId?: string) => {
         }
         latitude = currentLocation.latitude;
         longitude = currentLocation.longitude;
+        console.log('[useWeatherMood] Got location:', { latitude, longitude });
       }
 
+      console.log('[useWeatherMood] Calling API with:', { userId, latitude, longitude, currentMood });
       const response = await apiService.getComprehensiveLocationData(
         userId, 
         latitude, 
@@ -244,17 +264,54 @@ export const useWeatherMood = (userId?: string) => {
         currentMood
       );
       
-      if (response.success) {
+      console.log('[useWeatherMood] API response:', { 
+        success: response.success, 
+        error: response.error, 
+        data: response.data,
+        dataKeys: response.data ? Object.keys(response.data) : 'no data'
+      });
+      
+      if (!response.success) {
+        console.error('[useWeatherMood] API call failed:', response.error);
         setState(prev => ({ 
           ...prev, 
-          comprehensiveData: response.data,
-          weather: response.data.weather,
-          moodCorrelation: response.data.moodCorrelation,
-          nearbyStores: response.data.nearbyStores,
+          isLoading: false, 
+          error: response.error || 'Failed to get comprehensive data' 
+        }));
+        return null;
+      }
+      
+      if (response.success) {
+        // Ensure we have valid data structure even if some parts fail
+        const comprehensiveData = {
+          weather: response.data?.weather || null,
+          moodCorrelation: response.data?.moodCorrelation || null,
+          nearbyStores: response.data?.nearbyStores || [],
+          sleepAdjustment: response.data?.sleepAdjustment || null,
+          recommendations: response.data?.recommendations || [],
+        };
+        
+        console.log('[useWeatherMood] Setting comprehensive data:', {
+          hasWeather: !!comprehensiveData.weather,
+          hasMoodCorrelation: !!comprehensiveData.moodCorrelation,
+          hasNearbyStores: comprehensiveData.nearbyStores.length > 0,
+          hasSleepAdjustment: !!comprehensiveData.sleepAdjustment,
+          hasRecommendations: comprehensiveData.recommendations.length > 0,
+          weatherData: comprehensiveData.weather,
+          moodCorrelationData: comprehensiveData.moodCorrelation,
+        });
+        
+        setState(prev => ({ 
+          ...prev, 
+          comprehensiveData,
+          weather: comprehensiveData.weather,
+          moodCorrelation: comprehensiveData.moodCorrelation,
+          nearbyStores: comprehensiveData.nearbyStores,
           isLoading: false 
         }));
-        return response.data;
+        return comprehensiveData;
       } else {
+        console.log('[useWeatherMood] Comprehensive API failed:', response.error);
         setState(prev => ({ 
           ...prev, 
           isLoading: false, 
@@ -263,10 +320,19 @@ export const useWeatherMood = (userId?: string) => {
         return null;
       }
     } catch (error) {
+      console.error('[useWeatherMood] Error in getComprehensiveData:', error);
+      console.error('[useWeatherMood] Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : 'No stack trace',
+        userId,
+        lat,
+        lon,
+        currentMood
+      });
       setState(prev => ({ 
         ...prev, 
         isLoading: false, 
-        error: 'Failed to fetch comprehensive data' 
+        error: error instanceof Error ? error.message : 'Failed to fetch comprehensive data' 
       }));
       return null;
     }

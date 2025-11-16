@@ -47,7 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const isAuthenticated = !!token && !!user;
-  const isMockUser = user?.email === 'eneamuja87@gmail.com';
+  const isMockUser = false; // Disable mock user functionality
 
   // Load stored auth data on app start
   useEffect(() => {
