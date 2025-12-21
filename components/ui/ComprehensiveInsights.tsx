@@ -5,7 +5,6 @@ import { useWeatherMood } from '../../hooks/useWeatherMood';
 import { useMood } from '../../hooks/useMood';
 import { useLocation } from '../../hooks/useLocation';
 import WeatherCard from './WeatherCard';
-import MoodWeatherCorrelation from './MoodWeatherCorrelation';
 import ExpensiveStoreAlert from './ExpensiveStoreAlert';
 import { Loader2, MapPin, AlertCircle, RefreshCw } from 'lucide-react-native';
 import LoadingScreen from './LoadingScreen';
@@ -262,10 +261,6 @@ const ComprehensiveInsights: React.FC<ComprehensiveInsightsProps> = ({
         <WeatherCard weather={comprehensiveData.weather} />
       )}
 
-      {/* Mood-Weather Correlation */}
-      {comprehensiveData.moodCorrelation && (
-        <MoodWeatherCorrelation correlation={comprehensiveData.moodCorrelation} />
-      )}
 
       {/* Expensive Store Alert */}
       {comprehensiveData.nearbyStores && comprehensiveData.nearbyStores.length > 0 && (
@@ -340,7 +335,7 @@ const ComprehensiveInsights: React.FC<ComprehensiveInsightsProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: 'transparent',
   },
   loadingContainer: {
     justifyContent: 'center',
@@ -384,7 +379,7 @@ const styles = StyleSheet.create({
   refreshButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: 'transparent',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
@@ -404,7 +399,7 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   sleepAdjustmentContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(255,255,255,0.9)',
     borderRadius: 16,
     padding: 20,
     marginHorizontal: 10,

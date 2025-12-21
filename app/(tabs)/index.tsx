@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable, Alert } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { MoodPicker } from '@/components/ui/MoodPicker';
@@ -15,14 +15,14 @@ import { useUserData } from '@/hooks/useUserData';
 import { useWeatherMood } from '@/hooks/useWeatherMood';
 import { useLocation } from '@/hooks/useLocation';
 import { useSavings } from '@/hooks/useSavings';
+import { FEATURES } from '@/constants/features';
 import { useSubscription } from '@/hooks/useSubscription';
 import { usePermissions } from '@/hooks/usePermissions';
 import { useMood } from '@/hooks/useMood';
 import { colors } from '@/constants/colors';
-import { getGreeting } from '@/utils/dateUtils';
 import { useI18n } from '@/i18n';
 import { Mood } from '@/types';
-import { Moon, Battery, MessageCircle, MapPin, CloudSun } from 'lucide-react-native';
+import { Moon, Battery, MessageCircle, CloudSun } from 'lucide-react-native';
 import SafeLoadingScreen from '@/components/ui/SafeLoadingScreen';
 
 export default function HomeScreen() {
@@ -36,10 +36,15 @@ export default function HomeScreen() {
     nearbyStores, 
     fetchWeatherData, 
     correlateMoodWithWeather,
-    fetchNearbyExpensiveStores 
-  } = useWeatherMood();
+    fetchNearbyExpensiveStores,
+    getComprehensiveData,
+  } = useWeatherMood(userData?.id);
   
-  const { savings, loading: savingsLoading, recordSavings, fetchSavingsStats } = useSavings();
+  const { savings, recordSavings, fetchSavingsStats } = useSavings();
+  
+  // Only initialize weather/savings hooks if features are enabled
+  const weatherEnabled = FEATURES.WEATHER_INTEGRATION;
+  const savingsEnabled = FEATURES.SAVINGS_TRACKING;
   const { subscription } = useSubscription();
   const { permissions, requestAllPermissions, requestLocationPermission, requestHealthKitPermission, requestNotificationsPermission, isLoading: permissionsLoading } = usePermissions();
   const { createMoodEntry } = useMood();
@@ -87,6 +92,12 @@ export default function HomeScreen() {
     if (location && location.latitude && location.longitude) {
       const moodNumber = moodToNumber(mood);
       correlateMoodWithWeather(moodNumber, location.latitude, location.longitude);
+      // Also refresh comprehensive data so Insights tables update immediately
+      try {
+        await getComprehensiveData?.(moodNumber, location.latitude, location.longitude);
+      } catch (e) {
+        console.warn('[HomeScreen] Failed to refresh comprehensive data after mood change:', e);
+      }
     }
   };
 
@@ -111,7 +122,7 @@ export default function HomeScreen() {
   };
 
   useEffect(() => {
-    if (location) {
+    if (location && FEATURES.WEATHER_INTEGRATION) {
       fetchWeatherData(location.latitude, location.longitude);
       fetchNearbyExpensiveStores(location.latitude, location.longitude);
     }
@@ -130,9 +141,9 @@ export default function HomeScreen() {
         await new Promise(resolve => setTimeout(resolve, 500));
         
         // Check if all permissions are granted
-        const allPermissionsGranted = permissions.location.granted && 
-                                     permissions.healthKit.granted && 
-                                     permissions.notifications.granted;
+        // For MVP, require location + notifications; ignore HealthKit to avoid repeated prompts
+        const allPermissionsGranted = permissions.location.granted &&
+                                      permissions.notifications.granted;
         
         console.log('[HomeScreen] Permission status:', {
           location: permissions.location,
@@ -149,10 +160,12 @@ export default function HomeScreen() {
           console.log('[HomeScreen] All permissions granted or user dismissed modal, skipping modal');
         }
         
-        // Try to get location but don't fail if it doesn't work
-        handleLocationPermission().catch(error => {
-          console.error('Location initialization failed:', error);
-        });
+        // Try to get location but don't fail if it doesn't work (only if weather feature enabled)
+        if (FEATURES.WEATHER_INTEGRATION) {
+          handleLocationPermission().catch(error => {
+            console.error('Location initialization failed:', error);
+          });
+        }
       } catch (error) {
         console.error('App initialization error:', error);
       } finally {
@@ -263,29 +276,31 @@ export default function HomeScreen() {
         <Text style={styles.date}>{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</Text>
       </View>
 
-      {/* Savings Counter */}
-      <SavingsCounter
-        totalSaved={savings?.total.amount || 0}
-        monthlyTarget={savings?.monthly.target || 100}
-        monthlySaved={savings?.monthly.amount || 0}
-        todaySaved={savings?.today?.amount || 0}
-        onPress={() => {
-          // Navigate to subscription screen for now since /savings doesn't exist
-          router.push('/subscription');
-        }}
-        onUpgradePress={() => setShowUpgradeModal(true)}
-        userPlan={subscription?.plan as 'free' | 'pro' | 'premium'}
-        hasAccess={subscription?.isPro || false}
-        style={styles.savingsCounter}
-      />
+      {/* Savings Counter - Only show if feature enabled */}
+      {savingsEnabled && (
+        <SavingsCounter
+          totalSaved={savings?.total.amount || 0}
+          monthlyTarget={savings?.monthly.target || 100}
+          monthlySaved={savings?.monthly.amount || 0}
+          todaySaved={savings?.today?.amount || 0}
+          onPress={() => {
+            // Navigate to subscription screen for now since /savings doesn't exist
+            router.push('/subscription');
+          }}
+          onUpgradePress={() => setShowUpgradeModal(true)}
+          userPlan={subscription?.plan as 'free' | 'pro' | 'premium'}
+          hasAccess={subscription?.isPro || false}
+          style={styles.savingsCounter}
+        />
+      )}
 
-      {/* Weather Card */}
-      {weather && (
+      {/* Weather Card - Only show if feature enabled */}
+      {weatherEnabled && weather && (
         <WeatherCard weather={weather} style={styles.weatherCard} />
       )}
 
-      {/* Expensive Store Alert */}
-      {nearbyStores && nearbyStores.length > 0 && showStoreAlert && (
+      {/* Expensive Store Alert - Only show if feature enabled */}
+      {weatherEnabled && nearbyStores && nearbyStores.length > 0 && showStoreAlert && (
         <ExpensiveStoreAlert 
           stores={nearbyStores} 
           onDismiss={() => setShowStoreAlert(false)}

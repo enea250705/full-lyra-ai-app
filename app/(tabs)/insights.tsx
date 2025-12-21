@@ -38,6 +38,11 @@ export default function InsightsScreen() {
     try {
       await refreshMoodEntries(); // Refresh mood entries first
       await refreshData();
+      // Also refresh comprehensive weather/mood data when location is available
+      if (user?.id && location && moodData.length > 0) {
+        const latestMood = moodData[0]?.value || 5;
+        await getComprehensiveData(latestMood, location.latitude, location.longitude);
+      }
     } catch (error) {
       console.error('[InsightsScreen] Refresh error:', error);
     } finally {
@@ -158,14 +163,6 @@ export default function InsightsScreen() {
           <Text style={styles.sectionTitle}>{t('insights.screen.weather_location')}</Text>
           <ComprehensiveInsights userId={user?.id || ''} />
           
-          {/* Mood & Weather Correlation Chart */}
-          {moodData.length > 0 && (
-            <SimpleMoodWeatherChart
-              moodData={moodData}
-              weatherData={weatherData}
-              title="Mood & Weather Analysis"
-            />
-          )}
         </View>
       )}
 

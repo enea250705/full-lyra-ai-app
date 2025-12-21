@@ -4,7 +4,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/Button';
-import { GoogleSignInButton } from '../../components/ui/GoogleSignInButton';
 import { colors } from '../../constants/colors';
 import { useI18n } from '../../i18n';
 
@@ -166,19 +165,6 @@ export default function Register() {
                 />
               </LinearGradient>
 
-              {/* Divider */}
-              <View style={styles.divider}>
-                <View style={styles.dividerLine} />
-                <Text style={styles.dividerText}>{t('auth.register.divider_or')}</Text>
-                <View style={styles.dividerLine} />
-              </View>
-
-              {/* Google Sign-In Button */}
-              <GoogleSignInButton
-                buttonText={t('auth.google.sign_up_with_google')}
-                onSuccess={() => router.replace('/(tabs)')}
-                disabled={isLoading}
-              />
             </View>
             
             <View style={styles.footer}>

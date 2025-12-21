@@ -18,6 +18,7 @@ import { useI18n } from '../../i18n';
 import { apiService } from '../../services/api';
 import * as WebBrowser from 'expo-web-browser';
 import { useGoogleFit } from '../../hooks/useGoogleFit';
+import { FEATURES } from '@/constants/features';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -192,9 +193,13 @@ export default function SettingsScreen() {
     updateSettings({ voiceStyle: style });
   };
 
-  const handleSaveName = () => {
-    if (name.trim()) {
-      updateSettings({ name: name.trim() });
+  const handleSaveName = async () => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    try {
+      await updateSettings({ name: trimmed });
+    } catch (e) {
+      console.warn('[Settings] Failed to save name', e);
     }
   };
 
@@ -453,77 +458,7 @@ export default function SettingsScreen() {
         </Pressable>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t('settings.api_connections')}</Text>
-        
-        <View style={styles.settingItem}>
-          <View style={styles.settingLabelContainer}>
-            <Calendar size={20} color={colors.midnightBlue} />
-            <Text style={styles.settingLabel}>{t('settings.google_calendar')}</Text>
-            {/* Lock removed - all features free during launch */}
-          </View>
-          <Switch
-            value={safeSettings.connectedApis.googleCalendar}
-            onValueChange={() => handleToggleApi('googleCalendar')}
-            trackColor={{ false: colors.gray[300], true: colors.lightPurple }}
-            thumbColor={safeSettings.connectedApis.googleCalendar ? colors.midnightBlue : colors.gray[100]}
-          />
-        </View>
-        
-        <View style={styles.settingItem}>
-          <View style={styles.settingLabelContainer}>
-            <Activity size={20} color={colors.midnightBlue} />
-            <Text style={styles.settingLabel}>{t('settings.apple_health')}</Text>
-            {/* Lock removed - all features free during launch */}
-          </View>
-          <Switch
-            value={safeSettings.connectedApis.appleHealth}
-            onValueChange={() => handleToggleApi('appleHealth')}
-            trackColor={{ false: colors.gray[300], true: colors.lightPurple }}
-            thumbColor={safeSettings.connectedApis.appleHealth ? colors.midnightBlue : colors.gray[100]}
-          />
-        </View>
-        {/* Google Fit status & actions (Android parity) */}
-        <View style={styles.settingItem}>
-          <View style={styles.settingLabelContainer}>
-            <Activity size={20} color={colors.midnightBlue} />
-            <Text style={styles.settingLabel}>Google Fit</Text>
-          </View>
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <Button
-              title={googleFit.isConnected ? 'Disconnect' : (googleFit.isConnecting ? 'Connecting...' : 'Connect')}
-              onPress={async () => {
-                if (googleFit.isConnected) {
-                  await googleFit.disconnectGoogleFit();
-                } else {
-                  await googleFit.connectGoogleFit();
-                }
-                await googleFit.refreshStatus();
-              }}
-              variant="outline"
-            />
-            <Button
-              title={googleFit.isSyncing ? 'Syncing...' : 'Sync Now'}
-              onPress={async () => { await googleFit.syncGoogleFitData(30); await googleFit.refreshStatus(); }}
-              variant="outline"
-            />
-          </View>
-        </View>
-        
-        <View style={styles.settingItem}>
-          <View style={styles.settingLabelContainer}>
-            <DollarSign size={20} color={colors.midnightBlue} />
-            <Text style={styles.settingLabel}>{t('settings.plaid')}</Text>
-            {/* Lock removed - all features free during launch */}
-          </View>
-          <Switch
-            value={safeSettings.connectedApis.plaid}
-            onValueChange={() => handleToggleApi('plaid')}
-            trackColor={{ false: colors.gray[300], true: colors.lightPurple }}
-            thumbColor={safeSettings.connectedApis.plaid ? colors.midnightBlue : colors.gray[100]}
-          />
-        </View>
-      </View>
+      {/* API Connections removed for MVP */}
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t('settings.enabled_modules')}</Text>

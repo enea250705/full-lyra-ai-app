@@ -27,13 +27,26 @@ interface WeatherCardProps {
   style?: any;
 }
 
+// Normalize backend weather types to translation/icon keys
+const normalizeWeatherType = (raw: string) => {
+  const t = raw.toLowerCase();
+  if (t.includes('clear')) return 'sunny';
+  if (t.includes('cloud')) return 'cloudy';
+  if (t.includes('rain') || t.includes('drizzle')) return 'rainy';
+  if (t.includes('snow')) return 'snowy';
+  if (t.includes('thunder') || t.includes('storm')) return 'stormy';
+  if (t.includes('fog') || t.includes('mist') || t.includes('haze') || t.includes('smoke')) return 'foggy';
+  return t;
+};
+
 const getWeatherIcon = (weatherType: string, size: number = 24) => {
-  switch (weatherType.toLowerCase()) {
-    case 'clear':
+  const t = normalizeWeatherType(weatherType);
+  switch (t) {
+    case 'sunny':
       return <Sun size={size} color="#FFD700" />;
-    case 'clouds':
+    case 'cloudy':
       return <Cloud size={size} color="#87CEEB" />;
-    case 'rain':
+    case 'rainy':
       return <CloudRain size={size} color="#4682B4" />;
     default:
       return <Cloud size={size} color="#87CEEB" />;
@@ -41,13 +54,20 @@ const getWeatherIcon = (weatherType: string, size: number = 24) => {
 };
 
 const getWeatherGradient = (weatherType: string) => {
-  switch (weatherType.toLowerCase()) {
-    case 'clear':
+  const t = normalizeWeatherType(weatherType);
+  switch (t) {
+    case 'sunny':
       return ['#FFD700', '#FFA500'];
-    case 'clouds':
+    case 'cloudy':
       return ['#87CEEB', '#4682B4'];
-    case 'rain':
+    case 'rainy':
       return ['#4682B4', '#2F4F4F'];
+    case 'snowy':
+      return ['#BEE9FF', '#6BA6D6'];
+    case 'stormy':
+      return ['#4A5568', '#2D3748'];
+    case 'foggy':
+      return ['#CBD5E0', '#A0AEC0'];
     default:
       return ['#87CEEB', '#4682B4'];
   }
@@ -55,7 +75,8 @@ const getWeatherGradient = (weatherType: string) => {
 
 const WeatherCard: React.FC<WeatherCardProps> = ({ weather, style }) => {
   const { t } = useI18n();
-  const gradient = getWeatherGradient(weather.weatherType);
+  const normalizedType = normalizeWeatherType(weather.weatherType);
+  const gradient = getWeatherGradient(normalizedType);
 
   return (
     <LinearGradient
@@ -70,13 +91,15 @@ const WeatherCard: React.FC<WeatherCardProps> = ({ weather, style }) => {
           <Text style={styles.country}>{weather.location.country}</Text>
         </View>
         <View style={styles.weatherIcon}>
-          {getWeatherIcon(weather.weatherType, 32)}
+          {getWeatherIcon(normalizedType, 32)}
         </View>
       </View>
 
       <View style={styles.temperatureContainer}>
         <Text style={styles.temperature}>{Math.round(weather.temperature)}°C</Text>
-        <Text style={styles.weatherType}>{t(`weather.type_${weather.weatherType.toLowerCase()}`)}</Text>
+        <Text style={styles.weatherType}>
+          {t(`weather.type_${normalizedType}`) || normalizedType}
+        </Text>
       </View>
 
       <View style={styles.detailsContainer}>
