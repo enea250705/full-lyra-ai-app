@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>LyraAILifeCompanion.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>arm64</string>
+			</array>
+			<key>buildNumber</key>
+			<string>2</string>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>9EBC8E4078DB6440148074FBC890729BF239BFEC</string>
+				<key>dateExpires</key>
+				<string>21/12/2026</string>
+				<key>type</key>
+				<string>Cloud Managed Apple Distribution</string>
+			</dict>
+			<key>embeddedBinaries</key>
+			<array>
+				<dict>
+					<key>architectures</key>
+					<array>
+						<string>arm64</string>
+					</array>
+					<key>buildNumber</key>
+					<string>0.12.0</string>
+					<key>certificate</key>
+					<dict>
+						<key>SHA1</key>
+						<string>9EBC8E4078DB6440148074FBC890729BF239BFEC</string>
+						<key>dateExpires</key>
+						<string>21/12/2026</string>
+						<key>type</key>
+						<string>Cloud Managed Apple Distribution</string>
+					</dict>
+					<key>name</key>
+					<string>hermes.framework</string>
+					<key>symbols</key>
+					<true/>
+					<key>team</key>
+					<dict>
+						<key>id</key>
+						<string>3V28XJ2KVM</string>
+						<key>name</key>
+						<string>ENEA MUJA</string>
+					</dict>
+					<key>versionNumber</key>
+					<string>0.12.0</string>
+				</dict>
+			</array>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>3V28XJ2KVM.com.getlyra.app</string>
+				<key>aps-environment</key>
+				<string>production</string>
+				<key>beta-reports-active</key>
+				<true/>
+				<key>com.apple.developer.healthkit</key>
+				<true/>
+				<key>com.apple.developer.healthkit.access</key>
+				<array>
+					<string>health-records</string>
+				</array>
+				<key>com.apple.developer.healthkit.background-delivery</key>
+				<true/>
+				<key>com.apple.developer.healthkit.recalibrate-estimates</key>
+				<true/>
+				<key>com.apple.developer.team-identifier</key>
+				<string>3V28XJ2KVM</string>
+				<key>get-task-allow</key>
+				<false/>
+			</dict>
+			<key>name</key>
+			<string>LyraAILifeCompanion.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>6ebde1e1-4122-4fa8-a354-dddbea96d42c</string>
+				<key>dateExpires</key>
+				<string>21/12/2026</string>
+				<key>name</key>
+				<string>iOS Team Store Provisioning Profile: com.getlyra.app</string>
+			</dict>
+			<key>symbols</key>
+			<true/>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>3V28XJ2KVM</string>
+				<key>name</key>
+				<string>ENEA MUJA</string>
+			</dict>
+			<key>versionNumber</key>
+			<string>1.0.0</string>
+		</dict>
+	</array>
+</dict>
+</plist>

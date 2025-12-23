@@ -17,14 +17,12 @@ import { User, Calendar, Activity, DollarSign, Trash2, Download, VolumeX, Volume
 import { useI18n } from '../../i18n';
 import { apiService } from '../../services/api';
 import * as WebBrowser from 'expo-web-browser';
-import { useGoogleFit } from '../../hooks/useGoogleFit';
 import { FEATURES } from '@/constants/features';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { settings, updateSettings, loading: userDataLoading, notificationSettings, updateNotificationSettings, refreshData } = useUserData();
   const { t, languages, setLocale, locale } = useI18n();
-  const googleFit = useGoogleFit();
   const { 
     healthKitAvailable, 
     healthKitEnabled, 
