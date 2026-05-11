@@ -1,4 +1,4 @@
--- Lyra AI Backend - PostgreSQL Database Schema
+-- Northstar AI Backend - PostgreSQL Database Schema
 -- Complete database schema for personal life operating system
 
 -- Users table

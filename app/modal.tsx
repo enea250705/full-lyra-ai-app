@@ -13,20 +13,20 @@ export default function ModalScreen() {
       <StatusBar style="dark" />
       
       <View style={styles.header}>
-        <Text style={styles.title}>About Lyra</Text>
+        <Text style={styles.title}>About Northstar</Text>
         <Text style={styles.subtitle}>Your Personal Life Operating System</Text>
       </View>
       
       <View style={styles.imageContainer}>
         <View style={styles.logoPlaceholder}>
-          <Text style={styles.logoText}>Lyra</Text>
+          <Text style={styles.logoText}>Northstar</Text>
         </View>
       </View>
       
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Our Mission</Text>
         <Text style={styles.sectionText}>
-          Lyra helps you live with clarity, alignment, and peace by offering intelligent, 
+          Northstar helps you live with clarity, alignment, and peace by offering intelligent, 
           emotional daily support. We believe in creating technology that enhances your 
           wellbeing and helps you make better decisions.
         </Text>
@@ -45,7 +45,7 @@ export default function ModalScreen() {
         <View style={styles.featureItem}>
           <Text style={styles.featureTitle}>AI Companion</Text>
           <Text style={styles.featureText}>
-            Chat with Lyra for support, guidance, and reflection on your daily experiences.
+            Chat with Northstar for support, guidance, and reflection on your daily experiences.
           </Text>
         </View>
         
@@ -82,7 +82,7 @@ export default function ModalScreen() {
       </View>
       
       <View style={styles.footer}>
-        <Text style={styles.footerText}>© 2025 Lyra AI • All Rights Reserved</Text>
+        <Text style={styles.footerText}>© 2025 Northstar AI • All Rights Reserved</Text>
       </View>
     </ScrollView>
   );

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Lyra - AI Life Companion",
-    "slug": "lyra-personal-life-operating-system",
+    "name": "Northstar - Your AI Operating System",
+    "slug": "northstar-personal-life-operating-system",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "myapp",
@@ -13,7 +13,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.getlyra.app",
+      "bundleIdentifier": "com.getnorthstar.app",
       "buildNumber": "2",
       "entitlements": {
         "com.apple.developer.healthkit": true,
@@ -24,12 +24,12 @@
         "aps-environment": "development"
       },
       "infoPlist": {
-        "NSHealthShareUsageDescription": "Lyra needs access to your sleep data to provide personalized insights and track your sleep patterns automatically.",
-        "NSHealthUpdateUsageDescription": "Lyra wants to save sleep data to your Health app to keep your health information synchronized.",
+        "NSHealthShareUsageDescription": "Northstar needs access to your sleep data to provide personalized insights and track your sleep patterns automatically.",
+        "NSHealthUpdateUsageDescription": "Northstar wants to save sleep data to your Health app to keep your health information synchronized.",
         "ITSAppUsesNonExemptEncryption": false,
-        "NSLocationWhenInUseUsageDescription": "Lyra uses your location to provide weather insights and location-based recommendations.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "Lyra uses your location to provide weather insights and location-based recommendations.",
-        "NSUserNotificationsUsageDescription": "Lyra sends you personalized reminders and insights about your sleep patterns, mood tracking, and wellness goals."
+        "NSLocationWhenInUseUsageDescription": "Northstar uses your location to provide weather insights and location-based recommendations.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Northstar uses your location to provide weather insights and location-based recommendations.",
+        "NSUserNotificationsUsageDescription": "Northstar sends you personalized reminders and insights about your sleep patterns, mood tracking, and wellness goals."
       }
     },
     "android": {
@@ -37,7 +37,7 @@
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#111111"
       },
-      "package": "com.getlyra.app",
+      "package": "com.getnorthstar.app",
       "versionCode": 2,
       "permissions": [
         "ACCESS_FINE_LOCATION",
@@ -50,6 +50,7 @@
     "plugins": [
       "expo-router",
       "expo-web-browser",
+      "expo-apple-authentication",
       [
         "expo-notifications",
         {
@@ -60,8 +61,8 @@
       [
         "@kingstinct/react-native-healthkit",
         {
-          "NSHealthShareUsageDescription": "Lyra needs access to your sleep data to provide personalized insights and track your sleep patterns automatically.",
-          "NSHealthUpdateUsageDescription": "Lyra wants to save sleep data to your Health app to keep your health information synchronized.",
+          "NSHealthShareUsageDescription": "Northstar needs access to your sleep data to provide personalized insights and track your sleep patterns automatically.",
+          "NSHealthUpdateUsageDescription": "Northstar wants to save sleep data to your Health app to keep your health information synchronized.",
           "background": true
         }
       ]

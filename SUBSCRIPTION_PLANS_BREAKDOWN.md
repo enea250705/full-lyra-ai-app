@@ -1,4 +1,4 @@
-# 🎯 Lyra AI Subscription Plans Breakdown
+# 🎯 Northstar AI Subscription Plans Breakdown
 
 ## 📋 **Plan Comparison Overview**
 
@@ -45,7 +45,7 @@
 - **Mood-Spending Correlation** - Understand when emotions trigger overspending
 - **Calendar Management** - Reschedule when tired/overwhelmed
 - **Push Notifications** - Real-time intervention alerts
-- **Savings Counter** - Track exactly how much Lyra saved you
+- **Savings Counter** - Track exactly how much Northstar saved you
 
 ### 📊 **Enhanced Limits:**
 - **180 days data retention** (vs 30 days)

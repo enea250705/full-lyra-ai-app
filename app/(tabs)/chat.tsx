@@ -46,7 +46,7 @@ export default function ChatScreen() {
     // Add user message immediately
     await addMessage(messageText, 'user');
     
-    // Simulate Lyra thinking
+    // Simulate Northstar thinking
     setIsLoading(true);
     
     try {
@@ -95,7 +95,7 @@ export default function ChatScreen() {
               featureName: `${actionInfo.requiredPlan?.toUpperCase()} Feature`
             });
             setShowUpgradeModal(true);
-            await addMessage(actionInfo.message, 'lyra');
+            await addMessage(actionInfo.message, 'northstar');
             return;
           }
           
@@ -108,7 +108,7 @@ export default function ChatScreen() {
                 {
                   text: t('common.cancel'),
                   style: 'cancel',
-                  onPress: () => addMessage(t('chat.action_cancelled'), 'lyra'),
+                  onPress: () => addMessage(t('chat.action_cancelled'), 'northstar'),
                 },
                 {
                   text: t('common.confirm'),
@@ -133,13 +133,13 @@ export default function ChatScreen() {
 
                       const confirmData = await confirmResponse.json();
                       if (confirmData.success) {
-                        await addMessage(confirmData.message || t('chat.action_completed'), 'lyra');
+                        await addMessage(confirmData.message || t('chat.action_completed'), 'northstar');
                       } else {
-                        await addMessage(t('chat.action_failed'), 'lyra');
+                        await addMessage(t('chat.action_failed'), 'northstar');
                       }
                     } catch (error) {
                       console.error('Action confirmation error:', error);
-                      await addMessage(t('chat.action_failed'), 'lyra');
+                      await addMessage(t('chat.action_failed'), 'northstar');
                     }
                   },
                 },
@@ -147,11 +147,11 @@ export default function ChatScreen() {
             );
           } else {
             // Action was executed directly, show the response
-            await addMessage(aiResponse, 'lyra');
+            await addMessage(aiResponse, 'northstar');
           }
         } else {
           // Regular chat response
-          await addMessage(aiResponse, 'lyra');
+          await addMessage(aiResponse, 'northstar');
         }
       } else {
         throw new Error('Invalid response format from AI');
@@ -175,7 +175,7 @@ export default function ChatScreen() {
         fallbackResponse = t('chat.fallback_generic');
       }
       
-      await addMessage(fallbackResponse, 'lyra');
+      await addMessage(fallbackResponse, 'northstar');
     } finally {
       setIsLoading(false);
     }
@@ -272,7 +272,7 @@ export default function ChatScreen() {
       if (apiResponse) {
         const data = await apiResponse.json();
         if (data.success) {
-          await addMessage(data.data?.message || '🎉 Great job! Your savings have been recorded.', 'lyra');
+          await addMessage(data.data?.message || '🎉 Great job! Your savings have been recorded.', 'northstar');
         } else {
           // Check if error is due to upgrade requirement
           if (data.data && Array.isArray(data.data) && data.data[0]?.upgradeRequired) {
@@ -281,7 +281,7 @@ export default function ChatScreen() {
               featureName: 'Savings Tracking'
             });
             setShowUpgradeModal(true);
-            await addMessage(data.error || 'This feature requires a Pro plan upgrade.', 'lyra');
+            await addMessage(data.error || 'This feature requires a Pro plan upgrade.', 'northstar');
             return;
           }
           throw new Error(data.error || 'Failed to record savings');
@@ -475,7 +475,7 @@ export default function ChatScreen() {
               style={styles.input}
               value={inputText}
               onChangeText={setInputText}
-              placeholder="Message Lyra..."
+              placeholder="Message Northstar..."
               placeholderTextColor="#94A3B8"
               multiline
               maxLength={500}

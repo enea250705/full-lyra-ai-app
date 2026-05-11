@@ -1,8 +1,8 @@
-# 🚀 LYRA AI - COMPLETE SETUP INSTRUCTIONS
+# 🚀 NORTHSTAR AI - COMPLETE SETUP INSTRUCTIONS
 
 ## 🎯 YOU'RE ALMOST DONE! 
 
-Your Lyra AI app is **100% complete** with **full backend-frontend connection**. You only need to add environment variables!
+Your Northstar AI app is **100% complete** with **full backend-frontend connection**. You only need to add environment variables!
 
 ---
 
@@ -220,4 +220,4 @@ expo start --port 8081
 - **Security**: ✅ Enterprise-grade security and encryption
 - **Documentation**: ✅ Complete API and setup documentation
 
-**Your Lyra AI app is ready to change users' lives!** 🚀
+**Your Northstar AI app is ready to change users' lives!** 🚀

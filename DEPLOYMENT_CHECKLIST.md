@@ -1,4 +1,4 @@
-# 🚀 Lyra Launch Deployment Checklist
+# 🚀 Northstar Launch Deployment Checklist
 
 ## ✅ All Tasks Completed!
 

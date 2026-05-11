@@ -125,7 +125,7 @@ const SubscriptionUpgradeModal: React.FC<SubscriptionUpgradeModalProps> = ({
         );
       } else {
         // Handle native IAP purchase
-        const productId = planId === 'pro' ? 'lyra_pro_monthly' : 'lyra_premium_monthly';
+        const productId = planId === 'pro' ? 'northstar_pro_monthly' : 'northstar_premium_monthly';
         
         Alert.alert(
           'Purchase Subscription',

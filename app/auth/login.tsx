@@ -6,11 +6,12 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/Button';
 import { colors } from '../../constants/colors';
 import { useI18n } from '../../i18n';
+import * as AppleAuthentication from 'expo-apple-authentication';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, isLoading } = useAuth();
+  const { login, loginWithApple, isLoading } = useAuth();
   const router = useRouter();
   const { t } = useI18n();
 
@@ -63,7 +64,7 @@ export default function Login() {
         <Text style={styles.starText}>⭐</Text>
       </View>
       
-      {/* Lyra Constellation Pattern */}
+      {/* Northstar Constellation Pattern */}
       <View style={styles.constellation}>
         <View style={[styles.constellationStar, { top: 80, left: 50 }]} />
         <View style={[styles.constellationStar, { top: 120, left: 100 }]} />
@@ -83,7 +84,7 @@ export default function Login() {
       >
         <View style={styles.content}>
           <View style={styles.titleContainer}>
-            <Text style={styles.lyraText}>LYRA</Text>
+            <Text style={styles.lyraText}>NORTHSTAR</Text>
             <Text style={styles.title}>{t('auth.login.title')}</Text>
             <Text style={styles.subtitle}>{t('auth.login.subtitle')}</Text>
           </View>
@@ -128,6 +129,31 @@ export default function Login() {
                 textStyle={styles.loginButtonText}
               />
             </LinearGradient>
+
+            {Platform.OS === 'ios' && (
+              <View>
+                <View style={styles.divider}>
+                  <View style={styles.dividerLine} />
+                  <Text style={styles.dividerText}>{t('auth.login.divider_or')}</Text>
+                  <View style={styles.dividerLine} />
+                </View>
+
+                <AppleAuthentication.AppleAuthenticationButton
+                  buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+                  buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                  cornerRadius={15}
+                  style={{ width: '100%', height: 55, marginTop: 5 }}
+                  onPress={async () => {
+                    try {
+                      await loginWithApple();
+                      router.replace('/(tabs)');
+                    } catch (error) {
+                      // Handled in context
+                    }
+                  }}
+                />
+              </View>
+            )}
 
           </View>
           

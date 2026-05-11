@@ -26,7 +26,7 @@ export default function AuthIndex() {
         style={styles.container}
       >
         <View style={styles.lyraContainer}>
-          <Text style={styles.lyraText}>LYRA</Text>
+          <Text style={styles.lyraText}>NORTHSTAR</Text>
         </View>
         <SafeLoadingScreen 
           type="auth"
@@ -58,7 +58,7 @@ export default function AuthIndex() {
         <Text style={styles.starText}>✨</Text>
       </View>
       
-      {/* Central Lyra Symbol */}
+      {/* Central Northstar Symbol */}
       <View style={styles.lyraSymbol}>
         <View style={styles.symbolCore} />
         <View style={[styles.symbolRing, styles.ring1]} />
@@ -84,7 +84,7 @@ export default function AuthIndex() {
       
       <View style={styles.content}>
         <View style={styles.titleContainer}>
-          <Text style={styles.lyraText}>LYRA</Text>
+          <Text style={styles.lyraText}>NORTHSTAR</Text>
           <Text style={styles.title}>{t('auth.index.welcome_title')}</Text>
           <Text style={styles.subtitle}>{t('auth.index.welcome_subtitle')}</Text>
         </View>
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 12,
   },
-  // Central Lyra Symbol
+  // Central Northstar Symbol
   lyraSymbol: {
     position: 'absolute',
     top: 100,

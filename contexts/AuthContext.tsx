@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiService } from '../services/api';
-
+import * as AppleAuthentication from 'expo-apple-authentication';
 interface User {
   id: string;
   email: string;
@@ -18,7 +18,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, firstName?: string, lastName?: string) => Promise<void>;
-  loginWithGoogle: () => Promise<void>;
+  loginWithApple: () => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (firstName?: string, lastName?: string) => Promise<void>;
   refreshUserData: () => Promise<void>;
@@ -170,22 +170,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const loginWithGoogle = async () => {
+  const loginWithApple = async () => {
     try {
       setIsLoading(true);
-      const result = await googleAuthService.signInWithGoogle();
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
       
-      if (result.success) {
-        await storeAuth(result.token, result.refreshToken, result.user);
+      const response = await apiService.handleAppleCallback(
+        credential.identityToken!,
+        credential.fullName?.givenName,
+        credential.fullName?.familyName
+      );
+      
+      if (response.success && response.data) {
+        await storeAuth(response.data.token, response.data.refreshToken, response.data.user);
         
-        // Track Google login event
-        await apiService.trackEvent('auth', 'google_login');
+        // Track Apple login event
+        await apiService.trackEvent('auth', 'apple_login');
       } else {
-        throw new Error('Google authentication failed');
+        throw new Error('Apple authentication failed on server');
       }
-    } catch (error) {
-      console.error('Google login error:', error);
-      throw error;
+    } catch (error: any) {
+      if (error.code === 'ERR_REQUEST_CANCELED') {
+        // user canceled the sign-in
+        console.log('User canceled Apple sign in');
+      } else {
+        console.error('Apple login error:', error);
+        throw error;
+      }
     } finally {
       setIsLoading(false);
     }
@@ -269,7 +285,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isAuthenticated,
     login,
     register,
-    loginWithGoogle,
+    loginWithApple,
     logout,
     updateProfile,
     refreshUserData,

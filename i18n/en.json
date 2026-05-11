@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_name": "Lyra - AI Life Companion",
+    "app_name": "Northstar - Your AI Operating System",
     "ok": "OK",
     "cancel": "Cancel",
     "confirm": "Confirm",
@@ -20,7 +20,7 @@
     "unavailable": "Unavailable",
     "not_available": "Not available",
     "something_went_wrong": "Something went wrong",
-    "support_contact": "Questions? Contact us at support@lyra-ai.com",
+    "support_contact": "Questions? Contact us at support@northstar-ai.com",
     "hour_short": "h",
     "minute_short": "m",
     "awesome": "Awesome!",
@@ -90,8 +90,8 @@
     "delete": "Delete",
     "data_deleted": "Data Deleted",
     "data_deleted_message": "All your data has been deleted.",
-    "version": "Lyra v{version}",
-    "copyright": "© {year} Lyra AI",
+    "version": "Northstar v{version}",
+    "copyright": "© {year} Northstar AI",
     "health_connected_title": "HealthKit Connected",
     "health_connected_message": "Automatic sleep tracking is now enabled. Your sleep will be detected automatically.",
     "health_failed_title": "Connection Failed",
@@ -134,7 +134,7 @@
   },
   "auth": {
     "index": {
-      "welcome_title": "Welcome to Lyra",
+      "welcome_title": "Welcome to Northstar",
       "welcome_subtitle": "Your AI-powered life companion",
       "get_started": "Get Started",
       "have_account": "I Have an Account",
@@ -159,7 +159,7 @@
     },
     "register": {
       "title": "Create Account",
-      "subtitle": "Join Lyra and start your journey",
+      "subtitle": "Join Northstar and start your journey",
       "first_name": "First Name",
       "last_name": "Last Name",
       "email_required": "Email (Required)",
@@ -198,10 +198,10 @@
     "question": "How are you feeling today?"
   },
   "permissions": {
-    "welcome_title": "Welcome to Lyra",
+    "welcome_title": "Welcome to Northstar",
     "welcome_subtitle": "To provide the best experience, we need a few permissions",
     "section_title": "Permissions Needed",
-    "section_description": "These permissions help Lyra provide personalized insights and features",
+    "section_description": "These permissions help Northstar provide personalized insights and features",
     "location_title": "Location Access",
     "location_desc": "For weather insights and location-based recommendations",
     "health_title": "Health & Sleep Data",
@@ -217,7 +217,7 @@
     "footer": "You can change these permissions anytime in Settings"
   },
   "chat": {
-    "title": "Chat with Lyra",
+    "title": "Chat with Northstar",
     "placeholder": "Ask me anything...",
     "send": "Send",
     "thinking": "Thinking...",
@@ -539,7 +539,7 @@
     "sleep_reminder_time": "Reminder Time"
   },
   "onboarding": {
-    "welcome_title": "Welcome to Lyra",
+    "welcome_title": "Welcome to Northstar",
     "welcome_subtitle": "Your AI-powered life companion",
     "step_1_title": "Personalized Insights",
     "step_1_desc": "Get AI-powered insights about your mood, sleep, and daily patterns",

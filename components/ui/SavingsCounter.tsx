@@ -75,7 +75,7 @@ const SavingsCounter: React.FC<SavingsCounterProps> = ({
           <View style={styles.upgradeSection}>
             <Text style={styles.upgradeTitle}>Track Your Savings!</Text>
             <Text style={styles.upgradeDescription}>
-              See how much money Lyra helps you save with AI-powered spending insights and real-time tracking.
+              See how much money Northstar helps you save with AI-powered spending insights and real-time tracking.
             </Text>
           </View>
 
@@ -118,7 +118,7 @@ const SavingsCounter: React.FC<SavingsCounterProps> = ({
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <PiggyBank size={24} color="white" />
-            <Text style={styles.headerTitle}>Lyra Saved You</Text>
+            <Text style={styles.headerTitle}>Northstar Saved You</Text>
           </View>
           <TrendingUp size={20} color="white" />
         </View>

@@ -87,9 +87,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.getlyra.app'
+    namespace 'com.getnorthstar.app'
     defaultConfig {
-        applicationId 'com.getlyra.app'
+        applicationId 'com.getnorthstar.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

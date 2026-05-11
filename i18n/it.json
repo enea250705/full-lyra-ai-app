@@ -1,6 +1,6 @@
 {
   "common": {
-    "app_name": "Lyra - Compagna di Vita IA",
+    "app_name": "Northstar - Compagna di Vita IA",
     "ok": "OK",
     "cancel": "Annulla",
     "confirm": "Conferma",
@@ -20,7 +20,7 @@
     "unavailable": "Non disponibile",
     "not_available": "Non disponibile",
     "something_went_wrong": "Qualcosa è andato storto",
-    "support_contact": "Domande? Contattaci su support@lyra-ai.com",
+    "support_contact": "Domande? Contattaci su support@northstar-ai.com",
     "hour_short": "h",
     "minute_short": "m",
     "awesome": "Fantastico!",
@@ -62,7 +62,7 @@
     },
     "register": {
       "title": "Crea account",
-      "subtitle": "Inizia il tuo percorso di benessere con Lyra",
+      "subtitle": "Inizia il tuo percorso di benessere con Northstar",
       "first_name": "Nome",
       "last_name": "Cognome",
       "email_required": "Email *",
@@ -97,10 +97,10 @@
     "great": "Benissimo"
   },
   "permissions": {
-    "welcome_title": "Benvenuto su Lyra",
+    "welcome_title": "Benvenuto su Northstar",
     "welcome_subtitle": "Configuriamo la tua esperienza personalizzata",
     "section_title": "Permessi",
-    "section_description": "Questi permessi aiutano Lyra a offrire migliori approfondimenti e raccomandazioni",
+    "section_description": "Questi permessi aiutano Northstar a offrire migliori approfondimenti e raccomandazioni",
     "location_title": "Accesso alla posizione",
     "location_desc": "Ottieni meteo e raccomandazioni basate sulla posizione",
     "health_title": "Salute e monitoraggio del sonno",
@@ -114,9 +114,9 @@
     "request_failed_title": "Richiesta permessi non riuscita",
     "request_failed_message": "Alcuni permessi non possono essere richiesti ora. Puoi abilitarli più tardi in Impostazioni.",
     "granted_title": "Permessi concessi ✅",
-    "granted_message": "Ottimo! Hai concesso l’accesso a: {list}. Questo aiuterà Lyra a fornire approfondimenti personalizzati.",
+    "granted_message": "Ottimo! Hai concesso l’accesso a: {list}. Questo aiuterà Northstar a fornire approfondimenti personalizzati.",
     "denied_title": "Alcuni permessi negati",
-    "denied_message": "Puoi comunque usare Lyra, ma alcune funzionalità potrebbero essere limitate. Puoi abilitarle più tardi in Impostazioni:\n\n{list}"
+    "denied_message": "Puoi comunque usare Northstar, ma alcune funzionalità potrebbero essere limitate. Puoi abilitarle più tardi in Impostazioni:\n\n{list}"
   },
   "chat": {
     "confirm_action_title": "Conferma azione",
@@ -129,9 +129,9 @@
     "feedback_message": "Grazie per il tuo {reaction}! Questo mi aiuta a migliorare.",
     "fallback_mood": "Vedo che oggi ti senti {mood}. Vorrei aiutarti, ma al momento ho problemi di connessione. Riprova tra poco.",
     "fallback_anxiety": "Capisco che ti senti ansioso. Prova la respirazione: inspira 4 secondi, trattieni 4, espira 4. Sto avendo problemi ma torno presto.",
-    "fallback_get_started": "Benvenuto su Lyra! 🎉 Inizia impostando il tuo umore nella schermata principale. Tornerò presto a pieno regime.",
+    "fallback_get_started": "Benvenuto su Northstar! 🎉 Inizia impostando il tuo umore nella schermata principale. Tornerò presto a pieno regime.",
     "fallback_generic": "Sto riscontrando problemi tecnici, ma sono qui per te. Riprova tra poco!",
-    "input_placeholder": "Scrivi a Lyra...",
+    "input_placeholder": "Scrivi a Northstar...",
     "voice_message": "Messaggio vocale"
   },
   "home": {
@@ -146,7 +146,7 @@
     "todays_focus": "Focus di oggi",
     "default_focus": "Prenditi un momento per riflettere e fissare le intenzioni della giornata.",
     "weather_recommendation": "Raccomandazione meteo",
-    "start_day_with_lyra": "Inizia la giornata con Lyra",
+    "start_day_with_lyra": "Inizia la giornata con Northstar",
     "recent_insights": "Approfondimenti recenti",
     "sleep_pattern": "Schema del sonno",
     "sleep_pattern_desc": "Il tuo sonno è stato costante questa settimana. Continua così!",
@@ -158,12 +158,12 @@
   "savings": {
     "locked_title": "Monitoraggio risparmi",
     "locked_cta": "✨ Passa a Pro - Inizia a risparmiare ora!",
-    "locked_desc": "Scopri quanto denaro Lyra ti aiuta a risparmiare con approfondimenti basati sull’IA e monitoraggio in tempo reale.",
+    "locked_desc": "Scopri quanto denaro Northstar ti aiuta a risparmiare con approfondimenti basati sull’IA e monitoraggio in tempo reale.",
     "feature_realtime": "Monitoraggio risparmi in tempo reale",
     "feature_monthly": "Obiettivi mensili e analisi",
     "feature_ai": "Approfondimenti sulla spesa con IA",
-    "card_title": "Lyra ti ha fatto risparmiare",
-    "saved_you": "Lyra ti ha fatto risparmiare",
+    "card_title": "Northstar ti ha fatto risparmiare",
+    "saved_you": "Northstar ti ha fatto risparmiare",
     "badge_total": "Totale",
     "today": "Oggi: €{amount}",
     "month": "Questo mese: €{amount}",
@@ -202,7 +202,7 @@
       "support": "Supporto",
       "need_help": "Hai bisogno di aiuto?",
       "support_24_7": "Supporto 24/7 dal nostro team",
-      "footer_contact": "Domande? Contattaci su support@lyra-ai.com"
+      "footer_contact": "Domande? Contattaci su support@northstar-ai.com"
     },
     "choose_plan": "Scegli il tuo piano",
     "unlock_feature": "Sblocca {featureName} e funzionalità premium",
@@ -431,8 +431,8 @@
     "delete": "Elimina",
     "data_deleted": "Dati eliminati",
     "data_deleted_message": "Tutti i tuoi dati sono stati eliminati.",
-    "version": "Lyra v{version}",
-    "copyright": "© {year} Lyra AI",
+    "version": "Northstar v{version}",
+    "copyright": "© {year} Northstar AI",
     "health_connected_title": "HealthKit connesso",
     "health_connected_message": "Il monitoraggio automatico del sonno è ora abilitato. Il tuo sonno verrà rilevato automaticamente.",
     "health_failed_title": "Connessione non riuscita",

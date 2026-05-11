@@ -22,12 +22,12 @@ import apiService from './api';
 // Product IDs - these must match exactly what you set up in App Store Connect and Google Play Console
 export const SUBSCRIPTION_SKUS = Platform.select({
   ios: [
-    'lyra_pro_monthly',     // iOS: com.lyra.ai.pro.monthly
-    'lyra_premium_monthly', // iOS: com.lyra.ai.premium.monthly
+    'northstar_pro_monthly',     // iOS: com.lyra.ai.pro.monthly
+    'northstar_premium_monthly', // iOS: com.lyra.ai.premium.monthly
   ],
   android: [
-    'lyra_pro_monthly',     // Android: lyra_pro_monthly
-    'lyra_premium_monthly', // Android: lyra_premium_monthly
+    'northstar_pro_monthly',     // Android: northstar_pro_monthly
+    'northstar_premium_monthly', // Android: northstar_premium_monthly
   ],
 }) || [];
 

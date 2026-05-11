@@ -35,7 +35,7 @@ Add HealthKit configuration to your `app.json`:
 ```json
 {
   "expo": {
-    "name": "Lyra - Personal Life Operating System",
+    "name": "Northstar - Personal Life Operating System",
     "slug": "lyra-personal-life-operating-system",
     "ios": {
       "supportsTablet": true,
@@ -47,9 +47,9 @@ Add HealthKit configuration to your `app.json`:
         ]
       },
       "infoPlist": {
-        "NSHealthShareUsageDescription": "Lyra needs access to your sleep data to provide personalized insights and track your sleep patterns automatically.",
-        "NSHealthUpdateUsageDescription": "Lyra wants to save sleep data to your Health app to keep your health information synchronized.",
-        "NSHealthClinicalHealthRecordsShareUsageDescription": "Lyra may access your health records to provide comprehensive health insights."
+        "NSHealthShareUsageDescription": "Northstar needs access to your sleep data to provide personalized insights and track your sleep patterns automatically.",
+        "NSHealthUpdateUsageDescription": "Northstar wants to save sleep data to your Health app to keep your health information synchronized.",
+        "NSHealthClinicalHealthRecordsShareUsageDescription": "Northstar may access your health records to provide comprehensive health insights."
       }
     }
   }
@@ -133,17 +133,17 @@ Add these detailed descriptions to ensure App Store approval:
 
 ### NSHealthShareUsageDescription
 ```
-"Lyra needs access to your sleep data to provide personalized insights and track your sleep patterns automatically. This helps you understand your sleep quality and receive recommendations for better rest."
+"Northstar needs access to your sleep data to provide personalized insights and track your sleep patterns automatically. This helps you understand your sleep quality and receive recommendations for better rest."
 ```
 
 ### NSHealthUpdateUsageDescription
 ```
-"Lyra wants to save sleep data to your Health app to keep your health information synchronized across all your devices and apps."
+"Northstar wants to save sleep data to your Health app to keep your health information synchronized across all your devices and apps."
 ```
 
 ### Optional: NSHealthClinicalHealthRecordsShareUsageDescription
 ```
-"Lyra may access your health records to provide comprehensive health insights when you choose to share this information."
+"Northstar may access your health records to provide comprehensive health insights when you choose to share this information."
 ```
 
 ---
@@ -161,10 +161,10 @@ eas build --profile development --platform ios
 1. Open **Health app** on iPhone
 2. Go to **Health Data** → **Sleep**
 3. Add some sample sleep data manually
-4. Grant permissions when Lyra requests them
+4. Grant permissions when Northstar requests them
 
 ### 6.3 Test Permission Flow
-1. Open Lyra app
+1. Open Northstar app
 2. Go to **Settings** → **Sleep Tracking**
 3. Tap **Connect Apple Health**
 4. Allow permissions in HealthKit dialog
@@ -230,7 +230,7 @@ eas submit --platform ios
 - [ ] Development build installs on device
 - [ ] HealthKit permission dialog appears
 - [ ] Sleep data can be read from Health app
-- [ ] Sleep data syncs to Lyra backend
+- [ ] Sleep data syncs to Northstar backend
 - [ ] Background sync works (test by sleeping)
 
 ### App Store Submission Checklist
@@ -246,7 +246,7 @@ eas submit --platform ios
 
 ### Permission Issues
 - **Problem**: HealthKit permissions denied
-- **Solution**: Check Health app → Privacy → Apps → Lyra
+- **Solution**: Check Health app → Privacy → Apps → Northstar
 
 ### Build Issues
 - **Problem**: HealthKit entitlement errors
@@ -298,7 +298,7 @@ The app requests access to these HealthKit data types:
 
 ## 🎉 Congratulations!
 
-Once configured, your Lyra AI app will have:
+Once configured, your Northstar AI app will have:
 - ✅ Automatic sleep tracking via HealthKit
 - ✅ Sleep stages detection (light, deep, REM)
 - ✅ Heart rate monitoring during sleep

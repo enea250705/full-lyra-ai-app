@@ -74,7 +74,7 @@ function RootLayoutNav() {
                     name="modal" 
                     options={{ 
                       presentation: "modal",
-                      title: "About Lyra"
+                      title: "About Northstar"
                     }} 
                   />
                 </Stack>

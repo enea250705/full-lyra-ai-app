@@ -301,24 +301,15 @@ class ApiService {
     });
   }
 
-  // Google OAuth API
-  async getGoogleAuthUrl() {
-    return this.request<{
-      authUrl: string;
-      message: string;
-    }>('/auth/google');
-  }
-
-  async handleGoogleCallback(code: string) {
+  // Apple Auth API
+  async handleAppleCallback(identityToken: string, firstName?: string | null, lastName?: string | null) {
     return this.request<{
       user: any;
       token: string;
       refreshToken: string;
-      googleAccessToken: string;
-      googleRefreshToken: string;
-    }>('/auth/google/callback', {
+    }>('/auth/apple/callback', {
       method: 'POST',
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ identityToken, firstName, lastName }),
     });
   }
 
@@ -818,7 +809,7 @@ class ApiService {
     return this.request<{ data: any[]; pagination: any }>(`/chat/messages?page=${page}&limit=${limit}`);
   }
 
-  async createChatMessage(text: string, sender: 'user' | 'lyra', isVoice = false) {
+  async createChatMessage(text: string, sender: 'user' | 'northstar', isVoice = false) {
     return this.request('/chat/messages', {
       method: 'POST',
       body: JSON.stringify({ text, sender, isVoice }),

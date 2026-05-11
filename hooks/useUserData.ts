@@ -14,7 +14,7 @@ interface UserDataContextValue {
   loading: boolean;
   error: string | null;
   updateUserData: (newData: Partial<UserData>) => Promise<void>;
-  addMessage: (text: string, sender: 'user' | 'lyra', isVoice?: boolean) => Promise<void>;
+  addMessage: (text: string, sender: 'user' | 'northstar', isVoice?: boolean) => Promise<void>;
   addJournalEntry: (content: string, mood: Mood, prompt: string) => Promise<void>;
   updateSettings: (newSettings: Partial<UserSettings>) => Promise<void>;
   refreshData: () => Promise<void>;
@@ -46,7 +46,7 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
     });
     setMessages([
       { id: 'm1', text: 'Plan my day to avoid overspending', sender: 'user', timestamp: new Date(), isVoice: false },
-      { id: 'm2', text: 'Here is a simple spending plan and 3 ways to save today 💡', sender: 'lyra', timestamp: new Date(), isVoice: false },
+      { id: 'm2', text: 'Here is a simple spending plan and 3 ways to save today 💡', sender: 'northstar', timestamp: new Date(), isVoice: false },
     ]);
     setJournalEntries([
       { id: 'j1', date: new Date(), content: 'Feeling focused and calm.', mood: 'good', prompt: 'Daily reflection' },
@@ -119,7 +119,7 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
           mood: 'neutral' as Mood,
           sleepHours: 0,
           energyLevel: 0,
-          suggestedAction: 'Welcome to Lyra! Start by checking in with your mood.',
+          suggestedAction: 'Welcome to Northstar! Start by checking in with your mood.',
         };
         setUserData(fallbackUserData);
       }
@@ -152,7 +152,7 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
         mood: 'neutral' as Mood,
         sleepHours: 0,
         energyLevel: 0,
-        suggestedAction: 'Welcome to Lyra! Start by checking in with your mood.',
+        suggestedAction: 'Welcome to Northstar! Start by checking in with your mood.',
       };
       setUserData(fallbackUserData);
     } finally {
@@ -206,7 +206,7 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
         console.log('[useUserData] Using mock user data...');
         setMessages(prev => (prev.length ? prev : [
           { id: 'm1', text: 'Plan my day to avoid overspending', sender: 'user', timestamp: new Date(), isVoice: false },
-          { id: 'm2', text: 'Here is a simple spending plan and 3 ways to save today 💡', sender: 'lyra', timestamp: new Date(), isVoice: false },
+          { id: 'm2', text: 'Here is a simple spending plan and 3 ways to save today 💡', sender: 'northstar', timestamp: new Date(), isVoice: false },
         ]));
       }
     } else {
@@ -229,7 +229,7 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
         const transformedMessages: Message[] = chatResponse.data.data.map((message: any) => ({
           id: message.id,
           text: message.text,
-          sender: message.sender as 'user' | 'lyra',
+          sender: message.sender as 'user' | 'northstar',
           timestamp: new Date(message.createdAt),
           isVoice: message.isVoice || false,
         }));
@@ -418,7 +418,7 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
     }
   }, [isAuthenticated, isMockUser]);
 
-  const addMessage = useCallback(async (text: string, sender: 'user' | 'lyra', isVoice = false) => {
+  const addMessage = useCallback(async (text: string, sender: 'user' | 'northstar', isVoice = false) => {
     if (isMockUser) {
       const newMessage: Message = { id: Date.now().toString(), text, sender, timestamp: new Date(), isVoice };
       setMessages(prev => [...prev, newMessage]);
@@ -439,7 +439,7 @@ export function UserDataProvider({ children }: { children: ReactNode }) {
         const savedMessage: Message = {
           id: (response.data as any).id || newMessage.id,
           text: (response.data as any).text || text,
-          sender: (response.data as any).sender as 'user' | 'lyra' || sender,
+          sender: (response.data as any).sender as 'user' | 'northstar' || sender,
           timestamp: (response.data as any).createdAt ? new Date((response.data as any).createdAt) : new Date(),
           isVoice: (response.data as any).isVoice || false,
         };

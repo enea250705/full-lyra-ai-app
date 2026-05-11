@@ -11,7 +11,7 @@ export interface UserData {
 export interface Message {
   id: string;
   text: string;
-  sender: 'user' | 'lyra';
+  sender: 'user' | 'northstar';
   timestamp: Date;
   isVoice?: boolean;
 }

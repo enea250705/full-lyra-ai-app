@@ -7,7 +7,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
-    <string>Lyra - AI Life Companion</string>
+    <string>Northstar - Your AI Operating System</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -28,7 +28,7 @@
         <key>CFBundleURLSchemes</key>
         <array>
           <string>myapp</string>
-          <string>com.getlyra.app</string>
+          <string>com.getnorthstar.app</string>
         </array>
       </dict>
       <dict>
@@ -54,19 +54,19 @@
       <true/>
     </dict>
     <key>NSHealthShareUsageDescription</key>
-    <string>Lyra needs access to your sleep data to provide personalized insights and track your sleep patterns automatically.</string>
+    <string>Northstar needs access to your sleep data to provide personalized insights and track your sleep patterns automatically.</string>
     <key>NSHealthUpdateUsageDescription</key>
-    <string>Lyra wants to save sleep data to your Health app to keep your health information synchronized.</string>
+    <string>Northstar wants to save sleep data to your Health app to keep your health information synchronized.</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-    <string>Lyra uses your location to provide weather insights and location-based recommendations.</string>
+    <string>Northstar uses your location to provide weather insights and location-based recommendations.</string>
     <key>NSLocationWhenInUseUsageDescription</key>
-    <string>Lyra uses your location to provide weather insights and location-based recommendations.</string>
+    <string>Northstar uses your location to provide weather insights and location-based recommendations.</string>
     <key>NSUserActivityTypes</key>
     <array>
       <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
     </array>
     <key>NSUserNotificationsUsageDescription</key>
-    <string>Lyra sends you personalized reminders and insights about your sleep patterns, mood tracking, and wellness goals.</string>
+    <string>Northstar sends you personalized reminders and insights about your sleep patterns, mood tracking, and wellness goals.</string>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
     <key>UIRequiredDeviceCapabilities</key>

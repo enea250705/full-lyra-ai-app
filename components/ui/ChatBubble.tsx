@@ -118,7 +118,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({
             }
           </Text>
           
-          {/* Action Buttons for Lyra messages */}
+          {/* Action Buttons for Northstar messages */}
           {!isUser && (
             <View style={styles.actionButtons}>
               <TouchableOpacity

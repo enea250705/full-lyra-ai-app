@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../../components/ui/Button';
 import { colors } from '../../constants/colors';
 import { useI18n } from '../../i18n';
+import * as AppleAuthentication from 'expo-apple-authentication';
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -13,7 +14,7 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const { register, isLoading } = useAuth();
+  const { register, loginWithApple, isLoading } = useAuth();
   const router = useRouter();
   const { t } = useI18n();
 
@@ -84,7 +85,7 @@ export default function Register() {
         >
           <View style={styles.content}>
             <View style={styles.titleContainer}>
-              <Text style={styles.lyraText}>LYRA</Text>
+              <Text style={styles.lyraText}>NORTHSTAR</Text>
               <Text style={styles.title}>{t('auth.register.title')}</Text>
               <Text style={styles.subtitle}>{t('auth.register.subtitle')}</Text>
             </View>
@@ -164,6 +165,31 @@ export default function Register() {
                   textStyle={styles.registerButtonText}
                 />
               </LinearGradient>
+
+              {Platform.OS === 'ios' && (
+                <View>
+                  <View style={styles.divider}>
+                    <View style={styles.dividerLine} />
+                    <Text style={styles.dividerText}>{t('auth.register.divider_or')}</Text>
+                    <View style={styles.dividerLine} />
+                  </View>
+
+                  <AppleAuthentication.AppleAuthenticationButton
+                    buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_UP}
+                    buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                    cornerRadius={15}
+                    style={{ width: '100%', height: 55, marginTop: 5 }}
+                    onPress={async () => {
+                      try {
+                        await loginWithApple();
+                        router.replace('/(tabs)');
+                      } catch (error) {
+                        // Handled in context
+                      }
+                    }}
+                  />
+                </View>
+              )}
 
             </View>
             

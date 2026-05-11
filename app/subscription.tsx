@@ -280,7 +280,7 @@ export default function SubscriptionScreen() {
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Questions? Contact us at support@lyra-ai.com
+            Questions? Contact us at support@northstar-ai.com
           </Text>
         </View>
       </ScrollView>

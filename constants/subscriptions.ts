@@ -1,9 +1,9 @@
 // Native subscription product IDs - must match App Store Connect and Google Play Console
 export const SUBSCRIPTION_PRODUCTS = {
-  PRO_MONTHLY: 'lyra_pro_monthly',
-  PRO_YEARLY: 'lyra_pro_yearly', 
-  PREMIUM_MONTHLY: 'lyra_premium_monthly',
-  PREMIUM_YEARLY: 'lyra_premium_yearly',
+  PRO_MONTHLY: 'northstar_pro_monthly',
+  PRO_YEARLY: 'northstar_pro_yearly', 
+  PREMIUM_MONTHLY: 'northstar_premium_monthly',
+  PREMIUM_YEARLY: 'northstar_premium_yearly',
 } as const;
 
 export const SUBSCRIPTION_PLANS = [

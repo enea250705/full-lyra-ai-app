@@ -251,7 +251,7 @@ export const usePermissions = () => {
       if (grantedPermissions.length > 0) {
         Alert.alert(
           'Permissions Granted ✅',
-          `Great! You've granted access to: ${grantedPermissions.join(', ')}. This will help Lyra provide personalized insights.`,
+          `Great! You've granted access to: ${grantedPermissions.join(', ')}. This will help Northstar provide personalized insights.`,
           [{ text: 'Continue', style: 'default' }]
         );
       }
@@ -259,7 +259,7 @@ export const usePermissions = () => {
       if (deniedPermissions.length > 0) {
         Alert.alert(
           'Some Permissions Denied',
-          `You can still use Lyra, but some features may be limited. You can enable these permissions later in Settings:\n\n${deniedPermissions.join('\n')}`,
+          `You can still use Northstar, but some features may be limited. You can enable these permissions later in Settings:\n\n${deniedPermissions.join('\n')}`,
           [{ text: 'OK', style: 'default' }]
         );
       }

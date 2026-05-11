@@ -1,7 +1,7 @@
-# 🚀 Lyra AI - Free Launch Version
+# 🚀 Northstar AI - Free Launch Version
 
 ## Overview
-Lyra has been configured for a **fast public launch** with all features available **FREE** to all users! Subscription plans and monetization will be introduced in future updates.
+Northstar has been configured for a **fast public launch** with all features available **FREE** to all users! Subscription plans and monetization will be introduced in future updates.
 
 ---
 

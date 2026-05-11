@@ -7,15 +7,15 @@
 2. **Navigate to:** Your App → Features → In-App Purchases
 3. **Create subscription groups:**
 
-#### **Subscription Group: "Lyra Pro Plans"**
-- **Group Name:** Lyra Pro Plans
+#### **Subscription Group: "Northstar Pro Plans"**
+- **Group Name:** Northstar Pro Plans
 - **Group Reference Name:** lyra_pro_plans
 
 #### **Individual Subscriptions:**
 
 **Pro Monthly:**
 - **Product ID:** `lyra_pro_monthly`
-- **Reference Name:** Lyra Pro Monthly
+- **Reference Name:** Northstar Pro Monthly
 - **Duration:** 1 Month
 - **Price:** €9.99
 - **Family Sharing:** Enabled
@@ -23,7 +23,7 @@
 
 **Pro Yearly:**
 - **Product ID:** `lyra_pro_yearly`
-- **Reference Name:** Lyra Pro Yearly  
+- **Reference Name:** Northstar Pro Yearly  
 - **Duration:** 1 Year
 - **Price:** €99.99 (2 months free)
 - **Family Sharing:** Enabled
@@ -31,7 +31,7 @@
 
 **Premium Monthly:**
 - **Product ID:** `lyra_premium_monthly`
-- **Reference Name:** Lyra Premium Monthly
+- **Reference Name:** Northstar Premium Monthly
 - **Duration:** 1 Month
 - **Price:** €19.99
 - **Family Sharing:** Enabled
@@ -39,7 +39,7 @@
 
 **Premium Yearly:**
 - **Product ID:** `lyra_premium_yearly`
-- **Reference Name:** Lyra Premium Yearly
+- **Reference Name:** Northstar Premium Yearly
 - **Duration:** 1 Year
 - **Price:** €199.99 (2 months free)
 - **Family Sharing:** Enabled
@@ -62,7 +62,7 @@ Create `Products.storekit` file in Xcode:
     {
       "id" : "21482820",
       "localizations" : [],
-      "name" : "Lyra Pro Plans",
+      "name" : "Northstar Pro Plans",
       "subscriptions" : [
         {
           "adHocOffers" : [],
@@ -79,7 +79,7 @@ Create `Products.storekit` file in Xcode:
           "localizations" : [
             {
               "description" : "AI-powered spending protection with mood correlation and smart interventions",
-              "displayName" : "Lyra Pro",
+              "displayName" : "Northstar Pro",
               "locale" : "en_US"
             }
           ],
@@ -110,7 +110,7 @@ Create `Products.storekit` file in Xcode:
 
 **Pro Monthly:**
 - **Product ID:** `lyra_pro_monthly`
-- **Name:** Lyra Pro
+- **Name:** Northstar Pro
 - **Description:** AI-powered spending protection
 - **Billing Period:** 1 month
 - **Price:** €9.99
@@ -119,7 +119,7 @@ Create `Products.storekit` file in Xcode:
 
 **Pro Yearly:**
 - **Product ID:** `lyra_pro_yearly`
-- **Name:** Lyra Pro (Yearly)
+- **Name:** Northstar Pro (Yearly)
 - **Description:** AI-powered spending protection - Save 17%
 - **Billing Period:** 12 months
 - **Price:** €99.99
@@ -127,7 +127,7 @@ Create `Products.storekit` file in Xcode:
 
 **Premium Monthly:**
 - **Product ID:** `lyra_premium_monthly`
-- **Name:** Lyra Premium
+- **Name:** Northstar Premium
 - **Description:** Complete life operating system with unlimited features
 - **Billing Period:** 1 month
 - **Price:** €19.99
@@ -135,7 +135,7 @@ Create `Products.storekit` file in Xcode:
 
 **Premium Yearly:**
 - **Product ID:** `lyra_premium_yearly`
-- **Name:** Lyra Premium (Yearly)
+- **Name:** Northstar Premium (Yearly)
 - **Description:** Complete life operating system - Save 17%
 - **Billing Period:** 12 months
 - **Price:** €199.99

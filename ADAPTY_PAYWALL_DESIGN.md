@@ -1,4 +1,4 @@
-# Lyra AI - Custom Paywall Design Specification
+# Northstar AI - Custom Paywall Design Specification
 
 ## 🎨 **EXACT DESIGN FOR ADAPTY VISUAL BUILDER**
 

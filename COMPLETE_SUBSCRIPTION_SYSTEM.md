@@ -24,7 +24,7 @@ Your complete subscription system with all 3 tiers (FREE, PRO, PREMIUM) is now *
 - ✅ **Mood-spending correlation** - "You overspend when stressed"
 - ✅ **Calendar management** - reschedule when tired/overwhelmed
 - ✅ **Push notifications** - real-time intervention alerts
-- ✅ **Savings counter** - track exactly how much Lyra saved you (`savingsCounterService.ts`)
+- ✅ **Savings counter** - track exactly how much Northstar saved you (`savingsCounterService.ts`)
 - ✅ **Data retention**: 6 months history
 
 ### 👑 **PREMIUM PLAN (€19.99/month)** - Power users
@@ -144,7 +144,7 @@ STRIPE_WEBHOOK_SECRET=whsec_... # Your webhook secret
 - **Churn prediction** - Identify at-risk users
 
 ### User Insights
-- **Savings counter** - "Lyra saved you €245 this month"
+- **Savings counter** - "Northstar saved you €245 this month"
 - **Intervention history** - Track all prevented purchases
 - **Mood patterns** - Correlation analysis
 - **Behavioral insights** - Spending pattern recognition
