@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS chat_messages (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     text TEXT NOT NULL,
-    sender VARCHAR(10) NOT NULL CHECK (sender IN ('user', 'lyra')),
+    sender VARCHAR(15) NOT NULL CHECK (sender IN ('user', 'northstar')),
     is_voice BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -23,7 +23,7 @@ CREATE INDEX IF NOT EXISTS idx_chat_messages_sender ON chat_messages(sender);
 COMMENT ON TABLE chat_messages IS 'Stores chat messages between users and Lyra AI';
 COMMENT ON COLUMN chat_messages.user_id IS 'Reference to the user who owns this message';
 COMMENT ON COLUMN chat_messages.text IS 'The content of the chat message';
-COMMENT ON COLUMN chat_messages.sender IS 'Who sent the message: user or lyra';
+COMMENT ON COLUMN chat_messages.sender IS 'Who sent the message: user or northstar';
 COMMENT ON COLUMN chat_messages.is_voice IS 'Whether this message was sent via voice input';
 COMMENT ON COLUMN chat_messages.created_at IS 'Timestamp when the message was created';
 

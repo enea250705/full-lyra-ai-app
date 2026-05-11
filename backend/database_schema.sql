@@ -200,7 +200,7 @@ CREATE TABLE chat_messages (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     text TEXT NOT NULL,
-    sender VARCHAR(10) NOT NULL CHECK (sender IN ('user', 'lyra')),
+    sender VARCHAR(15) NOT NULL CHECK (sender IN ('user', 'northstar')),
     is_voice BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
