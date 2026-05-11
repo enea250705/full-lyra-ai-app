@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // API Configuration
 const API_BASE_URL = (process.env.EXPO_PUBLIC_API_URL && process.env.EXPO_PUBLIC_API_URL.trim().length > 0
   ? process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '')
-  : 'https://lyra-backend-xn4o.onrender.com/api/v1');
+  : 'https://full-lyra-ai-app.onrender.com/api/v1');
 
 // Add timeout and additional options for better error handling
 const API_TIMEOUT = 30000; // 30 seconds

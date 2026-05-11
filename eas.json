@@ -11,7 +11,7 @@
         "resourceClass": "m1-medium"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://lyra-backend-xn4o.onrender.com/api/v1"
+        "EXPO_PUBLIC_API_URL": "https://full-lyra-ai-app.onrender.com/api/v1"
       }
     },
     "preview": {
@@ -21,7 +21,7 @@
         "resourceClass": "m1-medium"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://lyra-backend-xn4o.onrender.com/api/v1"
+        "EXPO_PUBLIC_API_URL": "https://full-lyra-ai-app.onrender.com/api/v1"
       }
     },
     "production": {
@@ -30,7 +30,7 @@
         "resourceClass": "m1-medium"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://lyra-backend-xn4o.onrender.com/api/v1"
+        "EXPO_PUBLIC_API_URL": "https://full-lyra-ai-app.onrender.com/api/v1"
       }
     },
     "testflight": {
@@ -40,7 +40,7 @@
         "resourceClass": "m1-medium"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://lyra-backend-xn4o.onrender.com/api/v1"
+        "EXPO_PUBLIC_API_URL": "https://full-lyra-ai-app.onrender.com/api/v1"
       }
     }
   },

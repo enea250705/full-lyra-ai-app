@@ -53,7 +53,7 @@ export default function ChatScreen() {
       // Use real AI chat endpoint
       const base = (process.env.EXPO_PUBLIC_API_URL && process.env.EXPO_PUBLIC_API_URL.trim().length > 0
         ? process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '')
-        : 'https://lyra-backend-xn4o.onrender.com/api/v1');
+        : 'https://full-lyra-ai-app.onrender.com/api/v1');
       const response = await fetch(`${base}/ai/chat`, {
         method: 'POST',
         headers: {
@@ -117,7 +117,7 @@ export default function ChatScreen() {
                       // Execute the confirmed action
                       const base = (process.env.EXPO_PUBLIC_API_URL && process.env.EXPO_PUBLIC_API_URL.trim().length > 0
                         ? process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '')
-                        : 'https://lyra-backend-xn4o.onrender.com/api/v1');
+                        : 'https://full-lyra-ai-app.onrender.com/api/v1');
                       const confirmResponse = await fetch(`${base}/ai/execute-action`, {
                         method: 'POST',
                         headers: {
@@ -204,7 +204,7 @@ export default function ChatScreen() {
           {
             const base = (process.env.EXPO_PUBLIC_API_URL && process.env.EXPO_PUBLIC_API_URL.trim().length > 0
               ? process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '')
-              : 'https://lyra-backend-xn4o.onrender.com/api/v1');
+              : 'https://full-lyra-ai-app.onrender.com/api/v1');
             apiResponse = await fetch(`${base}/ai/execute-action`, {
             method: 'POST',
             headers: {
@@ -223,7 +223,7 @@ export default function ChatScreen() {
           {
             const base = (process.env.EXPO_PUBLIC_API_URL && process.env.EXPO_PUBLIC_API_URL.trim().length > 0
               ? process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '')
-              : 'https://lyra-backend-xn4o.onrender.com/api/v1');
+              : 'https://full-lyra-ai-app.onrender.com/api/v1');
             apiResponse = await fetch(`${base}/ai/execute-action`, {
             method: 'POST',
             headers: {
@@ -242,7 +242,7 @@ export default function ChatScreen() {
           {
             const base = (process.env.EXPO_PUBLIC_API_URL && process.env.EXPO_PUBLIC_API_URL.trim().length > 0
               ? process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '')
-              : 'https://lyra-backend-xn4o.onrender.com/api/v1');
+              : 'https://full-lyra-ai-app.onrender.com/api/v1');
             apiResponse = await fetch(`${base}/ai/execute-action`, {
             method: 'POST',
             headers: {

@@ -134,7 +134,7 @@ export function useApiRequest() {
         })();
         const base = (process.env.EXPO_PUBLIC_API_URL && process.env.EXPO_PUBLIC_API_URL.trim().length > 0
           ? process.env.EXPO_PUBLIC_API_URL.replace(/\/$/, '')
-          : 'https://lyra-backend-xn4o.onrender.com/api/v1');
+          : 'https://full-lyra-ai-app.onrender.com/api/v1');
         const res = await fetch(`${base}${path}`, {
           ...init,
           headers: { ...headers, ...(init?.headers as any) },
